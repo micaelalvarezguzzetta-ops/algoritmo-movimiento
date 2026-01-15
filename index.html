@@ -6528,7 +6528,24 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             
             closeAfiliadosModal();
         }
+        
+        // ========================================
+        // CARGAR DATOS AL INICIAR PÁGINA
+        // ========================================
+        
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Página cargada');
+            
+            // Si el usuario está logueado, cargar sus créditos
+            const userRegistered = localStorage.getItem('userRegistered');
+            const userType = localStorage.getItem('userType');
+            const userCreditos = localStorage.getItem('userCreditos');
+            
+            if (userRegistered === 'true' && userType === 'artista' && userCreditos) {
+                console.log('💰 Cargando créditos:', userCreditos);
+                document.getElementById('creditosStandard').textContent = userCreditos;
+            }
+        });
     </script>
 </body>
 </html>
-
