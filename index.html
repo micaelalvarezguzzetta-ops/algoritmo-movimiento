@@ -423,7 +423,7 @@
                     💰<span class="badge" id="creditosStandard">0</span>
                 </button>
                 <button class="nav-icon-btn" onclick="openNotificacionesModal()" title="Notificaciones">
-                    🔔<span class="badge notification-badge" id="notificationCount">3</span>
+                    🔔<span class="badge notification-badge" id="notificationCount" style="display: none;">0</span>
                 </button>
                 <div class="user-avatar" onclick="openPerfilModal()" style="cursor: pointer;" title="Mi Perfil">
                     <span id="userInitial">U</span>
@@ -4583,11 +4583,15 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 document.getElementById('artistaName').textContent = name;
                 // Actualizar créditos en navbar
                 document.getElementById('creditosStandard').textContent = data[0].creditos || 0;
+                // Actualizar inicial en avatar
+                document.getElementById('userInitial').textContent = name.charAt(0).toUpperCase();
             } else if(userType === 'curador'){
                 console.log('💰 Activando panel de CURADOR');
                 document.getElementById('curadorPanel').classList.add('active');
                 document.getElementById('curadorName').textContent = name;
                 document.getElementById('curadorPuntosDisplay').textContent = '0';
+                // Actualizar inicial en avatar
+                document.getElementById('userInitial').textContent = name.charAt(0).toUpperCase();
                 // Verificar puntos pendientes
                 setTimeout(() => {
                     inicializarCurador();
@@ -6180,11 +6184,15 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     document.getElementById('artistaName').textContent = data.nombre;
                     // Actualizar créditos en navbar
                     document.getElementById('creditosStandard').textContent = data.creditos || 0;
+                    // Actualizar inicial en avatar
+                    document.getElementById('userInitial').textContent = data.nombre.charAt(0).toUpperCase();
                 } else {
                     document.getElementById('curadorPanel').classList.add('active');
                     document.getElementById('curadorName').textContent = data.nombre;
                     // Cargar puntos del curador
                     document.getElementById('curadorPuntosDisplay').textContent = data.puntos || 0;
+                    // Actualizar inicial en avatar
+                    document.getElementById('userInitial').textContent = data.nombre.charAt(0).toUpperCase();
                     // Verificar y liberar puntos pendientes
                     setTimeout(() => {
                         inicializarCurador();
@@ -6536,16 +6544,30 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         window.addEventListener('DOMContentLoaded', function() {
             console.log('🚀 Página cargada');
             
-            // Si el usuario está logueado, cargar sus créditos
+            // Si el usuario está logueado, cargar sus datos
             const userRegistered = localStorage.getItem('userRegistered');
             const userType = localStorage.getItem('userType');
             const userCreditos = localStorage.getItem('userCreditos');
+            const userName = localStorage.getItem('userName');
             
-            if (userRegistered === 'true' && userType === 'artista' && userCreditos) {
-                console.log('💰 Cargando créditos:', userCreditos);
-                document.getElementById('creditosStandard').textContent = userCreditos;
+            if (userRegistered === 'true') {
+                // Cargar inicial del usuario en avatar
+                if (userName) {
+                    const inicial = userName.charAt(0).toUpperCase();
+                    document.getElementById('userInitial').textContent = inicial;
+                }
+                
+                // Cargar créditos si es artista
+                if (userType === 'artista' && userCreditos) {
+                    console.log('💰 Cargando créditos:', userCreditos);
+                    document.getElementById('creditosStandard').textContent = userCreditos;
+                }
+                
+                // Mostrar badge de notificaciones (vacío por ahora)
+                // document.getElementById('notificationCount').style.display = 'inline-block';
             }
         });
     </script>
 </body>
 </html>
+
