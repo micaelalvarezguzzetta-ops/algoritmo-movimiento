@@ -2398,19 +2398,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             </div>
             
             <!-- Estadísticas rápidas -->
-            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 3rem;">
-                <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 2rem; font-weight: 900; color: #10b981; margin-bottom: 0.5rem;">12</div>
-                    <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Envíos Aceptados</div>
-                </div>
-                <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 2rem; font-weight: 900; color: #7c3aed; margin-bottom: 0.5rem;">23</div>
-                    <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Total Envíos</div>
-                </div>
-                <div style="background: rgba(236, 72, 153, 0.1); border: 2px solid rgba(236, 72, 153, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 2rem; font-weight: 900; color: #ec4899; margin-bottom: 0.5rem;">24.5K</div>
-                    <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Reproducciones</div>
-                </div>
+            <div id="profileStats" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 3rem;">
+                <!-- Las estadísticas se cargan dinámicamente según el tipo de usuario -->
             </div>
             
             <!-- Cajero / Balance (solo para curadores) -->
@@ -6669,62 +6658,139 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             closeNotificacionesModal();
         }
         
-        function openPerfilModal(){
+        async function openPerfilModal(){
             console.log('🖱️ Click en Mi Perfil');
-            alert('🔍 DEBUG: openPerfilModal() llamada');
-            
-            console.log('🔍 isUserRegistered():', isUserRegistered());
-            console.log('🔍 localStorage.userRegistered:', localStorage.getItem('userRegistered'));
             
             if(!isUserRegistered()){ 
-                console.log('❌ Usuario no registrado, mostrando alert');
                 showRegisterAlert(); 
                 return; 
             }
-            
-            console.log('✅ Usuario registrado, abriendo modal');
             
             // Actualizar datos del perfil
             const userName = localStorage.getItem('userName') || 'Usuario';
             const userEmail = localStorage.getItem('userEmail') || 'usuario@example.com';
             const userType = localStorage.getItem('userType') || 'artista';
-            
-            console.log('📝 Actualizando perfil:', {userName, userEmail, userType});
+            const userId = localStorage.getItem('userId');
             
             try {
                 document.getElementById('profileName').textContent = userName;
                 document.getElementById('profileEmail').textContent = userEmail;
                 document.getElementById('profileAvatarLarge').textContent = userName.charAt(0).toUpperCase();
-                document.getElementById('userInitial').textContent = userName.charAt(0).toUpperCase();
                 
-                console.log('✅ Datos de perfil actualizados');
-            } catch(error) {
-                console.error('❌ Error actualizando datos:', error);
-            }
-            
-            // Actualizar créditos en el perfil
-            try {
-                const userType = localStorage.getItem('userType') || 'artista';
-                const creditos = localStorage.getItem('userCreditos') || 0;
-                
-                // Mostrar créditos
-                document.getElementById('profileCreditosStandard').textContent = creditos + ' 💰';
-                
-                // Mostrar/ocultar sección de cajero según tipo de usuario
-                const cajeroSection = document.getElementById('profileCajeroSection');
-                if (userType === 'curador') {
-                    cajeroSection.style.display = 'block';
-                    // Aquí cargaríamos el balance del curador desde Supabase
-                    document.getElementById('profileBalance').textContent = '0.00 €';
-                    document.getElementById('profileTotalEarnings').textContent = '0.00 €';
-                    document.getElementById('profileWithdrawn').textContent = '0.00 €';
-                } else {
-                    cajeroSection.style.display = 'none';
+                // Actualizar tipo de usuario mostrado
+                const tipoTexto = userType === 'artista' ? '👤 Artista' : '👤 Curador';
+                const tipoElement = document.querySelector('#modalPerfil p[style*="Artista"]');
+                if (tipoElement) {
+                    tipoElement.innerHTML = `${tipoTexto} • Miembro desde Enero 2026`;
                 }
                 
-                console.log('✅ Créditos actualizados');
+                // Cargar datos desde Supabase
+                const { data: usuario, error } = await supabaseClient
+                    .from('usuarios')
+                    .select('*')
+                    .eq('id', userId)
+                    .single();
+                
+                if (!error && usuario) {
+                    if (userType === 'artista') {
+                        // Cargar estadísticas de artista
+                        const statsContainer = document.getElementById('profileStats');
+                        statsContainer.innerHTML = `
+                            <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                                <div style="font-size: 2rem; font-weight: 900; color: #10b981; margin-bottom: 0.5rem;" id="statEnviosAceptados">0</div>
+                                <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Envíos Aceptados</div>
+                            </div>
+                            <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                                <div style="font-size: 2rem; font-weight: 900; color: #7c3aed; margin-bottom: 0.5rem;" id="statTotalEnvios">0</div>
+                                <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Total Envíos</div>
+                            </div>
+                            <div style="background: rgba(236, 72, 153, 0.1); border: 2px solid rgba(236, 72, 153, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                                <div style="font-size: 2rem; font-weight: 900; color: #ec4899; margin-bottom: 0.5rem;" id="statReproducciones">0</div>
+                                <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Reproducciones</div>
+                            </div>
+                        `;
+                        
+                        // TODO: Cargar estadísticas reales desde Supabase
+                        
+                        // Mostrar créditos
+                        document.getElementById('profileCreditosStandard').textContent = (usuario.creditos || 0) + ' 💰';
+                        
+                        // Ocultar sección de cajero
+                        document.getElementById('profileCajeroSection').style.display = 'none';
+                        
+                        // Cambiar texto del plan
+                        const planElement = document.querySelector('#modalPerfil [style*="Plan actual"]');
+                        if (planElement) {
+                            planElement.nextElementSibling.textContent = 'Créditos por demanda';
+                        }
+                        
+                        // Mostrar botón comprar créditos
+                        const btnComprar = document.querySelector('button[onclick="comprarCreditos()"]');
+                        if (btnComprar) {
+                            btnComprar.textContent = '💳 Comprar Créditos';
+                            btnComprar.setAttribute('onclick', 'openCreditosModal(); closePerfilModal();');
+                        }
+                        
+                    } else if (userType === 'curador') {
+                        // Cargar estadísticas de curador
+                        const statsContainer = document.getElementById('profileStats');
+                        statsContainer.innerHTML = `
+                            <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                                <div style="font-size: 2rem; font-weight: 900; color: #10b981; margin-bottom: 0.5rem;" id="statEnviosAceptados">0</div>
+                                <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Envíos Aceptados</div>
+                            </div>
+                            <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                                <div style="font-size: 2rem; font-weight: 900; color: #ef4444; margin-bottom: 0.5rem;" id="statEnviosRechazados">0</div>
+                                <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Envíos Rechazados</div>
+                            </div>
+                            <div style="background: rgba(251, 191, 36, 0.1); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                                <div style="font-size: 2rem; font-weight: 900; color: #fbbf24; margin-bottom: 0.5rem;" id="statEnviosPendientes">0</div>
+                                <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Envíos Pendientes</div>
+                            </div>
+                            <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center; grid-column: span 2;">
+                                <div style="font-size: 2rem; font-weight: 900; color: #7c3aed; margin-bottom: 0.5rem;">${usuario.puntos || 0} ⭐</div>
+                                <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Total Puntos</div>
+                            </div>
+                            <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                                <div style="font-size: 2rem; font-weight: 900; color: #10b981; margin-bottom: 0.5rem;">${(usuario.balance || 0).toFixed(2)} €</div>
+                                <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Dinero Acumulado</div>
+                            </div>
+                        `;
+                        
+                        // TODO: Cargar estadísticas reales de envíos desde Supabase
+                        
+                        // Mostrar puntos
+                        document.getElementById('profileCreditosStandard').textContent = (usuario.puntos || 0) + ' ⭐';
+                        
+                        // Cambiar label de "Créditos" a "Puntos"
+                        const creditosLabel = document.querySelector('#modalPerfil span[style*="Créditos"]');
+                        if (creditosLabel) {
+                            creditosLabel.textContent = 'Puntos:';
+                        }
+                        
+                        // Mostrar sección de cajero
+                        document.getElementById('profileCajeroSection').style.display = 'block';
+                        document.getElementById('profileBalance').textContent = (usuario.balance || 0).toFixed(2) + ' €';
+                        document.getElementById('profileTotalEarnings').textContent = '0.00 €'; // TODO: calcular
+                        document.getElementById('profileWithdrawn').textContent = '0.00 €'; // TODO: calcular
+                        
+                        // Cambiar texto del plan
+                        const planElement = document.querySelector('#modalPerfil [style*="Plan actual"]');
+                        if (planElement) {
+                            planElement.nextElementSibling.textContent = 'Gana por aceptar envíos';
+                        }
+                        
+                        // Cambiar botón a "Canjear Puntos"
+                        const btnComprar = document.querySelector('button[onclick="comprarCreditos()"]');
+                        if (btnComprar) {
+                            btnComprar.textContent = '⭐ Canjear Puntos';
+                            btnComprar.setAttribute('onclick', 'openMisPuntosModal(); closePerfilModal();');
+                        }
+                    }
+                }
+                
             } catch(error) {
-                console.error('❌ Error actualizando créditos:', error);
+                console.error('❌ Error actualizando datos:', error);
             }
             
             console.log('🎭 Intentando activar modal...');
