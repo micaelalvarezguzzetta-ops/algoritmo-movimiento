@@ -1,0 +1,8 @@
+{
+  "name": "algoritmo-en-movimiento",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "stripe": "^14.10.0"
+  }
+}
