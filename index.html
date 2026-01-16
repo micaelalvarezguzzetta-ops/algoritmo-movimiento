@@ -6541,26 +6541,39 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         // CARGAR DATOS AL INICIAR PÁGINA
         // ========================================
         
-        window.addEventListener('DOMContentLoaded', function() {
+        window.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 Página cargada');
             
             // Si el usuario está logueado, cargar sus datos
             const userRegistered = localStorage.getItem('userRegistered');
             const userType = localStorage.getItem('userType');
-            const userCreditos = localStorage.getItem('userCreditos');
+            const userId = localStorage.getItem('userId');
             const userName = localStorage.getItem('userName');
             
-            if (userRegistered === 'true') {
+            if (userRegistered === 'true' && userId) {
                 // Cargar inicial del usuario en avatar
                 if (userName) {
                     const inicial = userName.charAt(0).toUpperCase();
                     document.getElementById('userInitial').textContent = inicial;
                 }
                 
-                // Cargar créditos si es artista
-                if (userType === 'artista' && userCreditos) {
-                    console.log('💰 Cargando créditos:', userCreditos);
-                    document.getElementById('creditosStandard').textContent = userCreditos;
+                // Cargar créditos ACTUALIZADOS desde Supabase
+                if (userType === 'artista') {
+                    try {
+                        const { data, error } = await supabaseClient
+                            .from('usuarios')
+                            .select('creditos')
+                            .eq('id', userId)
+                            .single();
+                        
+                        if (data && !error) {
+                            console.log('💰 Créditos cargados desde BD:', data.creditos);
+                            document.getElementById('creditosStandard').textContent = data.creditos || 0;
+                            localStorage.setItem('userCreditos', data.creditos);
+                        }
+                    } catch (err) {
+                        console.error('Error cargando créditos:', err);
+                    }
                 }
                 
                 // Mostrar badge de notificaciones (vacío por ahora)
@@ -6570,3 +6583,4 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
     </script>
 </body>
 </html>
+
