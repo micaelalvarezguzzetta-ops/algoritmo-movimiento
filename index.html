@@ -432,7 +432,7 @@
         </div>
     </nav>
 
-    <button class="btn-logout hidden" id="logoutBtn">Cerrar Sesión</button>
+    <button class="btn-logout hidden" id="logoutBtn" onclick="cerrarSesion()">Cerrar Sesión</button>
 
     <section id="inicio" class="hero">
         <div class="container">
@@ -544,12 +544,6 @@
                         <p class="panel-card-desc">1.50€ - 3.00€</p>
                         <button class="panel-card-btn">Comprar</button>
                     </div>
-                    <div class="panel-card" onclick="cerrarSesion()" style="background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3);">
-                        <div class="panel-card-icon">🚪</div>
-                        <h3 class="panel-card-title">Cerrar Sesión</h3>
-                        <p class="panel-card-desc">Salir de la cuenta</p>
-                        <button class="panel-card-btn" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">Salir</button>
-                    </div>
                 </div>
             </div>
 
@@ -605,12 +599,6 @@
                         <h3 class="panel-card-title">Retirar Fondos</h3>
                         <p class="panel-card-desc">Transferir ganancias</p>
                         <button class="panel-card-btn">Retirar</button>
-                    </div>
-                    <div class="panel-card" onclick="cerrarSesion()" style="background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3);">
-                        <div class="panel-card-icon">🚪</div>
-                        <h3 class="panel-card-title">Cerrar Sesión</h3>
-                        <p class="panel-card-desc">Salir de la cuenta</p>
-                        <button class="panel-card-btn" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">Salir</button>
                     </div>
                 </div>
             </div>
@@ -6400,6 +6388,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 // Ocultar auth panel
                 document.getElementById('authPanel').classList.add('hidden');
                 
+                // Mostrar botón de cerrar sesión
+                document.getElementById('logoutBtn').classList.remove('hidden');
+                
                 // Mostrar panel según tipo
                 document.getElementById('artistaPanel').classList.remove('active');
                 document.getElementById('curadorPanel').classList.remove('active');
@@ -6870,6 +6861,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             const userName = localStorage.getItem('userName');
             
             if (userRegistered === 'true' && userId) {
+                // Mostrar botón de cerrar sesión
+                document.getElementById('logoutBtn').classList.remove('hidden');
+                
                 // Cargar inicial del usuario en avatar
                 if (userName) {
                     const inicial = userName.charAt(0).toUpperCase();
