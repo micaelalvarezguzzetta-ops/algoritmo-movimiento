@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -605,7 +606,7 @@
         </div>
     </section>
 
-    <section id="como-funciona" class="section section-dark">
+    <section id="como-funciona" class="section section-dark hidden" data-require-login="true">
         <div class="container">
             <h2 class="section-title" id="comoFuncionaTitulo">CÓMO FUNCIONA</h2>
             <p class="section-subtitle" id="comoFuncionaSubtitulo">Tu música en playlists en 5 sencillos pasos</p>
@@ -639,7 +640,7 @@
         </div>
     </section>
 
-    <section id="servicios" class="section">
+    <section id="servicios" class="section hidden" data-require-login="true">
         <div class="container">
             <h2 class="section-title" id="serviciosTitulo">SERVICIOS</h2>
             <p class="section-subtitle" id="serviciosSubtitulo">Impulsa tu música</p>
@@ -668,7 +669,7 @@
         </div>
     </section>
 
-    <section id="precios" class="section section-dark">
+    <section id="precios" class="section section-dark hidden" data-require-login="true">
         <div class="container">
             <h2 class="section-title">PRECIOS</h2>
             <p class="section-subtitle">Transparentes y sin sorpresas</p>
@@ -2394,7 +2395,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 </div>
                 <h3 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem;" id="profileName">Micael Alvarez Guzzetta</h3>
                 <p style="color: rgba(255,255,255,0.6); font-size: 1rem;" id="profileEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="04696d6765616844617c65697468612a676b69">[email&#160;protected]</a></p>
-                <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-top: 0.5rem;">👤 Artista • Miembro desde Enero 2026</p>
+                <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-top: 0.5rem;" id="profileTipoUsuario">👤 Artista • Miembro desde Enero 2026</p>
             </div>
             
             <!-- Estadísticas rápidas -->
@@ -2438,10 +2439,10 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 <div style="display: grid; gap: 1rem;">
                     <div style="display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
                         <span style="color: rgba(255,255,255,0.6);">Plan actual:</span>
-                        <span style="font-weight: 700; color: #10b981;">Créditos por demanda</span>
+                        <span style="font-weight: 700; color: #10b981;" id="profilePlanActual">Créditos por demanda</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                        <span style="color: rgba(255,255,255,0.6);">Créditos:</span>
+                        <span style="color: rgba(255,255,255,0.6);" id="profileCreditosLabel">Créditos:</span>
                         <span style="font-weight: 700;" id="profileCreditosStandard">0 💰</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: 1rem 0;">
@@ -6380,6 +6381,11 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 // Mostrar botón de cerrar sesión
                 document.getElementById('logoutBtn').classList.remove('hidden');
                 
+                // Mostrar secciones que requieren login
+                document.querySelectorAll('[data-require-login]').forEach(section => {
+                    section.classList.remove('hidden');
+                });
+                
                 // Mostrar panel según tipo
                 document.getElementById('artistaPanel').classList.remove('active');
                 document.getElementById('curadorPanel').classList.remove('active');
@@ -6679,10 +6685,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
                 // Actualizar tipo de usuario mostrado
                 const tipoTexto = userType === 'artista' ? '👤 Artista' : '👤 Curador';
-                const tipoElement = document.querySelector('#modalPerfil p[style*="Artista"]');
-                if (tipoElement) {
-                    tipoElement.innerHTML = `${tipoTexto} • Miembro desde Enero 2026`;
-                }
+                document.getElementById('profileTipoUsuario').textContent = `${tipoTexto} • Miembro desde Enero 2026`;
                 
                 // Cargar datos desde Supabase
                 const { data: usuario, error } = await supabaseClient
@@ -6718,14 +6721,12 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         // Ocultar sección de cajero
                         document.getElementById('profileCajeroSection').style.display = 'none';
                         
-                        // Cambiar texto del plan
-                        const planElement = document.querySelector('#modalPerfil [style*="Plan actual"]');
-                        if (planElement) {
-                            planElement.nextElementSibling.textContent = 'Créditos por demanda';
-                        }
+                        // Actualizar textos
+                        document.getElementById('profilePlanActual').textContent = 'Créditos por demanda';
+                        document.getElementById('profileCreditosLabel').textContent = 'Créditos:';
                         
                         // Mostrar botón comprar créditos
-                        const btnComprar = document.querySelector('button[onclick="comprarCreditos()"]');
+                        const btnComprar = document.querySelector('button[onclick*="comprarCreditos"]');
                         if (btnComprar) {
                             btnComprar.textContent = '💳 Comprar Créditos';
                             btnComprar.setAttribute('onclick', 'openCreditosModal(); closePerfilModal();');
@@ -6762,11 +6763,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         // Mostrar puntos
                         document.getElementById('profileCreditosStandard').textContent = (usuario.puntos || 0) + ' ⭐';
                         
-                        // Cambiar label de "Créditos" a "Puntos"
-                        const creditosLabel = document.querySelector('#modalPerfil span[style*="Créditos"]');
-                        if (creditosLabel) {
-                            creditosLabel.textContent = 'Puntos:';
-                        }
+                        // Actualizar textos
+                        document.getElementById('profilePlanActual').textContent = 'Gana por aceptar envíos';
+                        document.getElementById('profileCreditosLabel').textContent = 'Puntos:';
                         
                         // Mostrar sección de cajero
                         document.getElementById('profileCajeroSection').style.display = 'block';
@@ -6774,14 +6773,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         document.getElementById('profileTotalEarnings').textContent = '0.00 €'; // TODO: calcular
                         document.getElementById('profileWithdrawn').textContent = '0.00 €'; // TODO: calcular
                         
-                        // Cambiar texto del plan
-                        const planElement = document.querySelector('#modalPerfil [style*="Plan actual"]');
-                        if (planElement) {
-                            planElement.nextElementSibling.textContent = 'Gana por aceptar envíos';
-                        }
-                        
                         // Cambiar botón a "Canjear Puntos"
-                        const btnComprar = document.querySelector('button[onclick="comprarCreditos()"]');
+                        const btnComprar = document.querySelector('button[onclick*="comprarCreditos"]');
                         if (btnComprar) {
                             btnComprar.textContent = '⭐ Canjear Puntos';
                             btnComprar.setAttribute('onclick', 'openMisPuntosModal(); closePerfilModal();');
@@ -6930,6 +6923,11 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 // Mostrar botón de cerrar sesión
                 document.getElementById('logoutBtn').classList.remove('hidden');
                 
+                // Mostrar secciones que requieren login
+                document.querySelectorAll('[data-require-login]').forEach(section => {
+                    section.classList.remove('hidden');
+                });
+                
                 // Cargar inicial del usuario en avatar
                 if (userName) {
                     const inicial = userName.charAt(0).toUpperCase();
@@ -6985,6 +6983,5 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
     </script>
 </body>
 </html>
-
 
 
