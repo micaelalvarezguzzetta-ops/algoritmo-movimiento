@@ -3161,7 +3161,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Gestiona tus playlists y configura la recepción de envíos</p>
             
             <!-- Botón agregar nueva playlist -->
-            <button onclick="agregarNuevaPlaylist()" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #10b981, #06b6d4); border: none; border-radius: 0.75rem; color: white; font-weight: 700; font-size: 1.1rem; cursor: pointer; margin-bottom: 2rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+            <button onclick="openAgregarPlaylistModal()" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #10b981, #06b6d4); border: none; border-radius: 0.75rem; color: white; font-weight: 700; font-size: 1.1rem; cursor: pointer; margin-bottom: 2rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                 <span style="font-size: 1.5rem;">➕</span>
                 <span>Agregar Nueva Playlist</span>
             </button>
@@ -5396,6 +5396,24 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 return;
             }
             
+            // Pedir nombre de la playlist
+            const nombrePlaylist = prompt('📝 ¿Cómo se llama tu playlist?', '');
+            if (!nombrePlaylist || nombrePlaylist.trim() === '') {
+                alert('⚠️ El nombre de la playlist es obligatorio.');
+                return;
+            }
+            
+            // Pedir género
+            const genero = prompt('🎵 ¿Qué género es tu playlist?\n\n(Urbano, Pop, Rock, Indie, Electrónica, etc.)', 'Urbano');
+            if (!genero || genero.trim() === '') {
+                alert('⚠️ El género es obligatorio.');
+                return;
+            }
+            
+            // Pedir número de seguidores aproximado
+            const seguidoresInput = prompt('👥 ¿Cuántos seguidores tiene aproximadamente?\n\n(Esto determina el precio: <100 FREE, 100-299 STANDARD, 300+ PREMIUM)', '0');
+            const seguidores = parseInt(seguidoresInput) || 0;
+            
             try {
                 // Extraer ID de la playlist
                 let playlistId = null;
@@ -5410,15 +5428,15 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
                 console.log('📋 Guardando playlist:', playlistId);
                 
-                // Guardar en Supabase (sin datos reales aún, solo la URL)
+                // Guardar en Supabase
                 const { data, error } = await supabaseClient
                     .from('playlists')
                     .insert({
                         curador_id: userId,
-                        nombre: 'Sincronizando...', // Se actualizará después
+                        nombre: nombrePlaylist.trim(),
                         url_spotify: url,
-                        genero: 'Sin género', // Se actualizará después
-                        seguidores: 0, // Se actualizará después
+                        genero: genero.trim(),
+                        seguidores: seguidores,
                         precio_standard: 1.5,
                         precio_premium: 3.0,
                         activa: true
@@ -5435,12 +5453,17 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
                 closeAgregarPlaylistModal();
                 
-                alert('✅ PLAYLIST AGREGADA\n\n' +
-                      'Tu playlist ha sido agregada exitosamente.\n\n' +
-                      'Ya puedes:\n' +
-                      '• Recibir envíos de artistas\n' +
-                      '• Ver la playlist en "Mis Playlists"\n\n' +
-                      'Nota: Los datos de seguidores se sincronizarán automáticamente.');
+                // Determinar tipo
+                let tipo = 'FREE';
+                if (seguidores >= 300) tipo = 'PREMIUM';
+                else if (seguidores >= 100) tipo = 'STANDARD';
+                
+                alert(`✅ PLAYLIST AGREGADA\n\n` +
+                      `📝 Nombre: ${nombrePlaylist}\n` +
+                      `🎵 Género: ${genero}\n` +
+                      `👥 Seguidores: ${seguidores}\n` +
+                      `💰 Tipo: ${tipo}\n\n` +
+                      `Ya puedes recibir envíos de artistas.`);
                 
                 // Recargar lista de playlists si está abierta
                 if (document.getElementById('modalMisPlaylists').classList.contains('active')) {
