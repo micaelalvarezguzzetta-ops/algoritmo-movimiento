@@ -2358,76 +2358,15 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             <button class="modal-close" onclick="closeNotificacionesModal()">×</button>
             <h2 style="font-size: 2rem; font-weight: 900; margin-bottom: 2rem;">🔔 Notificaciones</h2>
             
-            <!-- Lista de notificaciones -->
-            <div style="display: grid; gap: 1rem;">
-                
-                <!-- Notificación 1 - Nueva -->
-                <div style="background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; padding: 1.5rem; border-radius: 0.75rem; position: relative;">
-                    <span style="position: absolute; top: 1rem; right: 1rem; background: #10b981; color: white; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 700;">NUEVA</span>
-                    <div style="display: flex; gap: 1rem;">
-                        <div style="font-size: 2rem;">✅</div>
-                        <div>
-                            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem;" id="notifAceptadaTitulo">¡Canción aceptada!</h3>
-                            <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem; margin-bottom: 0.5rem;" id="notifAceptadaMensaje">
-                                Tu canción "Amanecer Urbano" ha sido aceptada en la playlist "Urbano Top 100" 🎉
-                            </p>
-                            <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Hace 2 horas</p>
-                        </div>
-                    </div>
+            <!-- Lista de notificaciones dinámicas -->
+            <div id="notificacionesList" style="display: grid; gap: 1rem;">
+                <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
+                    <p>No tienes notificaciones</p>
                 </div>
-                
-                <!-- Notificación 2 - Nueva -->
-                <div style="background: rgba(251, 191, 36, 0.1); border-left: 4px solid #fbbf24; padding: 1.5rem; border-radius: 0.75rem; position: relative;">
-                    <span style="position: absolute; top: 1rem; right: 1rem; background: #fbbf24; color: #1e293b; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 700;">NUEVA</span>
-                    <div style="display: flex; gap: 1rem;">
-                        <div style="font-size: 2rem;">⏱</div>
-                        <div>
-                            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem;" id="notifPendienteTitulo">Respuesta pendiente</h3>
-                            <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem; margin-bottom: 0.5rem;" id="notifPendienteMensaje">
-                                El curador de "Trap España" está revisando tu envío "Noches de Verano"
-                            </p>
-                            <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Hace 5 horas</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Notificación 3 - Nueva -->
-                <div style="background: rgba(124, 58, 237, 0.1); border-left: 4px solid #7c3aed; padding: 1.5rem; border-radius: 0.75rem; position: relative;">
-                    <span style="position: absolute; top: 1rem; right: 1rem; background: #7c3aed; color: white; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 700;">NUEVA</span>
-                    <div style="display: flex; gap: 1rem;">
-                        <div style="font-size: 2rem;">💳</div>
-                        <div>
-                            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem;">Créditos agregados</h3>
-                            <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem; margin-bottom: 0.5rem;">
-                                Se agregaron 10 créditos Premium a tu cuenta
-                            </p>
-                            <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Hace 1 día</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Notificación 4 - Leída -->
-                <div style="background: rgba(255,255,255,0.02); border-left: 4px solid rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 0.75rem; opacity: 0.7;">
-                    <div style="display: flex; gap: 1rem;">
-                        <div style="font-size: 2rem;">📊</div>
-                        <div>
-                            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem;" id="notifEstadisticasTitulo">Nuevas estadísticas disponibles</h3>
-                            <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem; margin-bottom: 0.5rem;" id="notifEstadisticasMensaje">
-                                Revisa el rendimiento de tus canciones en playlists
-                            </p>
-                            <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Hace 2 días</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Notificación 5 - Leída -->
-                <div style="background: rgba(255,255,255,0.02); border-left: 4px solid rgba(255,255,255,0.2); padding: 1.5rem; border-radius: 0.75rem; opacity: 0.7;">
-                    <div style="display: flex; gap: 1rem;">
-                        <div style="font-size: 2rem;">🎉</div>
-                        <div>
-                            <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem;" id="notifBienvenidaTitulo">¡Bienvenido a Algoritmo!</h3>
-                            <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem; margin-bottom: 0.5rem;" id="notifBienvenidaMensaje">
-                                Gracias por registrarte. Comienza a enviar tu música a playlists verificadas
+            </div>
+        </div>
+    </div>
                             </p>
                             <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Hace 3 días</p>
                         </div>
@@ -3227,88 +3166,19 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 <span>Agregar Nueva Playlist</span>
             </button>
             
-            <!-- Lista de playlists del curador (ejemplos) -->
-            <div style="display: grid; gap: 1.5rem;">
-                
-                <!-- Playlist 1 -->
-                <div style="background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 1.5rem;">
-                    <div style="display: flex; gap: 1.5rem; align-items: start;">
-                        <!-- Imagen de playlist -->
-                        <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #ec4899, #8b5cf6); border-radius: 0.75rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 3rem;">
-                            🔥
-                        </div>
-                        
-                        <!-- Info de playlist -->
-                        <div style="flex: 1;">
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                <div>
-                                    <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem;">Reggaeton 2026</h3>
-                                    <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">Creada hace 3 meses</p>
-                                </div>
-                                <div style="background: rgba(16, 185, 129, 0.2); padding: 0.5rem 1rem; border-radius: 1rem; color: #10b981; font-weight: 700; font-size: 0.9rem;">
-                                    ✓ Activa
-                                </div>
-                            </div>
-                            
-                            <!-- Estadísticas -->
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
-                                <div>
-                                    <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">Seguidores</div>
-                                    <div style="font-size: 1.3rem; font-weight: 800; color: #ec4899;">25,430</div>
-                                </div>
-                                <div>
-                                    <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">Canciones</div>
-                                    <div style="font-size: 1.3rem; font-weight: 800; color: #8b5cf6;">180</div>
-                                </div>
-                                <div>
-                                    <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">Envíos pendientes</div>
-                                    <div style="font-size: 1.3rem; font-weight: 800; color: #fbbf24;">12</div>
-                                </div>
-                                <div>
-                                    <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">Ganancias/mes</div>
-                                    <div style="font-size: 1.3rem; font-weight: 800; color: #10b981;">€340</div>
-                                </div>
-                            </div>
-                            
-                            <!-- Acciones -->
-                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                                <button onclick="editarPlaylist(&apos;Reggaeton 2026&apos;)" style="padding: 0.6rem 1.2rem; background: rgba(124, 58, 237, 0.2); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 0.5rem; color: #a78bfa; font-weight: 700; cursor: pointer;">
-                                    ✏️ Editar
-                                </button>
-                                <button onclick="verEstadisticasPlaylist(&apos;Reggaeton 2026&apos;)" style="padding: 0.6rem 1.2rem; background: rgba(59, 130, 246, 0.2); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 0.5rem; color: #60a5fa; font-weight: 700; cursor: pointer;">
-                                    📊 Estadísticas
-                                </button>
-                                <button onclick="toggleRecepcion(&apos;Reggaeton 2026&apos;, true)" style="padding: 0.6rem 1.2rem; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem; color: #f87171; font-weight: 700; cursor: pointer;">
-                                    🔴 Pausar envíos
-                                </button>
-                                <button onclick="verEnSpotify('https://open.spotify.com/playlist/...')" style="padding: 0.6rem 1.2rem; background: rgba(16, 185, 129, 0.2); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 0.5rem; color: #10b981; font-weight: 700; cursor: pointer;">
-                                    🎵 Ver en Spotify
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Playlist 2 -->
-                <div style="background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 1.5rem;">
-                    <div style="display: flex; gap: 1.5rem; align-items: start;">
-                        <div style="width: 120px; height: 120px; background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 0.75rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 3rem;">
-                            💎
-                        </div>
-                        
-                        <div style="flex: 1;">
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                <div>
-                                    <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem;">Trap Elite</h3>
-                                    <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">Creada hace 1 año</p>
-                                </div>
-                                <div style="background: rgba(239, 68, 68, 0.2); padding: 0.5rem 1rem; border-radius: 1rem; color: #ef4444; font-weight: 700; font-size: 0.9rem;">
-                                    ⏸ Pausada
-                                </div>
-                            </div>
-                            
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
-                                <div>
+            <!-- Lista de playlists del curador -->
+            <div id="playlistsCuradorList" style="display: grid; gap: 1.5rem;">
+                <!-- Las playlists se cargan dinámicamente -->
+            </div>
+            
+            <!-- Info adicional -->
+            <div style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 1rem; padding: 1.5rem; margin-top: 2rem; text-align: center;">
+                <p style="font-size: 0.95rem; color: rgba(255,255,255,0.8);">
+                    💡 <strong>Tip:</strong> Mantén tus playlists activas y actualizadas para recibir más envíos y aumentar tus ganancias
+                </p>
+            </div>
+        </div>
+    </div>
                                     <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">Seguidores</div>
                                     <div style="font-size: 1.3rem; font-weight: 800; color: #ec4899;">18,720</div>
                                 </div>
@@ -5250,8 +5120,85 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         
         // ==================== FUNCIONES PANEL CURADOR ====================
         
-        function openMisPlaylistsModal(){
+        async function openMisPlaylistsModal(){
             document.getElementById('modalMisPlaylists').classList.add('active');
+            await cargarMisPlaylists();
+        }
+        
+        async function cargarMisPlaylists() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) return;
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('playlists')
+                    .select('*')
+                    .eq('curador_id', userId)
+                    .eq('activa', true)
+                    .order('created_at', { ascending: false });
+                
+                const container = document.getElementById('playlistsCuradorList');
+                
+                if (error || !data || data.length === 0) {
+                    if (container) {
+                        container.innerHTML = `
+                            <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                                <div style="font-size: 4rem; margin-bottom: 1rem;">🎵</div>
+                                <p style="margin-bottom: 1.5rem;">No tienes playlists agregadas</p>
+                                <button onclick="openAgregarPlaylistModal()" style="padding: 1rem 2rem; background: linear-gradient(135deg, #7c3aed, #ec4899); border: none; border-radius: 0.75rem; color: white; font-weight: 700; cursor: pointer;">
+                                    ➕ Agregar Primera Playlist
+                                </button>
+                            </div>
+                        `;
+                    }
+                    return;
+                }
+                
+                // Renderizar playlists
+                if (container) {
+                    container.innerHTML = data.map(playlist => {
+                        // Calcular tipo según seguidores
+                        let tipo = 'free';
+                        let tipoBadge = '🎁 FREE';
+                        let tipoBg = 'rgba(16, 185, 129, 0.2)';
+                        
+                        if (playlist.seguidores >= 300) {
+                            tipo = 'premium';
+                            tipoBadge = '⭐ PREMIUM';
+                            tipoBg = 'rgba(124, 58, 237, 0.2)';
+                        } else if (playlist.seguidores >= 100) {
+                            tipo = 'standard';
+                            tipoBadge = '💰 STANDARD';
+                            tipoBg = 'rgba(251, 191, 36, 0.2)';
+                        }
+                        
+                        return `
+                            <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem;">
+                                <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
+                                    <div style="flex: 1;">
+                                        <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.75rem;">${playlist.nombre}</h3>
+                                        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
+                                            <span style="color: rgba(255,255,255,0.7);">🎵 ${playlist.genero || 'Sin género'}</span>
+                                            <span style="color: rgba(255,255,255,0.7);">👥 ${playlist.seguidores.toLocaleString()} seguidores</span>
+                                        </div>
+                                        <div style="background: ${tipoBg}; display: inline-block; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 700; font-size: 0.9rem;">
+                                            ${tipoBadge}
+                                        </div>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <a href="${playlist.url_spotify}" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: rgba(30, 215, 96, 0.2); border: 2px solid rgba(30, 215, 96, 0.3); border-radius: 0.5rem; color: #1ed760; font-weight: 700; text-decoration: none; margin-bottom: 0.75rem;">
+                                            Ver en Spotify
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+            } catch (err) {
+                console.error('Error cargando playlists:', err);
+            }
         }
         
         function closeMisPlaylistsModal(){
@@ -5430,7 +5377,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             document.getElementById('modalAgregarPlaylist').classList.remove('active');
         }
         
-        function confirmarAgregarPlaylist(){
+        async function confirmarAgregarPlaylist(){
             const url = document.getElementById('urlPlaylistNueva').value.trim();
             
             if(!url){
@@ -5443,15 +5390,67 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 return;
             }
             
-            closeAgregarPlaylistModal();
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                alert('⚠️ Error: Sesión no encontrada. Por favor inicia sesión de nuevo.');
+                return;
+            }
             
-            alert('✅ PLAYLIST AGREGADA\n\n' +
-                  'Tu playlist se está sincronizando con Spotify.\n\n' +
-                  'En unos minutos:\n' +
-                  '• Aparecerá en tu lista\n' +
-                  '• Podrás recibir envíos\n' +
-                  '• Verás las estadísticas\n\n' +
-                  'Te notificaremos cuando esté lista.');
+            try {
+                // Extraer ID de la playlist
+                let playlistId = null;
+                if (url.includes('open.spotify.com/playlist/')) {
+                    playlistId = url.split('open.spotify.com/playlist/')[1].split('?')[0].split('/')[0];
+                }
+                
+                if (!playlistId || playlistId.length !== 22) {
+                    alert('❌ No se pudo extraer el ID de la playlist.\n\nVerifica que el enlace sea correcto.');
+                    return;
+                }
+                
+                console.log('📋 Guardando playlist:', playlistId);
+                
+                // Guardar en Supabase (sin datos reales aún, solo la URL)
+                const { data, error } = await supabaseClient
+                    .from('playlists')
+                    .insert({
+                        curador_id: userId,
+                        nombre: 'Sincronizando...', // Se actualizará después
+                        url_spotify: url,
+                        genero: 'Sin género', // Se actualizará después
+                        seguidores: 0, // Se actualizará después
+                        precio_standard: 1.5,
+                        precio_premium: 3.0,
+                        activa: true
+                    })
+                    .select();
+                
+                if (error) {
+                    console.error('Error guardando playlist:', error);
+                    alert('⚠️ Error al guardar la playlist.\n\nPor favor intenta de nuevo.');
+                    return;
+                }
+                
+                console.log('✅ Playlist guardada:', data);
+                
+                closeAgregarPlaylistModal();
+                
+                alert('✅ PLAYLIST AGREGADA\n\n' +
+                      'Tu playlist ha sido agregada exitosamente.\n\n' +
+                      'Ya puedes:\n' +
+                      '• Recibir envíos de artistas\n' +
+                      '• Ver la playlist en "Mis Playlists"\n\n' +
+                      'Nota: Los datos de seguidores se sincronizarán automáticamente.');
+                
+                // Recargar lista de playlists si está abierta
+                if (document.getElementById('modalMisPlaylists').classList.contains('active')) {
+                    await cargarMisPlaylists();
+                }
+                
+            } catch (err) {
+                console.error('Error en confirmarAgregarPlaylist:', err);
+                alert('⚠️ Error inesperado. Por favor intenta de nuevo.');
+            }
         }
         
         function editarPlaylist(nombre){
@@ -6459,11 +6458,105 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                   '¡Compártelo y comienza a ganar comisiones!');
         }
         
-        function openNotificacionesModal(){
+        async function openNotificacionesModal(){
             document.getElementById('modalNotificaciones').classList.add('active');
-            // Limpiar badge de notificaciones
-            document.getElementById('notificationCount').textContent = '0';
-            document.getElementById('notificationCount').style.display = 'none';
+            // Cargar notificaciones desde Supabase
+            await cargarNotificaciones();
+        }
+        
+        async function cargarNotificaciones() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) return;
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('notificaciones')
+                    .select('*')
+                    .eq('usuario_id', userId)
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+                
+                const container = document.getElementById('notificacionesList');
+                
+                if (error || !data || data.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
+                            <p>No tienes notificaciones</p>
+                        </div>
+                    `;
+                    // Ocultar badge
+                    document.getElementById('notificationCount').style.display = 'none';
+                    return;
+                }
+                
+                // Renderizar notificaciones
+                container.innerHTML = data.map(notif => {
+                    const isNew = !notif.leida;
+                    const iconos = {
+                        'envio_recibido': '📨',
+                        'envio_aceptado': '✅',
+                        'envio_rechazado': '❌',
+                        'creditos_agregados': '💳',
+                        'puntos_liberados': '⭐'
+                    };
+                    const colores = {
+                        'envio_recibido': '#3b82f6',
+                        'envio_aceptado': '#10b981',
+                        'envio_rechazado': '#ef4444',
+                        'creditos_agregados': '#7c3aed',
+                        'puntos_liberados': '#fbbf24'
+                    };
+                    
+                    const icono = iconos[notif.tipo] || '📬';
+                    const color = colores[notif.tipo] || '#6b7280';
+                    const opacity = isNew ? '1' : '0.5';
+                    
+                    const tiempoTranscurrido = calcularTiempoTranscurrido(notif.created_at);
+                    
+                    return `
+                        <div style="background: rgba(255,255,255,${isNew ? '0.05' : '0.02'}); border-left: 4px solid ${color}; padding: 1.5rem; border-radius: 0.75rem; opacity: ${opacity}; position: relative;">
+                            ${isNew ? `<span style="position: absolute; top: 1rem; right: 1rem; background: ${color}; color: white; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 700;">NUEVA</span>` : ''}
+                            <div style="display: flex; gap: 1rem;">
+                                <div style="font-size: 2rem;">${icono}</div>
+                                <div style="flex: 1;">
+                                    <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem;">${notif.titulo}</h3>
+                                    <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem; margin-bottom: 0.5rem;">${notif.mensaje}</p>
+                                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">${tiempoTranscurrido}</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                // Actualizar contador de notificaciones
+                const noLeidas = data.filter(n => !n.leida).length;
+                const badge = document.getElementById('notificationCount');
+                if (noLeidas > 0) {
+                    badge.textContent = noLeidas;
+                    badge.style.display = 'inline-block';
+                } else {
+                    badge.style.display = 'none';
+                }
+                
+            } catch (err) {
+                console.error('Error cargando notificaciones:', err);
+            }
+        }
+        
+        function calcularTiempoTranscurrido(fecha) {
+            const ahora = new Date();
+            const entonces = new Date(fecha);
+            const diff = ahora - entonces;
+            
+            const minutos = Math.floor(diff / 60000);
+            const horas = Math.floor(minutos / 60);
+            const dias = Math.floor(horas / 24);
+            
+            if (minutos < 1) return 'Ahora mismo';
+            if (minutos < 60) return `Hace ${minutos} minuto${minutos > 1 ? 's' : ''}`;
+            if (horas < 24) return `Hace ${horas} hora${horas > 1 ? 's' : ''}`;
+            return `Hace ${dias} día${dias > 1 ? 's' : ''}`;
         }
         
         function closeNotificacionesModal(){
@@ -6699,5 +6792,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
     </script>
 </body>
 </html>
+
 
 
