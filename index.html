@@ -916,22 +916,14 @@
             <div class="wizard-steps">
                 <div class="step-indicator active" id="wstep1">
                     <div class="wiz-circle">1</div>
-                    <div class="wiz-label">Conectar</div>
+                    <div class="wiz-label">Link Canción</div>
                 </div>
                 <div class="step-indicator" id="wstep2">
                     <div class="wiz-circle">2</div>
-                    <div class="wiz-label">Canción</div>
+                    <div class="wiz-label">Playlists</div>
                 </div>
                 <div class="step-indicator" id="wstep3">
                     <div class="wiz-circle">3</div>
-                    <div class="wiz-label">Género</div>
-                </div>
-                <div class="step-indicator" id="wstep4">
-                    <div class="wiz-circle">4</div>
-                    <div class="wiz-label">Playlists</div>
-                </div>
-                <div class="step-indicator" id="wstep5">
-                    <div class="wiz-circle">5</div>
                     <div class="wiz-label">Confirmar</div>
                 </div>
             </div>
@@ -939,32 +931,55 @@
             <div class="wiz-content active" id="wcontent1">
                 <div class="spotify-connect">
                     <div class="spotify-icon">🎵</div>
-                    <h3 class="wiz-title">Conecta Spotify</h3>
-                    <p class="wiz-desc">Necesitamos acceso a tu biblioteca</p>
-                    <button class="btn-spotify" id="btnSpotify">♫ Conectar</button>
+                    <h3 class="wiz-title">Pega el link de tu canción</h3>
+                    <p class="wiz-desc" style="margin-bottom: 2rem;">Copia el enlace de Spotify y pégalo aquí</p>
+                    
+                    <div style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 2rem; text-align: left;">
+                        <div style="font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem;">💡 ¿Cómo obtener el enlace?</div>
+                        <ol style="margin: 0; padding-left: 1.5rem; font-size: 0.95rem; color: rgba(255,255,255,0.9); line-height: 1.8;">
+                            <li>Abre Spotify y busca tu canción</li>
+                            <li>Click en los 3 puntos (...) de tu canción</li>
+                            <li>Selecciona "Compartir" → "Copiar enlace de canción"</li>
+                            <li>Pega el enlace aquí abajo</li>
+                        </ol>
+                    </div>
+                    
+                    <input 
+                        type="url" 
+                        id="spotifyLinkInput" 
+                        placeholder="https://open.spotify.com/track/..." 
+                        style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 0.75rem; color: white; font-size: 1rem; margin-bottom: 1.5rem;"
+                        onpaste="setTimeout(verificarSpotifyLink, 100)"
+                        oninput="verificarSpotifyLink()"
+                    >
+                    
+                    <div id="spotifyPreview" style="display: none; margin-top: 1.5rem;"></div>
+                    
+                    <div id="linkError" style="display: none; background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 0.75rem; padding: 1rem; margin-top: 1rem; color: #ef4444; font-weight: 600;">
+                        ⚠️ Link no válido. Asegúrate de copiar el enlace completo de Spotify.
+                    </div>
                 </div>
             </div>
             
             <div class="wiz-content" id="wcontent2">
-                <h3 class="wiz-title">Selecciona tu canción</h3>
-                <input type="text" class="search-input" id="search" placeholder="🔍 Buscar...">
-                <div class="items-list" id="songsList"></div>
-            </div>
-            
-            <div class="wiz-content" id="wcontent3">
-                <h3 class="wiz-title">Selecciona el género</h3>
-                <div class="genres-grid" id="genresList"></div>
-            </div>
-            
-            <div class="wiz-content" id="wcontent4">
                 <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
-                    <h3 class="wiz-title" style="margin: 0;">Playlists</h3>
+                    <h3 class="wiz-title" style="margin: 0;">Selecciona Playlists</h3>
                     <div>Seleccionadas: <strong id="count" style="color: #7c3aed;">0</strong></div>
                 </div>
+                
+                <div style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 2rem;">
+                    <div style="font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem;">💡 Tipos de Playlists:</div>
+                    <div style="display: grid; gap: 0.75rem; font-size: 0.95rem;">
+                        <div>🎁 <strong>Free:</strong> Menos de 100 seguidores (0 créditos)</div>
+                        <div>💰 <strong>Standard:</strong> 100-299 seguidores (1.5 créditos)</div>
+                        <div>⭐ <strong>Premium:</strong> 300+ seguidores (3 créditos)</div>
+                    </div>
+                </div>
+                
                 <div class="items-list" id="playlistsList"></div>
             </div>
             
-            <div class="wiz-content" id="wcontent5">
+            <div class="wiz-content" id="wcontent3">
                 <div class="confirmation">
                     <div class="confirmation-icon">✅</div>
                     <h3 class="wiz-title">¡Listo!</h3>
@@ -4798,6 +4813,67 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             updateWizardUI();
         }
         
+        // ==================== VERIFICAR LINK DE SPOTIFY ====================
+        
+        function verificarSpotifyLink() {
+            const input = document.getElementById('spotifyLinkInput');
+            const preview = document.getElementById('spotifyPreview');
+            const error = document.getElementById('linkError');
+            const nextBtn = document.getElementById('next');
+            
+            const url = input.value.trim();
+            
+            // Resetear estados
+            preview.style.display = 'none';
+            error.style.display = 'none';
+            nextBtn.disabled = true;
+            
+            if (!url) return;
+            
+            // Extraer ID de la canción
+            // Formatos: https://open.spotify.com/track/6rqhFgbbKwnb9MLmUQDhG6
+            //           spotify:track:6rqhFgbbKwnb9MLmUQDhG6
+            
+            let trackId = null;
+            
+            if (url.includes('open.spotify.com/track/')) {
+                trackId = url.split('open.spotify.com/track/')[1].split('?')[0].split('/')[0];
+            } else if (url.includes('spotify:track:')) {
+                trackId = url.split('spotify:track:')[1].split('?')[0];
+            }
+            
+            if (trackId && trackId.length === 22) {
+                // Link válido - Mostrar preview
+                selectedSong = {
+                    id: trackId,
+                    url: url,
+                    embedUrl: `https://open.spotify.com/embed/track/${trackId}`
+                };
+                
+                preview.innerHTML = `
+                    <div style="background: rgba(255,255,255,0.05); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem; padding: 1.5rem;">
+                        <div style="font-weight: 700; color: #10b981; margin-bottom: 1rem; font-size: 1.1rem;">✓ Canción detectada</div>
+                        <iframe 
+                            src="${selectedSong.embedUrl}" 
+                            width="100%" 
+                            height="152" 
+                            frameBorder="0" 
+                            allowfullscreen="" 
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                            loading="lazy"
+                            style="border-radius: 0.75rem;">
+                        </iframe>
+                    </div>
+                `;
+                preview.style.display = 'block';
+                nextBtn.disabled = false;
+                
+            } else if (url.length > 10) {
+                // Link inválido
+                error.style.display = 'block';
+            }
+        }
+        
         // ==================== WIZARD SPOTIFY ====================
         let currentStep = 1;
         let selectedSong = null;
@@ -4817,32 +4893,37 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             {id:'indie', name:'Indie', icon:'🌟'}
         ];
         
-        const PLAYLISTS_DATA = {
-            urbano: [
-                {id:1, name:"Urbano Top 100", curator:"DJ Carlos", followers:45000, songs:120, type:'free', price:'Gratis'},
-                {id:2, name:"Trap España", curator:"Music Pro", followers:28000, songs:85, type:'standard', price:'0.50€'},
-                {id:3, name:"Reggaeton 2026", curator:"Latin Vibes", followers:150000, songs:200, type:'premium', price:'2.00€'}
-            ],
-            pop: [
-                {id:4, name:"Pop Internacional", curator:"Global Music", followers:85000, songs:150, type:'standard', price:'0.50€'},
-                {id:5, name:"Nuevos Pop", curator:"Indie Pop", followers:15000, songs:60, type:'free', price:'Gratis'},
-                {id:6, name:"Pop Top España", curator:"España Pop", followers:95000, songs:180, type:'premium', price:'2.00€'}
-            ],
-            rock: [
-                {id:7, name:"Rock Alternativo", curator:"Rock Forever", followers:32000, songs:95, type:'standard', price:'0.50€'},
-                {id:8, name:"Indie Rock", curator:"Underground", followers:18000, songs:70, type:'free', price:'Gratis'},
-                {id:9, name:"Rock Legends", curator:"Rock Central", followers:120000, songs:250, type:'premium', price:'2.00€'}
-            ],
-            indie: [
-                {id:10, name:"Indie Vibes", curator:"Indie Collective", followers:42000, songs:110, type:'free', price:'Gratis'},
-                {id:11, name:"Indie Alternative", curator:"Alt Music", followers:35000, songs:90, type:'standard', price:'0.50€'},
-                {id:12, name:"Indie Top Global", curator:"Indie Global", followers:180000, songs:300, type:'premium', price:'2.00€'}
-            ]
-        };
+        // Array de playlists - se clasifican por seguidores
+        const PLAYLISTS_DATA = [
+            // FREE (menos de 100 seguidores)
+            {id:1, name:"Urban Discoveries", curator:"DJ Fresh", followers:85, songs:45, genre:"Urbano"},
+            {id:2, name:"Indie Sounds", curator:"Indie Lover", followers:62, songs:38, genre:"Indie"},
+            {id:3, name:"Pop Nuevos", curator:"Pop Hunter", followers:95, songs:52, genre:"Pop"},
+            
+            // STANDARD (100-299 seguidores)
+            {id:4, name:"Trap España", curator:"Music Pro", followers:245, songs:85, genre:"Urbano"},
+            {id:5, name:"Rock Alternativo", curator:"Rock Forever", followers:185, songs:95, genre:"Rock"},
+            {id:6, name:"Pop Internacional", curator:"Global Music", followers:220, songs:110, genre:"Pop"},
+            {id:7, name:"Indie Alternative", curator:"Alt Music", followers:150, songs:90, genre:"Indie"},
+            
+            // PREMIUM (300+ seguidores)
+            {id:8, name:"Urbano Top 100", curator:"DJ Carlos", followers:45000, songs:120, genre:"Urbano"},
+            {id:9, name:"Reggaeton 2026", curator:"Latin Vibes", followers:8500, songs:200, genre:"Urbano"},
+            {id:10, name:"Pop Top España", curator:"España Pop", followers:3200, songs:180, genre:"Pop"},
+            {id:11, name:"Rock Legends", curator:"Rock Central", followers:12000, songs:250, genre:"Rock"},
+            {id:12, name:"Indie Top Global", curator:"Indie Global", followers:18000, songs:300, genre:"Indie"}
+        ];
+        
+        // Función para clasificar playlist por seguidores
+        function getPlaylistType(followers) {
+            if (followers < 100) return { type: 'free', price: 'Gratis', credits: 0 };
+            if (followers < 300) return { type: 'standard', price: '1.50€', credits: 1.5 };
+            return { type: 'premium', price: '3.00€', credits: 3 };
+        }
         
         function updateWizardUI(){
-            // Actualizar indicadores de paso
-            for(let i = 1; i <= 5; i++){
+            // Actualizar indicadores de paso (ahora son 3)
+            for(let i = 1; i <= 3; i++){
                 const indicator = document.getElementById('wstep' + i);
                 const content = document.getElementById('wcontent' + i);
                 
@@ -4866,18 +4947,12 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             
             // Habilitar/deshabilitar siguiente según el paso
             if(currentStep === 1){
-                nextBtn.disabled = false;
-                nextBtn.textContent = 'Conectar Spotify →';
+                // Ya se maneja en verificarSpotifyLink()
+                nextBtn.textContent = 'Siguiente →';
             } else if(currentStep === 2){
-                nextBtn.disabled = !selectedSong;
-                nextBtn.textContent = 'Siguiente →';
-            } else if(currentStep === 3){
-                nextBtn.disabled = !selectedGenre;
-                nextBtn.textContent = 'Siguiente →';
-            } else if(currentStep === 4){
                 nextBtn.disabled = selectedPlaylists.length === 0;
                 nextBtn.textContent = 'Siguiente →';
-            } else if(currentStep === 5){
+            } else if(currentStep === 3){
                 nextBtn.textContent = '✅ Enviar a Playlists';
                 nextBtn.disabled = false;
             }
@@ -4885,20 +4960,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         
         function nextStep(){
             if(currentStep === 1){
-                // Simular conexión con Spotify
-                alert('✅ Conectado con Spotify\n\nAhora puedes seleccionar tu canción.');
+                // Ya tiene la canción de Spotify
                 currentStep = 2;
-                renderSongs();
+                renderPlaylists();
             } else if(currentStep === 2){
                 currentStep = 3;
-                renderGenres();
-            } else if(currentStep === 3){
-                currentStep = 4;
-                renderPlaylists();
-            } else if(currentStep === 4){
-                currentStep = 5;
                 showConfirmation();
-            } else if(currentStep === 5){
+            } else if(currentStep === 3){
                 submitToPlaylists();
             }
             updateWizardUI();
@@ -4911,62 +4979,29 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             }
         }
         
-        function renderSongs(){
-            const container = document.getElementById('songsList');
-            container.innerHTML = SONGS_DATA.map(s => `
-                <div class="item ${selectedSong?.id === s.id ? 'selected' : ''}" onclick="selectSong(${s.id})">
-                    <div class="item-cover">${s.cover}</div>
-                    <div class="item-info">
-                        <div class="item-title">${s.title}</div>
-                        <div class="item-subtitle">${s.artist}</div>
-                    </div>
-                    <div class="item-check">${selectedSong?.id === s.id ? '✓' : ''}</div>
-                </div>
-            `).join('');
-        }
-        
-        function selectSong(id){
-            selectedSong = SONGS_DATA.find(s => s.id === id);
-            renderSongs();
-            updateWizardUI();
-        }
-        
-        function renderGenres(){
-            const container = document.getElementById('genresList');
-            container.innerHTML = GENRES_DATA.map(g => `
-                <div class="genre-card ${selectedGenre?.id === g.id ? 'selected' : ''}" onclick="selectGenre('${g.id}')">
-                    <div class="genre-icon">${g.icon}</div>
-                    <div>${g.name}</div>
-                </div>
-            `).join('');
-        }
-        
-        function selectGenre(id){
-            selectedGenre = GENRES_DATA.find(g => g.id === id);
-            renderGenres();
-            updateWizardUI();
-        }
-        
         function renderPlaylists(){
             const container = document.getElementById('playlistsList');
-            const playlists = PLAYLISTS_DATA[selectedGenre.id] || [];
             
-            container.innerHTML = playlists.map(p => `
+            container.innerHTML = PLAYLISTS_DATA.map(p => {
+                const typeInfo = getPlaylistType(p.followers);
+                
+                return `
                 <div class="playlist-item ${selectedPlaylists.includes(p.id) ? 'selected' : ''}" onclick="togglePlaylist(${p.id})">
                     <div class="playlist-header">
                         <div class="playlist-cover">🎵</div>
                         <div class="playlist-info">
                             <div class="playlist-name">${p.name}</div>
-                            <div class="playlist-curator">Por ${p.curator}</div>
+                            <div class="playlist-curator">Por ${p.curator} • ${p.genre}</div>
                             <div class="playlist-stats">
-                                <span>👥 ${p.followers.toLocaleString()}</span>
-                                <span>🎵 ${p.songs}</span>
+                                <span>👥 ${p.followers.toLocaleString()} seguidores</span>
+                                <span>🎵 ${p.songs} canciones</span>
                             </div>
                         </div>
-                        <div class="playlist-price price-${p.type}">${p.price}</div>
+                        <div class="playlist-price price-${typeInfo.type}">${typeInfo.price}</div>
                     </div>
                 </div>
-            `).join('');
+                `;
+            }).join('');
             
             document.getElementById('count').textContent = selectedPlaylists.length;
         }
@@ -5012,13 +5047,94 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             document.getElementById('details').innerHTML = html;
         }
         
-        function submitToPlaylists(){
-            alert('🎉 ¡MÚSICA ENVIADA!\n\n' +
-                  'Tu canción "' + selectedSong.title + '" ha sido enviada a ' + selectedPlaylists.length + ' playlists.\n\n' +
-                  'Los curadores revisarán tu música y recibirás respuestas en 48-72 horas.\n\n' +
-                  'Te notificaremos por email cuando haya actualizaciones.');
-            
-            closeSpotifyModal();
+        async function submitToPlaylists(){
+            try {
+                const userId = localStorage.getItem('userId');
+                const userCreditos = parseFloat(localStorage.getItem('userCreditos')) || 0;
+                
+                if (!userId) {
+                    alert('⚠️ Error: No se encontró tu sesión. Por favor inicia sesión de nuevo.');
+                    return;
+                }
+                
+                // Calcular créditos necesarios
+                let creditosNecesarios = 0;
+                
+                selectedPlaylists.forEach(playlistId => {
+                    const playlist = PLAYLISTS_DATA.find(p => p.id === playlistId);
+                    if (playlist) {
+                        const typeInfo = getPlaylistType(playlist.followers);
+                        creditosNecesarios += typeInfo.credits;
+                    }
+                });
+                
+                // Verificar si tiene suficientes créditos
+                if (userCreditos < creditosNecesarios) {
+                    alert(`⚠️ Créditos insuficientes\n\nNecesitas ${creditosNecesarios} créditos.\nTienes ${userCreditos} créditos.\n\nCompra más créditos para continuar.`);
+                    return;
+                }
+                
+                console.log('💰 Créditos necesarios:', creditosNecesarios);
+                console.log('💰 Créditos actuales:', userCreditos);
+                
+                // Crear envíos en Supabase
+                for (const playlistId of selectedPlaylists) {
+                    const playlist = PLAYLISTS_DATA.find(p => p.id === playlistId);
+                    const typeInfo = getPlaylistType(playlist.followers);
+                    
+                    // Aquí falta el curador_id - por ahora lo dejamos en null
+                    // Necesitarás tener playlists reales con curadores asignados
+                    
+                    const { data, error } = await supabaseClient
+                        .from('envios_canciones')
+                        .insert({
+                            artista_id: userId,
+                            curador_id: null, // TODO: asignar curador real
+                            playlist_id: playlistId,
+                            cancion_url: selectedSong.url,
+                            cancion_id: selectedSong.id,
+                            tipo_envio: typeInfo.type,
+                            creditos_usados: typeInfo.credits,
+                            estado: 'pendiente'
+                        });
+                    
+                    if (error) {
+                        console.error('Error creando envío:', error);
+                    } else {
+                        console.log('✅ Envío creado:', data);
+                    }
+                }
+                
+                // Descontar créditos
+                const nuevosCreditos = userCreditos - creditosNecesarios;
+                
+                const { error: updateError } = await supabaseClient
+                    .from('usuarios')
+                    .update({ creditos: nuevosCreditos })
+                    .eq('id', userId);
+                
+                if (updateError) {
+                    console.error('Error actualizando créditos:', updateError);
+                    alert('⚠️ Error al descontar créditos. Por favor contacta soporte.');
+                    return;
+                }
+                
+                // Actualizar localStorage
+                localStorage.setItem('userCreditos', nuevosCreditos);
+                document.getElementById('creditosStandard').textContent = nuevosCreditos;
+                
+                alert(`🎉 ¡MÚSICA ENVIADA!\n\n` +
+                      `Tu canción ha sido enviada a ${selectedPlaylists.length} playlists.\n\n` +
+                      `💰 Créditos usados: ${creditosNecesarios}\n` +
+                      `💰 Créditos restantes: ${nuevosCreditos}\n\n` +
+                      `Los curadores revisarán tu música en 48-72 horas.`);
+                
+                closeSpotifyModal();
+                
+            } catch (err) {
+                console.error('Error en submitToPlaylists:', err);
+                alert('⚠️ Error al enviar música. Por favor intenta de nuevo.');
+            }
         }
         
         // Event listeners del wizard
@@ -6583,4 +6699,5 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
     </script>
 </body>
 </html>
+
 
