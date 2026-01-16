@@ -544,6 +544,12 @@
                         <p class="panel-card-desc">1.50€ - 3.00€</p>
                         <button class="panel-card-btn">Comprar</button>
                     </div>
+                    <div class="panel-card" onclick="cerrarSesion()" style="background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3);">
+                        <div class="panel-card-icon">🚪</div>
+                        <h3 class="panel-card-title">Cerrar Sesión</h3>
+                        <p class="panel-card-desc">Salir de la cuenta</p>
+                        <button class="panel-card-btn" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">Salir</button>
+                    </div>
                 </div>
             </div>
 
@@ -599,6 +605,12 @@
                         <h3 class="panel-card-title">Retirar Fondos</h3>
                         <p class="panel-card-desc">Transferir ganancias</p>
                         <button class="panel-card-btn">Retirar</button>
+                    </div>
+                    <div class="panel-card" onclick="cerrarSesion()" style="background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3);">
+                        <div class="panel-card-icon">🚪</div>
+                        <h3 class="panel-card-title">Cerrar Sesión</h3>
+                        <p class="panel-card-desc">Salir de la cuenta</p>
+                        <button class="panel-card-btn" style="background: rgba(239, 68, 68, 0.2); color: #ef4444;">Salir</button>
                     </div>
                 </div>
             </div>
@@ -4668,9 +4680,11 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             document.getElementById('inicio').scrollIntoView({behavior: 'smooth'});
         }
         
-        function openSpotifyModal(){
+        async function openSpotifyModal(){
             if(!isUserRegistered()){ showRegisterAlert(); return; }
             document.getElementById('modalSpotify').classList.add('active');
+            // Cargar playlists disponibles
+            await cargarPlaylistsDisponibles();
         }
         
         function closeSpotifyModal(){
@@ -4764,25 +4778,48 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         ];
         
         // Array de playlists - se clasifican por seguidores
-        const PLAYLISTS_DATA = [
-            // FREE (menos de 100 seguidores)
-            {id:1, name:"Urban Discoveries", curator:"DJ Fresh", followers:85, songs:45, genre:"Urbano"},
-            {id:2, name:"Indie Sounds", curator:"Indie Lover", followers:62, songs:38, genre:"Indie"},
-            {id:3, name:"Pop Nuevos", curator:"Pop Hunter", followers:95, songs:52, genre:"Pop"},
-            
-            // STANDARD (100-299 seguidores)
-            {id:4, name:"Trap España", curator:"Music Pro", followers:245, songs:85, genre:"Urbano"},
-            {id:5, name:"Rock Alternativo", curator:"Rock Forever", followers:185, songs:95, genre:"Rock"},
-            {id:6, name:"Pop Internacional", curator:"Global Music", followers:220, songs:110, genre:"Pop"},
-            {id:7, name:"Indie Alternative", curator:"Alt Music", followers:150, songs:90, genre:"Indie"},
-            
-            // PREMIUM (300+ seguidores)
-            {id:8, name:"Urbano Top 100", curator:"DJ Carlos", followers:45000, songs:120, genre:"Urbano"},
-            {id:9, name:"Reggaeton 2026", curator:"Latin Vibes", followers:8500, songs:200, genre:"Urbano"},
-            {id:10, name:"Pop Top España", curator:"España Pop", followers:3200, songs:180, genre:"Pop"},
-            {id:11, name:"Rock Legends", curator:"Rock Central", followers:12000, songs:250, genre:"Rock"},
-            {id:12, name:"Indie Top Global", curator:"Indie Global", followers:18000, songs:300, genre:"Indie"}
-        ];
+        // Array de playlists - se carga desde Supabase
+        let PLAYLISTS_DATA = [];
+        
+        // Cargar playlists desde Supabase
+        async function cargarPlaylistsDisponibles() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('playlists')
+                    .select(`
+                        id,
+                        nombre,
+                        genero,
+                        seguidores,
+                        curador_id,
+                        usuarios!playlists_curador_id_fkey (
+                            nombre
+                        )
+                    `)
+                    .eq('activa', true)
+                    .order('seguidores', { ascending: false });
+                
+                if (error) {
+                    console.error('Error cargando playlists:', error);
+                    return;
+                }
+                
+                // Mapear a formato esperado
+                PLAYLISTS_DATA = data.map(p => ({
+                    id: p.id,
+                    name: p.nombre,
+                    curator: p.usuarios?.nombre || 'Curador',
+                    followers: p.seguidores || 0,
+                    songs: 0, // No tenemos este dato aún
+                    genre: p.genero || 'Sin género'
+                }));
+                
+                console.log('✅ Playlists cargadas:', PLAYLISTS_DATA.length);
+                
+            } catch (err) {
+                console.error('Error en cargarPlaylistsDisponibles:', err);
+            }
+        }
         
         // Función para clasificar playlist por seguidores
         function getPlaylistType(followers) {
@@ -4852,6 +4889,17 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         function renderPlaylists(){
             const container = document.getElementById('playlistsList');
             
+            if (!PLAYLISTS_DATA || PLAYLISTS_DATA.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
+                        <p style="margin-bottom: 0.5rem;">No hay playlists disponibles</p>
+                        <p style="font-size: 0.9rem; opacity: 0.7;">Los curadores deben agregar playlists para que puedas enviar música.</p>
+                    </div>
+                `;
+                return;
+            }
+            
             container.innerHTML = PLAYLISTS_DATA.map(p => {
                 const typeInfo = getPlaylistType(p.followers);
                 
@@ -4864,7 +4912,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                             <div class="playlist-curator">Por ${p.curator} • ${p.genre}</div>
                             <div class="playlist-stats">
                                 <span>👥 ${p.followers.toLocaleString()} seguidores</span>
-                                <span>🎵 ${p.songs} canciones</span>
+                                ${p.songs > 0 ? `<span>🎵 ${p.songs} canciones</span>` : ''}
                             </div>
                         </div>
                         <div class="playlist-price price-${typeInfo.type}">${typeInfo.price}</div>
@@ -5185,10 +5233,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                                             ${tipoBadge}
                                         </div>
                                     </div>
-                                    <div style="text-align: right;">
-                                        <a href="${playlist.url_spotify}" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: rgba(30, 215, 96, 0.2); border: 2px solid rgba(30, 215, 96, 0.3); border-radius: 0.5rem; color: #1ed760; font-weight: 700; text-decoration: none; margin-bottom: 0.75rem;">
-                                            Ver en Spotify
+                                    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                        <a href="${playlist.url_spotify}" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: rgba(30, 215, 96, 0.2); border: 2px solid rgba(30, 215, 96, 0.3); border-radius: 0.5rem; color: #1ed760; font-weight: 700; text-decoration: none; text-align: center;">
+                                            🎵 Ver en Spotify
                                         </a>
+                                        <button onclick="eliminarPlaylist(${playlist.id}, '${playlist.nombre}')" style="padding: 0.75rem 1.5rem; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem; color: #ef4444; font-weight: 700; cursor: pointer;">
+                                            🗑️ Eliminar
+                                        </button>
                                     </div>
                                 </div>
                             </div>
@@ -5203,6 +5254,34 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         
         function closeMisPlaylistsModal(){
             document.getElementById('modalMisPlaylists').classList.remove('active');
+        }
+        
+        async function eliminarPlaylist(playlistId, nombrePlaylist) {
+            if (!confirm(`¿Estás seguro que deseas eliminar la playlist "${nombrePlaylist}"?\n\nEsta acción no se puede deshacer.`)) {
+                return;
+            }
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('playlists')
+                    .delete()
+                    .eq('id', playlistId);
+                
+                if (error) {
+                    console.error('Error eliminando playlist:', error);
+                    alert('⚠️ Error al eliminar la playlist. Por favor intenta de nuevo.');
+                    return;
+                }
+                
+                alert(`✅ Playlist "${nombrePlaylist}" eliminada correctamente.`);
+                
+                // Recargar lista
+                await cargarMisPlaylists();
+                
+            } catch (err) {
+                console.error('Error en eliminarPlaylist:', err);
+                alert('⚠️ Error inesperado. Por favor intenta de nuevo.');
+            }
         }
         
         // ========================================
@@ -5374,7 +5453,12 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         }
         
         function openAgregarPlaylistModal(){
-            document.getElementById('modalAgregarPlaylist').classList.add('active');
+            // Cerrar modal Mis Playlists primero
+            closeMisPlaylistsModal();
+            // Esperar un momento antes de abrir el nuevo modal
+            setTimeout(() => {
+                document.getElementById('modalAgregarPlaylist').classList.add('active');
+            }, 100);
         }
         
         function closeAgregarPlaylistModal(){
