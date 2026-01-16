@@ -4936,8 +4936,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         }
         
         function showConfirmation(){
-            const allPlaylists = Object.values(PLAYLISTS_DATA).flat();
-            const selected = allPlaylists.filter(p => selectedPlaylists.includes(p.id));
+            const selected = PLAYLISTS_DATA.filter(p => selectedPlaylists.includes(p.id));
             
             const html = `
                 <div style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 1rem; margin-bottom: 2rem;">
@@ -5237,7 +5236,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                                         <a href="${playlist.url_spotify}" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: rgba(30, 215, 96, 0.2); border: 2px solid rgba(30, 215, 96, 0.3); border-radius: 0.5rem; color: #1ed760; font-weight: 700; text-decoration: none; text-align: center;">
                                             🎵 Ver en Spotify
                                         </a>
-                                        <button onclick="eliminarPlaylist(${playlist.id}, '${playlist.nombre}')" style="padding: 0.75rem 1.5rem; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem; color: #ef4444; font-weight: 700; cursor: pointer;">
+                                        <button data-playlist-id="${playlist.id}" data-playlist-nombre="${playlist.nombre.replace(/"/g, '&quot;')}" onclick="eliminarPlaylist(this.dataset.playlistId, this.dataset.playlistNombre)" style="padding: 0.75rem 1.5rem; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem; color: #ef4444; font-weight: 700; cursor: pointer;">
                                             🗑️ Eliminar
                                         </button>
                                     </div>
@@ -6877,7 +6876,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     document.getElementById('userInitial').textContent = inicial;
                 }
                 
-                // Cargar créditos ACTUALIZADOS desde Supabase
+                // Cargar créditos o puntos según tipo de usuario
                 if (userType === 'artista') {
                     try {
                         const { data, error } = await supabaseClient
@@ -6893,6 +6892,29 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         }
                     } catch (err) {
                         console.error('Error cargando créditos:', err);
+                    }
+                } else if (userType === 'curador') {
+                    // Para curadores, mostrar puntos en lugar de créditos
+                    try {
+                        const { data, error } = await supabaseClient
+                            .from('usuarios')
+                            .select('puntos')
+                            .eq('id', userId)
+                            .single();
+                        
+                        if (data && !error) {
+                            console.log('⭐ Puntos cargados desde BD:', data.puntos);
+                            // Cambiar el icono y texto del botón de créditos
+                            const btnCreditos = document.querySelector('.nav-icon-btn[onclick="openCreditosModal()"]');
+                            if (btnCreditos) {
+                                btnCreditos.innerHTML = `⭐<span class="badge" id="creditosStandard">${data.puntos || 0}</span>`;
+                                btnCreditos.setAttribute('onclick', 'openMisPuntosModal()');
+                                btnCreditos.setAttribute('title', 'Mis Puntos');
+                            }
+                            localStorage.setItem('userPuntos', data.puntos);
+                        }
+                    } catch (err) {
+                        console.error('Error cargando puntos:', err);
                     }
                 }
                 
