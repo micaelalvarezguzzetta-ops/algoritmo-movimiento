@@ -5043,20 +5043,41 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         function showConfirmation(){
             const selected = PLAYLISTS_DATA.filter(p => selectedPlaylists.includes(p.id));
             
+            // Verificar que selectedSong existe
+            if (!selectedSong) {
+                alert('⚠️ Error: No se ha seleccionado una canción. Por favor vuelve al paso 1.');
+                return;
+            }
+            
             const html = `
                 <div style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 1rem; margin-bottom: 2rem;">
                     <h4 style="font-weight: 800; margin-bottom: 1rem;">📀 Canción</h4>
-                    <p style="color: rgba(255,255,255,0.8);">${selectedSong.title} - ${selectedSong.artist}</p>
+                    <p style="color: rgba(255,255,255,0.8);">${selectedSong.name || 'Canción de Spotify'} - ${selectedSong.artist || 'Artista'}</p>
+                    <div style="margin-top: 1rem;">
+                        <iframe 
+                            src="${selectedSong.embedUrl}" 
+                            width="100%" 
+                            height="152" 
+                            frameBorder="0" 
+                            allowfullscreen="" 
+                            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                            loading="lazy"
+                            style="border-radius: 0.75rem;">
+                        </iframe>
+                    </div>
                 </div>
                 
                 <div style="background: rgba(255,255,255,0.05); padding: 2rem; border-radius: 1rem; margin-bottom: 2rem;">
                     <h4 style="font-weight: 800; margin-bottom: 1rem;">🎵 Playlists seleccionadas (${selected.length})</h4>
-                    ${selected.map(p => `
-                        <div style="padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
-                            <div style="font-weight: 700;">${p.name}</div>
-                            <div style="font-size: 0.9rem; color: rgba(255,255,255,0.6);">Por ${p.curator} • ${p.followers.toLocaleString()} seguidores • ${p.price}</div>
-                        </div>
-                    `).join('')}
+                    ${selected.map(p => {
+                        const typeInfo = getPlaylistType(p.followers);
+                        return `
+                            <div style="padding: 0.75rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <div style="font-weight: 700;">${p.name}</div>
+                                <div style="font-size: 0.9rem; color: rgba(255,255,255,0.6);">Por ${p.curator} • ${p.followers.toLocaleString()} seguidores • ${typeInfo.price}</div>
+                            </div>
+                        `;
+                    }).join('')}
                 </div>
                 
                 <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); padding: 1.5rem; border-radius: 1rem;">
@@ -5076,6 +5097,16 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
                 if (!userId) {
                     alert('⚠️ Error: No se encontró tu sesión. Por favor inicia sesión de nuevo.');
+                    return;
+                }
+                
+                if (!selectedSong || !selectedSong.url) {
+                    alert('⚠️ Error: No se ha seleccionado una canción válida. Por favor vuelve al paso 1.');
+                    return;
+                }
+                
+                if (selectedPlaylists.length === 0) {
+                    alert('⚠️ Error: No has seleccionado ninguna playlist.');
                     return;
                 }
                 
