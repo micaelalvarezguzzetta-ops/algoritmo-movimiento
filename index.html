@@ -4645,6 +4645,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 selectedSong = {
                     id: trackId,
                     url: url,
+                    name: 'Canción de Spotify', // Se mostrará el embed al curador
+                    artist: 'Ver en reproductor',
                     embedUrl: `https://open.spotify.com/embed/track/${trackId}`
                 };
                 
@@ -5004,9 +5006,10 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             
             container.innerHTML = PLAYLISTS_DATA.map(p => {
                 const typeInfo = getPlaylistType(p.followers);
+                const isSelected = selectedPlaylists.includes(p.id);
                 
                 return `
-                <div class="playlist-item ${selectedPlaylists.includes(p.id) ? 'selected' : ''}" onclick="togglePlaylist(${p.id})">
+                <div class="playlist-item ${isSelected ? 'selected' : ''}" onclick="togglePlaylist('${p.id}')">
                     <div class="playlist-header">
                         <div class="playlist-cover">🎵</div>
                         <div class="playlist-info">
@@ -5101,20 +5104,32 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     const playlist = PLAYLISTS_DATA.find(p => p.id === playlistId);
                     const typeInfo = getPlaylistType(playlist.followers);
                     
-                    // Aquí falta el curador_id - por ahora lo dejamos en null
-                    // Necesitarás tener playlists reales con curadores asignados
+                    // Obtener curador_id de la playlist
+                    const { data: playlistData, error: playlistError } = await supabaseClient
+                        .from('playlists')
+                        .select('curador_id')
+                        .eq('id', playlistId)
+                        .single();
+                    
+                    if (playlistError) {
+                        console.error('Error obteniendo curador:', playlistError);
+                        continue;
+                    }
                     
                     const { data, error } = await supabaseClient
                         .from('envios_canciones')
                         .insert({
                             artista_id: userId,
-                            curador_id: null, // TODO: asignar curador real
+                            curador_id: playlistData.curador_id,
                             playlist_id: playlistId,
                             cancion_url: selectedSong.url,
                             cancion_id: selectedSong.id,
+                            cancion_nombre: selectedSong.name || 'Canción sin nombre',
+                            artista_nombre: selectedSong.artist || 'Artista desconocido',
                             tipo_envio: typeInfo.type,
                             creditos_usados: typeInfo.credits,
-                            estado: 'pendiente'
+                            estado: 'pendiente',
+                            fecha_envio: new Date().toISOString()
                         });
                     
                     if (error) {
