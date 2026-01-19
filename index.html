@@ -2925,13 +2925,32 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             
             <!-- Filtros -->
             <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
-                <button class="filter-btn active" onclick="filterEnvios('all')">Todos (12)</button>
-                <button class="filter-btn" onclick="filterEnvios('pendiente')">Pendientes (8)</button>
-                <button class="filter-btn" onclick="filterEnvios('aceptado')">Aceptados (3)</button>
-                <button class="filter-btn" onclick="filterEnvios('rechazado')">Rechazados (1)</button>
+                <button class="filter-btn active" onclick="filterEnvios('all')">Todos</button>
+                <button class="filter-btn" onclick="filterEnvios('pendiente')">Pendientes</button>
+                <button class="filter-btn" onclick="filterEnvios('aceptado')">Aceptados</button>
+                <button class="filter-btn" onclick="filterEnvios('rechazado')">Rechazados</button>
             </div>
             
             <!-- Lista de envíos -->
+            <div id="enviosRecibidosList" style="display: grid; gap: 1.5rem;">
+                <!-- Los envíos se cargan dinámicamente -->
+            </div>
+            
+            <!-- Info Importante -->
+            <div style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 1rem; padding: 1.5rem; margin-top: 2rem;">
+                <div style="font-weight: 800; margin-bottom: 0.5rem; color: #3b82f6;">ℹ️ Recordatorio:</div>
+                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">
+                    Debes mantener las canciones aceptadas en tu playlist durante:<br>
+                    • <strong>FREE</strong>: 3 días<br>
+                    • <strong>STANDARD</strong>: 7 días<br>
+                    • <strong>PREMIUM</strong>: 10 días<br><br>
+                    El dinero se desbloqueará automáticamente al completar el período.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL MIS PUNTOS (CURADOR) -->
             <div style="display: grid; gap: 1.5rem;">
                 
                 <!-- Envío 1 - Pendiente -->
@@ -5833,12 +5852,180 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             window.open(url, '_blank');
         }
         
-        function openEnviosRecibidosModal(){
+        async function openEnviosRecibidosModal(){
             document.getElementById('modalEnviosRecibidos').classList.add('active');
+            await cargarEnviosRecibidos();
+        }
+        
+        async function cargarEnviosRecibidos() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) return;
+            
+            try {
+                const { data: envios, error } = await supabaseClient
+                    .from('envios_canciones')
+                    .select('*')
+                    .eq('curador_id', userId)
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Error cargando envíos:', error);
+                    return;
+                }
+                
+                const container = document.getElementById('enviosRecibidosList');
+                
+                if (!envios || envios.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
+                            <p>No has recibido envíos aún</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = envios.map(envio => {
+                    const estadoColors = {
+                        'pendiente': { bg: 'rgba(251, 191, 36, 0.2)', border: '#fbbf24', text: '#fbbf24', label: '⏳ Pendiente' },
+                        'aceptado': { bg: 'rgba(16, 185, 129, 0.2)', border: '#10b981', text: '#10b981', label: '✅ Aceptado' },
+                        'rechazado': { bg: 'rgba(239, 68, 68, 0.2)', border: '#ef4444', text: '#ef4444', label: '❌ Rechazado' }
+                    };
+                    
+                    const estado = estadoColors[envio.estado] || estadoColors['pendiente'];
+                    
+                    // Calcular días restantes si está aceptado
+                    let contadorHTML = '';
+                    if (envio.estado === 'aceptado' && envio.fecha_aceptado) {
+                        const diasRequeridos = envio.tipo_envio === 'free' ? 3 : envio.tipo_envio === 'standard' ? 7 : 10;
+                        const fechaAceptado = new Date(envio.fecha_aceptado);
+                        const ahora = new Date();
+                        const diasPasados = Math.floor((ahora - fechaAceptado) / (1000 * 60 * 60 * 24));
+                        const diasRestantes = Math.max(0, diasRequeridos - diasPasados);
+                        
+                        const colorContador = diasRestantes === 0 ? '#10b981' : diasRestantes <= 2 ? '#fbbf24' : '#3b82f6';
+                        
+                        contadorHTML = `
+                            <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 0.5rem; padding: 0.75rem; margin-top: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
+                                    <span style="font-size: 1.2rem;">⏱️</span>
+                                    <span style="color: ${colorContador}; font-weight: 700; font-size: 1.1rem;">
+                                        ${diasRestantes === 0 ? '✅ Completado' : `Quedan ${diasRestantes} días`}
+                                    </span>
+                                </div>
+                                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); text-align: center; margin-top: 0.25rem;">
+                                    ${diasRestantes === 0 ? 'Dinero desbloqueado' : `Mantener hasta completar ${diasRequeridos} días`}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    
+                    return `
+                        <div class="envio-card" data-status="${envio.estado}" style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; border: 2px solid ${estado.border}20;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                <div>
+                                    <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem;">${envio.cancion_nombre || 'Canción sin nombre'}</h3>
+                                    <p style="color: rgba(255,255,255,0.7);">Por ${envio.artista_nombre || 'Artista'}</p>
+                                </div>
+                                <div style="background: ${estado.bg}; border: 2px solid ${estado.border}; padding: 0.5rem 1rem; border-radius: 0.5rem; color: ${estado.text}; font-weight: 700; font-size: 0.9rem;">
+                                    ${estado.label}
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                                <span style="background: rgba(124, 58, 237, 0.2); padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.9rem;">
+                                    ${envio.tipo_envio.toUpperCase()}
+                                </span>
+                                <span style="color: rgba(255,255,255,0.6);">
+                                    📅 ${new Date(envio.created_at).toLocaleDateString('es-ES')}
+                                </span>
+                            </div>
+                            
+                            ${contadorHTML}
+                            
+                            ${envio.estado === 'pendiente' ? `
+                                <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+                                    <button onclick="aceptarEnvio(${envio.id})" style="flex: 1; padding: 0.75rem; background: linear-gradient(135deg, #10b981, #06b6d4); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
+                                        ✅ Aceptar
+                                    </button>
+                                    <button onclick="rechazarEnvio(${envio.id})" style="flex: 1; padding: 0.75rem; background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; border-radius: 0.5rem; color: #ef4444; font-weight: 700; cursor: pointer;">
+                                        ❌ Rechazar
+                                    </button>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (err) {
+                console.error('Error en cargarEnviosRecibidos:', err);
+            }
         }
         
         function closeEnviosRecibidosModal(){
             document.getElementById('modalEnviosRecibidos').classList.remove('active');
+        }
+        
+        async function aceptarEnvio(envioId) {
+            if (!confirm('¿Aceptar este envío?\n\nRecuerda: Debes mantener la canción en tu playlist durante el tiempo requerido.')) {
+                return;
+            }
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('envios_canciones')
+                    .update({
+                        estado: 'aceptado',
+                        fecha_aceptado: new Date().toISOString(),
+                        fecha_respuesta: new Date().toISOString()
+                    })
+                    .eq('id', envioId);
+                
+                if (error) {
+                    console.error('Error aceptando envío:', error);
+                    alert('⚠️ Error al aceptar el envío');
+                    return;
+                }
+                
+                alert('✅ Envío aceptado\n\nAhora debes agregar la canción a tu playlist y mantenerla durante el tiempo requerido.');
+                
+                // Recargar lista
+                await cargarEnviosRecibidos();
+                
+            } catch (err) {
+                console.error('Error en aceptarEnvio:', err);
+                alert('⚠️ Error inesperado');
+            }
+        }
+        
+        async function rechazarEnvio(envioId) {
+            const motivo = prompt('¿Por qué rechazas este envío?\n\n(Opcional - se notificará al artista)');
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('envios_canciones')
+                    .update({
+                        estado: 'rechazado',
+                        fecha_respuesta: new Date().toISOString(),
+                        mensaje_curador: motivo || 'Sin motivo especificado'
+                    })
+                    .eq('id', envioId);
+                
+                if (error) {
+                    console.error('Error rechazando envío:', error);
+                    alert('⚠️ Error al rechazar el envío');
+                    return;
+                }
+                
+                alert('❌ Envío rechazado\n\nEl artista recibirá la devolución de sus créditos.');
+                
+                // Recargar lista
+                await cargarEnviosRecibidos();
+                
+            } catch (err) {
+                console.error('Error en rechazarEnvio:', err);
+                alert('⚠️ Error inesperado');
+            }
         }
         
         function filterEnvios(status){
