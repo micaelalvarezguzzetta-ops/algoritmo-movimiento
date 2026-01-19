@@ -5969,11 +5969,26 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     return `
                         <div class="envio-card" data-status="${envio.estado}" style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; border: 2px solid ${estado.border}20;">
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                <div>
+                                <div style="flex: 1;">
                                     <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem;">${envio.cancion_nombre || 'Canción sin nombre'}</h3>
-                                    <p style="color: rgba(255,255,255,0.7);">Por ${envio.artista_nombre || 'Artista'}</p>
+                                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Por ${envio.artista_nombre || 'Artista'}</p>
+                                    
+                                    ${envio.cancion_id ? `
+                                        <div style="margin-top: 1rem;">
+                                            <iframe 
+                                                src="https://open.spotify.com/embed/track/${envio.cancion_id}" 
+                                                width="100%" 
+                                                height="152" 
+                                                frameBorder="0" 
+                                                allowfullscreen="" 
+                                                allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" 
+                                                loading="lazy"
+                                                style="border-radius: 0.75rem;">
+                                            </iframe>
+                                        </div>
+                                    ` : ''}
                                 </div>
-                                <div style="background: ${estado.bg}; border: 2px solid ${estado.border}; padding: 0.5rem 1rem; border-radius: 0.5rem; color: ${estado.text}; font-weight: 700; font-size: 0.9rem;">
+                                <div style="background: ${estado.bg}; border: 2px solid ${estado.border}; padding: 0.5rem 1rem; border-radius: 0.5rem; color: ${estado.text}; font-weight: 700; font-size: 0.9rem; margin-left: 1rem;">
                                     ${estado.label}
                                 </div>
                             </div>
