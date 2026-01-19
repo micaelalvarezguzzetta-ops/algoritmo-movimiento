@@ -4782,7 +4782,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     <div style="text-align: center; padding: 2rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 1rem;">
                         <div style="font-size: 2.5rem; margin-bottom: 0.75rem;">⭐</div>
                         <h3 style="font-size: 1.4rem; margin-bottom: 0.75rem; font-weight: 900;">Playlists STANDARD</h3>
-                        <div style="font-size: 3rem; font-weight: 900; margin-bottom: 0.25rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">0.15€</div>
+                        <div style="font-size: 3rem; font-weight: 900; margin-bottom: 0.25rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">0.20€</div>
                         <p style="color: rgba(255,255,255,0.6); margin-bottom: 1.25rem; font-size: 0.9rem;">por envío aceptado</p>
                         <div style="background: rgba(251, 191, 36, 0.1); padding: 1rem; border-radius: 0.75rem; margin-bottom: 1.25rem;">
                             <p style="font-size: 1rem; font-weight: 700; color: #fbbf24;">100-299 seguidores</p>
@@ -6028,11 +6028,49 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         }
         
         async function aceptarEnvio(envioId) {
-            if (!confirm('¿Aceptar este envío?\n\nRecuerda: Debes mantener la canción en tu playlist durante el tiempo requerido.')) {
-                return;
-            }
-            
             try {
+                // Obtener datos del envío
+                const { data: envio, error: fetchError } = await supabaseClient
+                    .from('envios_canciones')
+                    .select('*, playlists(nombre)')
+                    .eq('id', envioId)
+                    .single();
+                
+                if (fetchError || !envio) {
+                    console.error('Error obteniendo envío:', fetchError);
+                    alert('⚠️ Error al obtener datos del envío');
+                    return;
+                }
+                
+                // Calcular ganancia y días según tipo
+                let ganancia = '';
+                let dias = 0;
+                
+                if (envio.tipo_envio === 'free') {
+                    ganancia = '+1 punto';
+                    dias = 3;
+                } else if (envio.tipo_envio === 'standard') {
+                    ganancia = '+€0.20';
+                    dias = 7;
+                } else if (envio.tipo_envio === 'premium') {
+                    ganancia = '+€0.45';
+                    dias = 10;
+                }
+                
+                const playlistNombre = envio.playlists?.nombre || 'tu playlist';
+                const cancionNombre = envio.cancion_nombre || 'esta canción';
+                
+                if (!confirm(
+                    `¿Aceptar este envío?\n\n` +
+                    `📀 Canción: ${cancionNombre}\n` +
+                    `🎵 Playlist: ${playlistNombre}\n` +
+                    `💰 Ganancia: ${ganancia}\n` +
+                    `⏱️ Días obligatorios: ${dias} días\n\n` +
+                    `Debes mantener la canción en tu playlist durante ${dias} días para recibir tu ganancia.`
+                )) {
+                    return;
+                }
+                
                 const { error } = await supabaseClient
                     .from('envios_canciones')
                     .update({
@@ -6048,10 +6086,48 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     return;
                 }
                 
-                alert('✅ Envío aceptado\n\nAhora debes agregar la canción a tu playlist y mantenerla durante el tiempo requerido.');
+                // Actualizar puntos o balance según tipo de envío
+                const userId = localStorage.getItem('userId');
+                if (envio.tipo_envio === 'free') {
+                    // Dar 1 punto
+                    const { data: userData } = await supabaseClient
+                        .from('usuarios')
+                        .select('puntos')
+                        .eq('id', userId)
+                        .single();
+                    
+                    await supabaseClient
+                        .from('usuarios')
+                        .update({ puntos: (userData.puntos || 0) + 1 })
+                        .eq('id', userId);
+                        
+                    alert(`✅ Envío aceptado\n\n+1 punto agregado.\n\nRecuerda: Debes mantener la canción en tu playlist durante ${dias} días.`);
+                } else {
+                    // Agregar dinero al balance (bloqueado hasta completar días)
+                    const dinero = envio.tipo_envio === 'standard' ? 0.20 : 0.45;
+                    
+                    const { data: userData } = await supabaseClient
+                        .from('usuarios')
+                        .select('balance')
+                        .eq('id', userId)
+                        .single();
+                    
+                    await supabaseClient
+                        .from('usuarios')
+                        .update({ balance: (userData.balance || 0) + dinero })
+                        .eq('id', userId);
+                    
+                    alert(`✅ Envío aceptado\n\n+€${dinero.toFixed(2)} agregado (bloqueado).\n\nEl dinero se desbloqueará en ${dias} días.`);
+                }
                 
                 // Recargar lista
                 await cargarEnviosRecibidos();
+                
+            } catch (err) {
+                console.error('Error en aceptarEnvio:', err);
+                alert('⚠️ Error inesperado');
+            }
+        }
                 
             } catch (err) {
                 console.error('Error en aceptarEnvio:', err);
