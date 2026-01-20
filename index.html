@@ -4916,7 +4916,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         async function submitToPlaylists(){
             try {
                 const userId = localStorage.getItem('userId');
-                const userCreditos = parseFloat(localStorage.getItem('userCreditos')) || 0;
+                let userCreditos = parseFloat(localStorage.getItem('userCreditos')) || 0;
                 
                 if (!userId) {
                     alert('⚠️ Error: No se encontró tu sesión. Por favor inicia sesión de nuevo.');
@@ -4933,31 +4933,78 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     return;
                 }
                 
-                // Calcular créditos necesarios
-                let creditosNecesarios = 0;
+                // Obtener datos del usuario (envíos gratis, fecha reset)
+                const { data: userData, error: userError } = await supabaseClient
+                    .from('usuarios')
+                    .select('creditos, envios_gratis_restantes, ultimo_reset_envios')
+                    .eq('id', userId)
+                    .single();
                 
-                selectedPlaylists.forEach(playlistId => {
-                    const playlist = PLAYLISTS_DATA.find(p => p.id === playlistId);
-                    if (playlist) {
-                        const typeInfo = getPlaylistType(playlist.followers);
-                        creditosNecesarios += typeInfo.credits;
-                    }
-                });
-                
-                // Verificar si tiene suficientes créditos
-                if (userCreditos < creditosNecesarios) {
-                    alert(`⚠️ Créditos insuficientes\n\nNecesitas ${creditosNecesarios} créditos.\nTienes ${userCreditos} créditos.\n\nCompra más créditos para continuar.`);
+                if (userError) {
+                    console.error('Error obteniendo usuario:', userError);
+                    alert('⚠️ Error al obtener tus datos');
                     return;
                 }
                 
-                console.log('💰 Créditos necesarios:', creditosNecesarios);
-                console.log('💰 Créditos actuales:', userCreditos);
+                userCreditos = userData.creditos || 0;
+                let enviosGratis = userData.envios_gratis_restantes || 0;
                 
-                // Crear envíos en Supabase
+                // Verificar si necesita resetear envíos gratis (nuevo mes)
+                const ultimoReset = userData.ultimo_reset_envios ? new Date(userData.ultimo_reset_envios) : new Date();
+                const ahora = new Date();
+                const mesActual = ahora.getMonth();
+                const mesUltimoReset = ultimoReset.getMonth();
+                
+                if (mesActual !== mesUltimoReset) {
+                    // Resetear a 3 envíos gratis
+                    enviosGratis = 3;
+                    await supabaseClient
+                        .from('usuarios')
+                        .update({ 
+                            envios_gratis_restantes: 3,
+                            ultimo_reset_envios: ahora.toISOString()
+                        })
+                        .eq('id', userId);
+                }
+                
+                // Separar playlists FREE de las de pago
+                const playlistsFree = [];
+                const playlistsPago = [];
+                let creditosNecesarios = 0;
+                
                 for (const playlistId of selectedPlaylists) {
                     const playlist = PLAYLISTS_DATA.find(p => p.id === playlistId);
-                    const typeInfo = getPlaylistType(playlist.followers);
-                    
+                    if (playlist) {
+                        const typeInfo = getPlaylistType(playlist.followers);
+                        if (typeInfo.type === 'free') {
+                            playlistsFree.push({ playlistId, playlist, typeInfo });
+                        } else {
+                            playlistsPago.push({ playlistId, playlist, typeInfo });
+                            creditosNecesarios += typeInfo.credits;
+                        }
+                    }
+                }
+                
+                // Verificar envíos gratis
+                if (playlistsFree.length > enviosGratis) {
+                    alert(`⚠️ Envíos gratis insuficientes\n\nHas seleccionado ${playlistsFree.length} playlists FREE pero solo tienes ${enviosGratis} envíos gratis este mes.\n\nPuedes:\n• Deseleccionar algunas playlists FREE\n• Esperar al próximo mes para resetear tus envíos gratis`);
+                    return;
+                }
+                
+                // Verificar créditos para playlists de pago
+                if (creditosNecesarios > userCreditos) {
+                    alert(`⚠️ Créditos insuficientes\n\nNecesitas ${creditosNecesarios} créditos para las playlists de pago.\nTienes ${userCreditos} créditos.\n\nCompra más créditos para continuar.`);
+                    return;
+                }
+                
+                console.log('💰 Envíos gratis:', enviosGratis, '/ FREE seleccionadas:', playlistsFree.length);
+                console.log('💰 Créditos necesarios:', creditosNecesarios, '/ Créditos disponibles:', userCreditos);
+                
+                // Crear envíos en Supabase
+                // Crear envíos en Supabase
+                const todosLosEnvios = [...playlistsFree, ...playlistsPago];
+                
+                for (const { playlistId, playlist, typeInfo } of todosLosEnvios) {
                     // Obtener curador_id de la playlist
                     const { data: playlistData, error: playlistError } = await supabaseClient
                         .from('playlists')
@@ -5007,17 +5054,21 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     }
                 }
                 
-                // Descontar créditos
+                // Descontar créditos y envíos gratis
                 const nuevosCreditos = userCreditos - creditosNecesarios;
+                const nuevosEnviosGratis = enviosGratis - playlistsFree.length;
                 
                 const { error: updateError } = await supabaseClient
                     .from('usuarios')
-                    .update({ creditos: nuevosCreditos })
+                    .update({ 
+                        creditos: nuevosCreditos,
+                        envios_gratis_restantes: nuevosEnviosGratis
+                    })
                     .eq('id', userId);
                 
                 if (updateError) {
-                    console.error('Error actualizando créditos:', updateError);
-                    alert('⚠️ Error al descontar créditos. Por favor contacta soporte.');
+                    console.error('Error actualizando datos:', updateError);
+                    alert('⚠️ Error al actualizar tus datos. Por favor contacta soporte.');
                     return;
                 }
                 
@@ -5025,11 +5076,21 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 localStorage.setItem('userCreditos', nuevosCreditos);
                 document.getElementById('creditosStandard').textContent = nuevosCreditos;
                 
-                alert(`🎉 ¡MÚSICA ENVIADA!\n\n` +
-                      `Tu canción ha sido enviada a ${selectedPlaylists.length} playlists.\n\n` +
-                      `💰 Créditos usados: ${creditosNecesarios}\n` +
-                      `💰 Créditos restantes: ${nuevosCreditos}\n\n` +
-                      `Los curadores revisarán tu música en 48-72 horas.`);
+                let mensaje = `🎉 ¡MÚSICA ENVIADA!\n\nTu canción ha sido enviada a ${selectedPlaylists.length} playlists.\n\n`;
+                
+                if (playlistsFree.length > 0) {
+                    mensaje += `🎁 Envíos gratis usados: ${playlistsFree.length}\n`;
+                    mensaje += `🎁 Envíos gratis restantes: ${nuevosEnviosGratis}/3\n\n`;
+                }
+                
+                if (creditosNecesarios > 0) {
+                    mensaje += `💰 Créditos usados: ${creditosNecesarios}\n`;
+                    mensaje += `💰 Créditos restantes: ${nuevosCreditos}\n\n`;
+                }
+                
+                mensaje += `Los curadores revisarán tu música en 48-72 horas.`;
+                
+                alert(mensaje);
                 
                 closeSpotifyModal();
                 
@@ -6962,6 +7023,20 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         
         async function openNotificacionesModal(){
             document.getElementById('modalNotificaciones').classList.add('active');
+            
+            // Marcar todas las notificaciones como leídas
+            const userId = localStorage.getItem('userId');
+            if (userId) {
+                await supabaseClient
+                    .from('notificaciones')
+                    .update({ leida: true })
+                    .eq('usuario_id', userId)
+                    .eq('leida', false);
+                
+                // Actualizar badge
+                document.getElementById('notificationCount').style.display = 'none';
+            }
+            
             // Cargar notificaciones desde Supabase
             await cargarNotificaciones();
         }
@@ -7017,7 +7092,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     const tiempoTranscurrido = calcularTiempoTranscurrido(notif.created_at);
                     
                     return `
-                        <div style="background: rgba(255,255,255,${isNew ? '0.05' : '0.02'}); border-left: 4px solid ${color}; padding: 1.5rem; border-radius: 0.75rem; opacity: ${opacity}; position: relative;">
+                        <div onclick="verNotificacion('${notif.tipo}', '${notif.envio_id || ''}')" style="background: rgba(255,255,255,${isNew ? '0.05' : '0.02'}); border-left: 4px solid ${color}; padding: 1.5rem; border-radius: 0.75rem; opacity: ${opacity}; position: relative; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='rgba(255,255,255,${isNew ? '0.05' : '0.02'})'">
                             ${isNew ? `<span style="position: absolute; top: 1rem; right: 1rem; background: ${color}; color: white; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 700;">NUEVA</span>` : ''}
                             <div style="display: flex; gap: 1rem;">
                                 <div style="font-size: 2rem;">${icono}</div>
@@ -7059,6 +7134,26 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             if (minutos < 60) return `Hace ${minutos} minuto${minutos > 1 ? 's' : ''}`;
             if (horas < 24) return `Hace ${horas} hora${horas > 1 ? 's' : ''}`;
             return `Hace ${dias} día${dias > 1 ? 's' : ''}`;
+        }
+        
+        function verNotificacion(tipo, envioId) {
+            const userType = localStorage.getItem('userType');
+            
+            // Cerrar modal de notificaciones
+            closeNotificacionesModal();
+            
+            // Abrir el modal correspondiente según el tipo
+            if (tipo === 'nuevo_envio' || tipo === 'ganancias_desbloqueadas') {
+                // Para curadores: abrir envíos recibidos
+                if (userType === 'curador') {
+                    openEnviosRecibidosModal();
+                }
+            } else if (tipo === 'envio_aceptado' || tipo === 'envio_rechazado' || tipo === 'plazo_cumplido') {
+                // Para artistas: abrir historial
+                if (userType === 'artista') {
+                    openHistorialModal();
+                }
+            }
         }
         
         async function actualizarContadorNotificaciones() {
