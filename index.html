@@ -4984,12 +4984,26 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                             creditos_usados: typeInfo.credits,
                             estado: 'pendiente',
                             fecha_envio: new Date().toISOString()
-                        });
+                        })
+                        .select()
+                        .single();
                     
                     if (error) {
                         console.error('Error creando envío:', error);
                     } else {
                         console.log('✅ Envío creado:', data);
+                        
+                        // Crear notificación para el curador
+                        await supabaseClient
+                            .from('notificaciones')
+                            .insert({
+                                usuario_id: playlistData.curador_id,
+                                tipo: 'nuevo_envio',
+                                titulo: '📨 Nuevo envío recibido',
+                                mensaje: `${selectedSong.artist} te ha enviado "${selectedSong.name}" a tu playlist`,
+                                envio_id: data.id,
+                                leida: false
+                            });
                     }
                 }
                 
@@ -6091,6 +6105,18 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     return;
                 }
                 
+                // Crear notificación para el artista
+                await supabaseClient
+                    .from('notificaciones')
+                    .insert({
+                        usuario_id: envio.artista_id,
+                        tipo: 'envio_aceptado',
+                        titulo: '✅ Envío aceptado',
+                        mensaje: `Tu canción "${cancionNombre}" ha sido aceptada. El curador debe mantenerla ${dias} días en su playlist.`,
+                        envio_id: envioId,
+                        leida: false
+                    });
+                
                 alert(`✅ Envío aceptado\n\n${ganancia} se desbloqueará en ${dias} días.\n\nRecuerda: Debes mantener la canción en tu playlist durante ${dias} días.`);
                 
                 // Recargar lista
@@ -6106,6 +6132,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             const motivo = prompt('¿Por qué rechazas este envío?\n\n(Opcional - se notificará al artista)');
             
             try {
+                // Obtener datos del envío para notificar
+                const { data: envio } = await supabaseClient
+                    .from('envios_canciones')
+                    .select('*')
+                    .eq('id', envioId)
+                    .single();
+                
                 const { error } = await supabaseClient
                     .from('envios_canciones')
                     .update({
@@ -6119,6 +6152,34 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     console.error('Error rechazando envío:', error);
                     alert('⚠️ Error al rechazar el envío');
                     return;
+                }
+                
+                // Devolver créditos al artista
+                if (envio && envio.creditos_usados > 0) {
+                    const { data: artista } = await supabaseClient
+                        .from('usuarios')
+                        .select('creditos')
+                        .eq('id', envio.artista_id)
+                        .single();
+                    
+                    await supabaseClient
+                        .from('usuarios')
+                        .update({ creditos: (artista.creditos || 0) + envio.creditos_usados })
+                        .eq('id', envio.artista_id);
+                }
+                
+                // Crear notificación para el artista
+                if (envio) {
+                    await supabaseClient
+                        .from('notificaciones')
+                        .insert({
+                            usuario_id: envio.artista_id,
+                            tipo: 'envio_rechazado',
+                            titulo: '❌ Envío rechazado',
+                            mensaje: `Tu canción "${envio.cancion_nombre}" fue rechazada. ${envio.creditos_usados > 0 ? `Se han devuelto ${envio.creditos_usados} créditos.` : ''} Motivo: ${motivo || 'No especificado'}`,
+                            envio_id: envioId,
+                            leida: false
+                        });
                 }
                 
                 alert('❌ Envío rechazado\n\nEl artista recibirá la devolución de sus créditos.');
@@ -6210,14 +6271,44 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                             .update({ ganancias_desbloqueadas: true })
                             .eq('id', envio.id);
                         
+                        // Determinar ganancia
+                        let gananciaTexto = '';
+                        
                         // Agregar ganancias al usuario
                         if (envio.tipo_envio === 'free') {
                             puntosDesbloqueados += 1;
+                            gananciaTexto = '+1 punto';
                         } else if (envio.tipo_envio === 'standard') {
                             dineroDesbloqueado += 0.20;
+                            gananciaTexto = '+€0.20';
                         } else if (envio.tipo_envio === 'premium') {
                             dineroDesbloqueado += 0.45;
+                            gananciaTexto = '+€0.45';
                         }
+                        
+                        // Crear notificación para el curador
+                        await supabaseClient
+                            .from('notificaciones')
+                            .insert({
+                                usuario_id: userId,
+                                tipo: 'ganancias_desbloqueadas',
+                                titulo: '💰 Ganancias desbloqueadas',
+                                mensaje: `Has cumplido el plazo de "${envio.cancion_nombre}". ${gananciaTexto} desbloqueado.`,
+                                envio_id: envio.id,
+                                leida: false
+                            });
+                        
+                        // Crear notificación para el artista
+                        await supabaseClient
+                            .from('notificaciones')
+                            .insert({
+                                usuario_id: envio.artista_id,
+                                tipo: 'plazo_cumplido',
+                                titulo: '✅ Plazo cumplido',
+                                mensaje: `El curador ha mantenido "${envio.cancion_nombre}" durante ${diasRequeridos} días en su playlist.`,
+                                envio_id: envio.id,
+                                leida: false
+                            });
                     }
                 }
                 
@@ -6970,6 +7061,31 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             return `Hace ${dias} día${dias > 1 ? 's' : ''}`;
         }
         
+        async function actualizarContadorNotificaciones() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) return;
+            
+            try {
+                const { data, error } = await supabaseClient
+                    .from('notificaciones')
+                    .select('id')
+                    .eq('usuario_id', userId)
+                    .eq('leida', false);
+                
+                if (!error && data) {
+                    const badge = document.getElementById('notificationCount');
+                    if (data.length > 0) {
+                        badge.textContent = data.length;
+                        badge.style.display = 'inline-block';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+                }
+            } catch (err) {
+                console.error('Error actualizando contador notificaciones:', err);
+            }
+        }
+        
         function closeNotificacionesModal(){
             document.getElementById('modalNotificaciones').classList.remove('active');
         }
@@ -7245,6 +7361,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
                 // Cargar contenido de precios según tipo de usuario
                 cargarSeccionPrecios();
+                
+                // Cargar contador de notificaciones
+                await actualizarContadorNotificaciones();
                 
                 // Cargar inicial del usuario en avatar
                 if (userName) {
