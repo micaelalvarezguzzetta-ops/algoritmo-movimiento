@@ -4436,8 +4436,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 selectedSong = {
                     id: trackId,
                     url: url,
-                    name: 'Canción de Spotify', // Se mostrará el embed al curador
-                    artist: 'Ver en reproductor',
+                    name: null, // Se pedirá al usuario
+                    artist: null,
                     embedUrl: `https://open.spotify.com/embed/track/${trackId}`
                 };
                 
@@ -4454,6 +4454,28 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                             loading="lazy"
                             style="border-radius: 0.75rem;">
                         </iframe>
+                        
+                        <div style="margin-top: 1.5rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 700; color: rgba(255,255,255,0.9);">Nombre de tu canción:</label>
+                            <input 
+                                type="text" 
+                                id="cancionNombreInput"
+                                placeholder="Ej: Noche de Verano"
+                                style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: white; font-size: 1rem;"
+                                oninput="actualizarNombreCancion()"
+                            />
+                        </div>
+                        
+                        <div style="margin-top: 1rem;">
+                            <label style="display: block; margin-bottom: 0.5rem; font-weight: 700; color: rgba(255,255,255,0.9);">Nombre del artista:</label>
+                            <input 
+                                type="text" 
+                                id="artistaNombreInput"
+                                placeholder="Ej: Bad Bunny"
+                                style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: white; font-size: 1rem;"
+                                oninput="actualizarNombreCancion()"
+                            />
+                        </div>
                     </div>
                 `;
                 preview.style.display = 'block';
@@ -4462,6 +4484,16 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             } else if (url.length > 10) {
                 // Link inválido
                 error.style.display = 'block';
+            }
+        }
+        
+        function actualizarNombreCancion() {
+            const nombreInput = document.getElementById('cancionNombreInput');
+            const artistaInput = document.getElementById('artistaNombreInput');
+            
+            if (selectedSong && nombreInput && artistaInput) {
+                selectedSong.name = nombreInput.value.trim() || 'Canción sin nombre';
+                selectedSong.artist = artistaInput.value.trim() || 'Artista';
             }
         }
         
