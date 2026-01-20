@@ -7309,7 +7309,22 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             const userId = localStorage.getItem('userId');
             const userType = localStorage.getItem('userType');
             
-            if (userType !== 'curador' || !userId) return;
+            if (userType !== 'curador' || !userId) {
+                console.log('No es curador o no hay userId');
+                return;
+            }
+            
+            // Esperar a que el DOM esté listo
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            const statusContainer = document.getElementById('spotifyConnectionStatus');
+            
+            if (!statusContainer) {
+                console.error('❌ No se encontró spotifyConnectionStatus');
+                return;
+            }
+            
+            console.log('✅ Verificando estado de Spotify...');
             
             try {
                 const { data: usuario, error } = await supabaseClient
@@ -7318,9 +7333,12 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     .eq('id', userId)
                     .single();
                 
-                const statusContainer = document.getElementById('spotifyConnectionStatus');
+                if (error) {
+                    console.error('Error obteniendo usuario:', error);
+                }
                 
                 if (usuario && usuario.spotify_access_token) {
+                    console.log('✅ Spotify conectado');
                     // Conectado
                     statusContainer.innerHTML = `
                         <div style="background: rgba(29, 185, 84, 0.2); border: 2px solid #1db954; border-radius: 0.75rem; padding: 1rem; display: flex; align-items: center; justify-content: space-between;">
@@ -7337,6 +7355,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         </div>
                     `;
                 } else {
+                    console.log('⚠️ Spotify no conectado');
                     // No conectado
                     statusContainer.innerHTML = `
                         <div style="background: rgba(29, 185, 84, 0.1); border: 2px solid #1db954; border-radius: 0.75rem; padding: 1rem;">
@@ -7356,6 +7375,11 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 }
             } catch (err) {
                 console.error('Error verificando Spotify:', err);
+                statusContainer.innerHTML = `
+                    <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 0.75rem; padding: 1rem; text-align: center; color: #ef4444;">
+                        ⚠️ Error al verificar conexión con Spotify
+                    </div>
+                `;
             }
         }
         
@@ -7806,8 +7830,23 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         
         function cerrarSesion(){
             if(confirm('¿Estás seguro que deseas cerrar sesión?')){
+                // Ocultar inmediatamente todos los paneles
+                document.getElementById('artistaPanel')?.classList.add('hidden');
+                document.getElementById('curadorPanel')?.classList.add('hidden');
+                document.querySelectorAll('[data-require-login]').forEach(section => {
+                    section.classList.add('hidden');
+                });
+                
+                // Mostrar panel de autenticación
+                document.getElementById('authPanel')?.classList.remove('hidden');
+                
+                // Limpiar localStorage
                 localStorage.clear();
-                location.reload();
+                
+                // Recargar página
+                setTimeout(() => {
+                    location.reload();
+                }, 100);
             }
         }
         
