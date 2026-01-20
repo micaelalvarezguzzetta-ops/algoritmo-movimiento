@@ -5139,7 +5139,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             try {
                 const { data: envios, error } = await supabaseClient
                     .from('envios_canciones')
-                    .select('*')
+                    .select('*, playlists(nombre, url_spotify)')
                     .eq('artista_id', userId)
                     .order('created_at', { ascending: false });
                 
@@ -5216,9 +5216,22 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     return `
                         <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; border: 2px solid ${estado.border}20;">
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                <div>
+                                <div style="flex: 1;">
                                     <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem;">${envio.cancion_nombre || 'Canción sin nombre'}</h3>
-                                    <p style="color: rgba(255,255,255,0.7);">Enviado el ${new Date(envio.created_at).toLocaleDateString('es-ES')}</p>
+                                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 0.5rem;">Enviado el ${new Date(envio.created_at).toLocaleDateString('es-ES')}</p>
+                                    ${envio.playlists ? `
+                                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-top: 0.75rem;">
+                                            <span style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">📋 Playlist:</span>
+                                            ${envio.playlists.url_spotify ? `
+                                                <a href="${envio.playlists.url_spotify}" target="_blank" style="color: #1db954; font-weight: 700; text-decoration: none; display: flex; align-items: center; gap: 0.25rem; font-size: 0.9rem;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">
+                                                    ${envio.playlists.nombre || 'Playlist'}
+                                                    <span style="font-size: 0.75rem;">🔗</span>
+                                                </a>
+                                            ` : `
+                                                <span style="color: rgba(255,255,255,0.8); font-weight: 600; font-size: 0.9rem;">${envio.playlists.nombre || 'Playlist'}</span>
+                                            `}
+                                        </div>
+                                    ` : ''}
                                 </div>
                                 <div style="background: ${estado.bg}; border: 2px solid ${estado.border}; padding: 0.5rem 1rem; border-radius: 0.5rem; color: ${estado.text}; font-weight: 700; font-size: 0.9rem;">
                                     ${estado.label}
@@ -5233,7 +5246,11 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                                     <span style="color: rgba(255,255,255,0.6);">
                                         💰 ${envio.creditos_usados} créditos
                                     </span>
-                                ` : ''}
+                                ` : `
+                                    <span style="color: rgba(255,255,255,0.6);">
+                                        🎁 Envío gratis
+                                    </span>
+                                `}
                             </div>
                             
                             ${contadorHTML}
