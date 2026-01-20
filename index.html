@@ -6032,7 +6032,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 // Obtener datos del envío
                 const { data: envio, error: fetchError } = await supabaseClient
                     .from('envios_canciones')
-                    .select('*, playlists(nombre)')
+                    .select('*')
                     .eq('id', envioId)
                     .single();
                 
@@ -6057,13 +6057,11 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     dias = 10;
                 }
                 
-                const playlistNombre = envio.playlists?.nombre || 'tu playlist';
                 const cancionNombre = envio.cancion_nombre || 'esta canción';
                 
                 if (!confirm(
                     `¿Aceptar este envío?\n\n` +
                     `📀 Canción: ${cancionNombre}\n` +
-                    `🎵 Playlist: ${playlistNombre}\n` +
                     `💰 Ganancia: ${ganancia}\n` +
                     `⏱️ Días obligatorios: ${dias} días\n\n` +
                     `Debes mantener la canción en tu playlist durante ${dias} días para recibir tu ganancia.`
