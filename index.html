@@ -971,223 +971,14 @@
 
     <!-- MODAL HISTORIAL DE ENVÍOS -->
     <div class="modal" id="modalHistorial">
-        <div class="modal-content" style="max-width: 1200px;">
+        <div class="modal-content" style="max-width: 900px;">
             <button class="modal-close" onclick="closeHistorialModal()">×</button>
             <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">📋 Historial de Envíos</h2>
             <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">Todos tus envíos a playlists y su estado</p>
             
-            <!-- Filtros y estadísticas -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 3rem;">
-                <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 2.5rem; font-weight: 900; color: #10b981; margin-bottom: 0.5rem;">12</div>
-                    <div style="color: rgba(255,255,255,0.8); font-weight: 600;">Aceptados</div>
-                </div>
-                
-                <div style="background: rgba(251, 191, 36, 0.1); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 2.5rem; font-weight: 900; color: #fbbf24; margin-bottom: 0.5rem;">8</div>
-                    <div style="color: rgba(255,255,255,0.8); font-weight: 600;">En Revisión</div>
-                </div>
-                
-                <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 2.5rem; font-weight: 900; color: #ef4444; margin-bottom: 0.5rem;">3</div>
-                    <div style="color: rgba(255,255,255,0.8); font-weight: 600;">Rechazados</div>
-                </div>
-                
-                <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 2.5rem; font-weight: 900; color: #7c3aed; margin-bottom: 0.5rem;">23</div>
-                    <div style="color: rgba(255,255,255,0.8); font-weight: 600;">Total Envíos</div>
-                </div>
-            </div>
-            
-            <!-- Filtros -->
-            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap;">
-                <button style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #7c3aed, #ec4899); border: none; border-radius: 0.75rem; color: white; font-weight: 700; cursor: pointer;">Todos</button>
-                <button style="padding: 0.75rem 1.5rem; background: rgba(16, 185, 129, 0.2); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 0.75rem; color: #10b981; font-weight: 700; cursor: pointer;">Aceptados</button>
-                <button style="padding: 0.75rem 1.5rem; background: rgba(251, 191, 36, 0.2); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 0.75rem; color: #fbbf24; font-weight: 700; cursor: pointer;">En Revisión</button>
-                <button style="padding: 0.75rem 1.5rem; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 0.75rem; color: #ef4444; font-weight: 700; cursor: pointer;">Rechazados</button>
-            </div>
-            
             <!-- Lista de envíos -->
-            <div style="display: grid; gap: 1.5rem;">
-                
-                <!-- Envío 1 - Aceptado -->
-                <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 2rem; border-left: 4px solid #10b981;">
-                    <div style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem;">
-                        <div style="font-size: 3rem;">🎵</div>
-                        <div>
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                <div>
-                                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Amanecer Urbano</h3>
-                                    <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem; margin-bottom: 0.5rem;">📋 Playlist: Urbano Top 100 by DJ Carlos</p>
-                                    <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 0.5rem;">👥 45,000 seguidores • 🎵 120 canciones</p>
-                                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">📅 Enviado: 5 de Enero, 2026 14:30</p>
-                                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">✅ Respondido: 6 de Enero, 2026 09:15</p>
-                                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">⏰ Tiempo en playlist: 28 días (permanece hasta 3 Feb, 2026)</p>
-                                </div>
-                                <div style="text-align: right;">
-                                    <div style="background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 700; margin-bottom: 0.75rem; display: inline-block;">
-                                        ✓ Aceptado
-                                    </div>
-                                    <div style="font-size: 1.2rem; font-weight: 800; color: #10b981; margin-bottom: 0.5rem;">+2,456 reproducciones</div>
-                                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">💾 234 guardados</div>
-                                </div>
-                            </div>
-                            
-                            <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
-                                <button onclick="verPlaylist('https://spotify.com/playlist/ejemplo')" style="flex: 1; padding: 0.75rem; background: linear-gradient(135deg, #1db954, #1ed760); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer; font-size: 0.9rem;">
-                                    🔗 Ver Playlist
-                                </button>
-                                <button onclick="reportarProblema('Amanecer Urbano', 'Urbano Top 100')" style="flex: 1; padding: 0.75rem; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem; color: #ef4444; font-weight: 700; cursor: pointer; font-size: 0.9rem;">
-                                    ⚠️ Reportar Problema
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Envío 2 - En Revisión -->
-                <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 2rem; border-left: 4px solid #fbbf24;">
-                    <div style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem;">
-                        <div style="font-size: 3rem;">🎵</div>
-                        <div>
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                <div>
-                                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Noches de Verano</h3>
-                                    <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem; margin-bottom: 0.5rem;">📋 Playlist: Trap España by Music Pro</p>
-                                    <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 0.5rem;">👥 28,000 seguidores • 🎵 85 canciones</p>
-                                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">📅 Enviado: 6 de Enero, 2026 16:45</p>
-                                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-top: 0.5rem;">⏱ El curador suele responder en 48-72 horas</p>
-                                </div>
-                                <div style="text-align: right;">
-                                    <div style="background: rgba(251, 191, 36, 0.2); color: #fbbf24; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 700; display: inline-block;">
-                                        ⏱ En Revisión
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div style="background: rgba(251, 191, 36, 0.1); border-left: 3px solid #fbbf24; padding: 1rem; border-radius: 0.5rem; margin-top: 1.5rem;">
-                                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">
-                                    💡 <strong>Consejo:</strong> Tu música está siendo revisada. Los curadores reciben muchos envíos, ten paciencia. Te notificaremos por email cuando haya una respuesta.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Envío 3 - Aceptado con reporte -->
-                <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 2rem; border-left: 4px solid #10b981;">
-                    <div style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem;">
-                        <div style="font-size: 3rem;">🎵</div>
-                        <div>
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                <div>
-                                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Ritmo Latino</h3>
-                                    <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem; margin-bottom: 0.5rem;">📋 Playlist: Reggaeton 2026 by Latin Vibes</p>
-                                    <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 0.5rem;">👥 150,000 seguidores • 🎵 200 canciones</p>
-                                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">📅 Enviado: 3 de Enero, 2026 10:20</p>
-                                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">✅ Respondido: 4 de Enero, 2026 15:30</p>
-                                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">⏰ Tiempo en playlist: 30 días (permanece hasta 5 Feb, 2026)</p>
-                                </div>
-                                <div style="text-align: right;">
-                                    <div style="background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 700; margin-bottom: 0.75rem; display: inline-block;">
-                                        ✓ Aceptado
-                                    </div>
-                                    <div style="font-size: 1.2rem; font-weight: 800; color: #10b981; margin-bottom: 0.5rem;">+4,832 reproducciones</div>
-                                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">💾 567 guardados</div>
-                                </div>
-                            </div>
-                            
-                            <div style="display: flex; gap: 0.75rem; margin-top: 1.5rem;">
-                                <button onclick="verPlaylist('https://spotify.com/playlist/ejemplo2')" style="flex: 1; padding: 0.75rem; background: linear-gradient(135deg, #1db954, #1ed760); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer; font-size: 0.9rem;">
-                                    🔗 Ver Playlist
-                                </button>
-                                <button onclick="reportarProblema('Ritmo Latino', 'Reggaeton 2026')" style="flex: 1; padding: 0.75rem; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem; color: #ef4444; font-weight: 700; cursor: pointer; font-size: 0.9rem;">
-                                    ⚠️ Reportar Problema
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Envío 4 - Rechazado -->
-                <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 2rem; border-left: 4px solid #ef4444;">
-                    <div style="display: grid; grid-template-columns: 60px 1fr; gap: 1.5rem;">
-                        <div style="font-size: 3rem;">🎵</div>
-                        <div>
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-                                <div>
-                                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Último Sencillo</h3>
-                                    <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem; margin-bottom: 0.5rem;">📋 Playlist: Pop Internacional by Global Music</p>
-                                    <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-bottom: 0.5rem;">👥 85,000 seguidores • 🎵 150 canciones</p>
-                                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">📅 Enviado: 2 de Enero, 2026 12:00</p>
-                                    <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">❌ Respondido: 3 de Enero, 2026 18:45</p>
-                                </div>
-                                <div style="text-align: right;">
-                                    <div style="background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 700; display: inline-block;">
-                                        ✗ Rechazado
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div style="background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; padding: 1rem; border-radius: 0.5rem; margin-top: 1.5rem;">
-                                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.9); margin-bottom: 0.5rem;">
-                                    <strong>Motivo del rechazo:</strong>
-                                </p>
-                                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">
-                                    "La canción no encaja con el estilo actual de la playlist. Buscamos un sonido más pop mainstream. ¡Sigue intentando!"
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-            </div>
-            
-            <!-- Info adicional -->
-            <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 2rem; margin-top: 3rem;">
-                <h3 style="font-size: 1.2rem; font-weight: 900; margin-bottom: 1.5rem;">⚠️ ¿Cuándo reportar un problema?</h3>
-                
-                <ul style="list-style: none; padding: 0; display: grid; gap: 0.75rem;">
-                    <li style="padding-left: 1.5rem; position: relative; color: rgba(255,255,255,0.9);">
-                        <span style="position: absolute; left: 0;">🔴</span>
-                        Tu canción fue aceptada pero nunca se agregó a la playlist
-                    </li>
-                    <li style="padding-left: 1.5rem; position: relative; color: rgba(255,255,255,0.9);">
-                        <span style="position: absolute; left: 0;">🔴</span>
-                        Tu canción fue eliminada antes del tiempo establecido (30 días)
-                    </li>
-                    <li style="padding-left: 1.5rem; position: relative; color: rgba(255,255,255,0.9);">
-                        <span style="position: absolute; left: 0;">🔴</span>
-                        El curador no cumplió con los términos acordados
-                    </li>
-                    <li style="padding-left: 1.5rem; position: relative; color: rgba(255,255,255,0.9);">
-                        <span style="position: absolute; left: 0;">✅</span>
-                        Revisaremos tu reporte en 24-48 horas y tomaremos medidas
-                    </li>
-                </ul>
-            </div>
-            
-            <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem; padding: 2rem; margin-top: 2rem;">
-                <h3 style="font-size: 1.2rem; font-weight: 900; margin-bottom: 1rem;">💡 Consejos para mejorar tu tasa de aceptación</h3>
-                
-                <ul style="list-style: none; padding: 0; display: grid; gap: 0.75rem;">
-                    <li style="padding-left: 1.5rem; position: relative; color: rgba(255,255,255,0.9);">
-                        <span style="position: absolute; left: 0;">✅</span>
-                        Envía tu música a playlists que realmente encajen con tu estilo
-                    </li>
-                    <li style="padding-left: 1.5rem; position: relative; color: rgba(255,255,255,0.9);">
-                        <span style="position: absolute; left: 0;">✅</span>
-                        Asegúrate de que tu música tenga calidad profesional de producción
-                    </li>
-                    <li style="padding-left: 1.5rem; position: relative; color: rgba(255,255,255,0.9);">
-                        <span style="position: absolute; left: 0;">✅</span>
-                        Ten paciencia - los curadores reciben cientos de envíos diarios
-                    </li>
-                    <li style="padding-left: 1.5rem; position: relative; color: rgba(255,255,255,0.9);">
-                        <span style="position: absolute; left: 0;">✅</span>
-                        No te desanimes con los rechazos - cada no te acerca más a un sí
-                    </li>
-                </ul>
+            <div id="historialEnviosList" style="display: grid; gap: 1.5rem;">
+                <!-- Los envíos se cargan dinámicamente -->
             </div>
         </div>
     </div>
@@ -5228,9 +5019,181 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             document.getElementById('modalSocial').classList.remove('active');
         }
         
-        function openHistorialModal(){
+        async function openHistorialModal(){
             if(!isUserRegistered()){ showRegisterAlert(); return; }
             document.getElementById('modalHistorial').classList.add('active');
+            await cargarHistorialEnvios();
+        }
+        
+        async function cargarHistorialEnvios() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) return;
+            
+            try {
+                const { data: envios, error } = await supabaseClient
+                    .from('envios_canciones')
+                    .select('*')
+                    .eq('artista_id', userId)
+                    .order('created_at', { ascending: false });
+                
+                if (error) {
+                    console.error('Error cargando historial:', error);
+                    return;
+                }
+                
+                const container = document.getElementById('historialEnviosList');
+                
+                if (!envios || envios.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                            <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
+                            <p>No has enviado música aún</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = envios.map(envio => {
+                    const estadoColors = {
+                        'pendiente': { bg: 'rgba(251, 191, 36, 0.2)', border: '#fbbf24', text: '#fbbf24', label: '⏳ Pendiente' },
+                        'aceptado': { bg: 'rgba(16, 185, 129, 0.2)', border: '#10b981', text: '#10b981', label: '✅ Aceptado' },
+                        'rechazado': { bg: 'rgba(239, 68, 68, 0.2)', border: '#ef4444', text: '#ef4444', label: '❌ Rechazado' }
+                    };
+                    
+                    const estado = estadoColors[envio.estado] || estadoColors['pendiente'];
+                    
+                    // Calcular días restantes si está aceptado
+                    let contadorHTML = '';
+                    let botonReportar = '';
+                    
+                    if (envio.estado === 'aceptado' && envio.fecha_aceptado) {
+                        const diasRequeridos = envio.tipo_envio === 'free' ? 3 : envio.tipo_envio === 'standard' ? 7 : 10;
+                        const fechaAceptado = new Date(envio.fecha_aceptado);
+                        const ahora = new Date();
+                        const diasPasados = Math.floor((ahora - fechaAceptado) / (1000 * 60 * 60 * 24));
+                        const diasRestantes = Math.max(0, diasRequeridos - diasPasados);
+                        
+                        const colorContador = diasRestantes === 0 ? '#10b981' : diasRestantes <= 2 ? '#fbbf24' : '#3b82f6';
+                        const completado = diasRestantes === 0;
+                        
+                        contadorHTML = `
+                            <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 0.5rem; padding: 0.75rem; margin-top: 1rem;">
+                                <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: space-between;">
+                                    <div style="display: flex; align-items: center; gap: 0.5rem;">
+                                        <span style="font-size: 1.2rem;">⏱️</span>
+                                        <span style="color: ${colorContador}; font-weight: 700;">
+                                            ${completado ? '✅ Completado' : `Quedan ${diasRestantes} días`}
+                                        </span>
+                                    </div>
+                                    <span style="font-size: 0.8rem; color: rgba(255,255,255,0.6);">
+                                        Aceptado: ${fechaAceptado.toLocaleDateString('es-ES')}
+                                    </span>
+                                </div>
+                                <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); text-align: center; margin-top: 0.25rem;">
+                                    ${completado ? 'El curador cumplió con el tiempo requerido' : `Debe mantenerla ${diasRequeridos} días en total`}
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Botón reportar (solo si aún no está completado)
+                        if (!completado) {
+                            botonReportar = `
+                                <button onclick="reportarEnvio('${envio.id}', '${envio.cancion_nombre}')" 
+                                    style="margin-top: 1rem; width: 100%; padding: 0.75rem; background: rgba(239, 68, 68, 0.2); border: 2px solid #ef4444; border-radius: 0.5rem; color: #ef4444; font-weight: 700; cursor: pointer;">
+                                    🚨 Reportar Problema
+                                </button>
+                            `;
+                        }
+                    }
+                    
+                    return `
+                        <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1rem; border: 2px solid ${estado.border}20;">
+                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                                <div>
+                                    <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem;">${envio.cancion_nombre || 'Canción sin nombre'}</h3>
+                                    <p style="color: rgba(255,255,255,0.7);">Enviado el ${new Date(envio.created_at).toLocaleDateString('es-ES')}</p>
+                                </div>
+                                <div style="background: ${estado.bg}; border: 2px solid ${estado.border}; padding: 0.5rem 1rem; border-radius: 0.5rem; color: ${estado.text}; font-weight: 700; font-size: 0.9rem;">
+                                    ${estado.label}
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+                                <span style="background: rgba(124, 58, 237, 0.2); padding: 0.5rem 1rem; border-radius: 0.5rem; font-size: 0.9rem;">
+                                    ${envio.tipo_envio.toUpperCase()}
+                                </span>
+                                ${envio.creditos_usados > 0 ? `
+                                    <span style="color: rgba(255,255,255,0.6);">
+                                        💰 ${envio.creditos_usados} créditos
+                                    </span>
+                                ` : ''}
+                            </div>
+                            
+                            ${contadorHTML}
+                            ${botonReportar}
+                            
+                            ${envio.mensaje_curador ? `
+                                <div style="background: rgba(59, 130, 246, 0.1); border-left: 3px solid #3b82f6; padding: 1rem; margin-top: 1rem; border-radius: 0.5rem;">
+                                    <div style="font-weight: 700; margin-bottom: 0.5rem; color: #3b82f6;">💬 Mensaje del curador:</div>
+                                    <div style="color: rgba(255,255,255,0.8);">${envio.mensaje_curador}</div>
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (err) {
+                console.error('Error en cargarHistorialEnvios:', err);
+            }
+        }
+        
+        async function reportarEnvio(envioId, cancionNombre) {
+            const motivo = prompt(
+                `🚨 REPORTAR PROBLEMA\n\n` +
+                `Canción: ${cancionNombre}\n\n` +
+                `Describe el problema:\n` +
+                `• ¿El curador eliminó la canción antes de tiempo?\n` +
+                `• ¿Dijo "aceptada" pero no la agregó a la playlist?\n` +
+                `• ¿Otro problema?\n\n` +
+                `Escribe tu reporte:`
+            );
+            
+            if (!motivo || motivo.trim() === '') {
+                return;
+            }
+            
+            try {
+                // Guardar reporte en Supabase (puedes crear una tabla 'reportes' después)
+                // Por ahora, agregamos el mensaje en mensaje_artista del envío
+                const { error } = await supabaseClient
+                    .from('envios_canciones')
+                    .update({
+                        mensaje_artista: `[REPORTE] ${motivo}`
+                    })
+                    .eq('id', envioId);
+                
+                if (error) {
+                    console.error('Error al reportar:', error);
+                    alert('⚠️ Error al enviar reporte');
+                    return;
+                }
+                
+                alert(
+                    `✅ Reporte enviado\n\n` +
+                    `Tu reporte ha sido registrado.\n` +
+                    `El equipo de ALGORITMO revisará el caso.\n\n` +
+                    `Si se confirma el problema:\n` +
+                    `• Se te devolverán los créditos\n` +
+                    `• El curador no recibirá su ganancia`
+                );
+                
+                // Recargar historial
+                await cargarHistorialEnvios();
+                
+            } catch (err) {
+                console.error('Error en reportarEnvio:', err);
+                alert('⚠️ Error inesperado');
+            }
         }
         
         function closeHistorialModal(){
