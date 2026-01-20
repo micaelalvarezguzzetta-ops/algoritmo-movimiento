@@ -5949,18 +5949,29 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         const diasPasados = Math.floor((ahora - fechaAceptado) / (1000 * 60 * 60 * 24));
                         const diasRestantes = Math.max(0, diasRequeridos - diasPasados);
                         
+                        // Determinar ganancia
+                        let gananciaTexto = '';
+                        if (envio.tipo_envio === 'free') {
+                            gananciaTexto = '+1 punto';
+                        } else if (envio.tipo_envio === 'standard') {
+                            gananciaTexto = '+€0.20';
+                        } else if (envio.tipo_envio === 'premium') {
+                            gananciaTexto = '+€0.45';
+                        }
+                        
                         const colorContador = diasRestantes === 0 ? '#10b981' : diasRestantes <= 2 ? '#fbbf24' : '#3b82f6';
+                        const desbloqueado = envio.ganancias_desbloqueadas || diasRestantes === 0;
                         
                         contadorHTML = `
                             <div style="background: rgba(59, 130, 246, 0.1); border: 1px solid rgba(59, 130, 246, 0.3); border-radius: 0.5rem; padding: 0.75rem; margin-top: 1rem;">
                                 <div style="display: flex; align-items: center; gap: 0.5rem; justify-content: center;">
                                     <span style="font-size: 1.2rem;">⏱️</span>
                                     <span style="color: ${colorContador}; font-weight: 700; font-size: 1.1rem;">
-                                        ${diasRestantes === 0 ? '✅ Completado' : `Quedan ${diasRestantes} días`}
+                                        ${desbloqueado ? '✅ Completado' : `Quedan ${diasRestantes} días`}
                                     </span>
                                 </div>
                                 <div style="font-size: 0.8rem; color: rgba(255,255,255,0.6); text-align: center; margin-top: 0.25rem;">
-                                    ${diasRestantes === 0 ? 'Dinero desbloqueado' : `Mantener hasta completar ${diasRequeridos} días`}
+                                    ${desbloqueado ? `Ganancia ${gananciaTexto} desbloqueada` : `${gananciaTexto} se desbloqueará en ${diasRestantes} días`}
                                 </div>
                             </div>
                         `;
@@ -6074,7 +6085,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     .update({
                         estado: 'aceptado',
                         fecha_aceptado: new Date().toISOString(),
-                        fecha_respuesta: new Date().toISOString()
+                        fecha_respuesta: new Date().toISOString(),
+                        ganancias_desbloqueadas: false
                     })
                     .eq('id', envioId);
                 
@@ -6084,39 +6096,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     return;
                 }
                 
-                // Actualizar puntos o balance según tipo de envío
-                const userId = localStorage.getItem('userId');
-                if (envio.tipo_envio === 'free') {
-                    // Dar 1 punto
-                    const { data: userData } = await supabaseClient
-                        .from('usuarios')
-                        .select('puntos')
-                        .eq('id', userId)
-                        .single();
-                    
-                    await supabaseClient
-                        .from('usuarios')
-                        .update({ puntos: (userData.puntos || 0) + 1 })
-                        .eq('id', userId);
-                        
-                    alert(`✅ Envío aceptado\n\n+1 punto agregado.\n\nRecuerda: Debes mantener la canción en tu playlist durante ${dias} días.`);
-                } else {
-                    // Agregar dinero al balance (bloqueado hasta completar días)
-                    const dinero = envio.tipo_envio === 'standard' ? 0.20 : 0.45;
-                    
-                    const { data: userData } = await supabaseClient
-                        .from('usuarios')
-                        .select('balance')
-                        .eq('id', userId)
-                        .single();
-                    
-                    await supabaseClient
-                        .from('usuarios')
-                        .update({ balance: (userData.balance || 0) + dinero })
-                        .eq('id', userId);
-                    
-                    alert(`✅ Envío aceptado\n\n+€${dinero.toFixed(2)} agregado (bloqueado).\n\nEl dinero se desbloqueará en ${dias} días.`);
-                }
+                alert(`✅ Envío aceptado\n\n${ganancia} se desbloqueará en ${dias} días.\n\nRecuerda: Debes mantener la canción en tu playlist durante ${dias} días.`);
                 
                 // Recargar lista
                 await cargarEnviosRecibidos();
@@ -6197,119 +6177,91 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         
         
         // ========================================
+        // SISTEMA AUTOMÁTICO DE DESBLOQUEO DE GANANCIAS
+        // ========================================
+        
+        async function verificarYDesbloquearGanancias() {
+            try {
+                const userId = localStorage.getItem('userId');
+                const userType = localStorage.getItem('userType');
+                
+                if (userType !== 'curador' || !userId) return;
+                
+                // Obtener envíos aceptados que aún no tienen ganancias desbloqueadas
+                const { data: envios, error } = await supabaseClient
+                    .from('envios_canciones')
+                    .select('*')
+                    .eq('curador_id', userId)
+                    .eq('estado', 'aceptado')
+                    .eq('ganancias_desbloqueadas', false)
+                    .not('fecha_aceptado', 'is', null);
+                
+                if (error || !envios || envios.length === 0) return;
+                
+                const ahora = new Date();
+                let puntosDesbloqueados = 0;
+                let dineroDesbloqueado = 0;
+                
+                for (const envio of envios) {
+                    const diasRequeridos = envio.tipo_envio === 'free' ? 3 : envio.tipo_envio === 'standard' ? 7 : 10;
+                    const fechaAceptado = new Date(envio.fecha_aceptado);
+                    const diasPasados = Math.floor((ahora - fechaAceptado) / (1000 * 60 * 60 * 24));
+                    
+                    // Si ya pasaron los días requeridos, desbloquear
+                    if (diasPasados >= diasRequeridos) {
+                        // Marcar como desbloqueado
+                        await supabaseClient
+                            .from('envios_canciones')
+                            .update({ ganancias_desbloqueadas: true })
+                            .eq('id', envio.id);
+                        
+                        // Agregar ganancias al usuario
+                        if (envio.tipo_envio === 'free') {
+                            puntosDesbloqueados += 1;
+                        } else if (envio.tipo_envio === 'standard') {
+                            dineroDesbloqueado += 0.20;
+                        } else if (envio.tipo_envio === 'premium') {
+                            dineroDesbloqueado += 0.45;
+                        }
+                    }
+                }
+                
+                // Actualizar puntos y balance del usuario
+                if (puntosDesbloqueados > 0 || dineroDesbloqueado > 0) {
+                    const { data: userData } = await supabaseClient
+                        .from('usuarios')
+                        .select('puntos, balance')
+                        .eq('id', userId)
+                        .single();
+                    
+                    const nuevosPuntos = (userData.puntos || 0) + puntosDesbloqueados;
+                    const nuevoBalance = (userData.balance || 0) + dineroDesbloqueado;
+                    
+                    await supabaseClient
+                        .from('usuarios')
+                        .update({ 
+                            puntos: nuevosPuntos,
+                            balance: nuevoBalance
+                        })
+                        .eq('id', userId);
+                    
+                    console.log(`✅ Ganancias desbloqueadas: +${puntosDesbloqueados} puntos, +€${dineroDesbloqueado.toFixed(2)}`);
+                }
+                
+            } catch (err) {
+                console.error('Error verificando ganancias:', err);
+            }
+        }
+        
+        // Ejecutar verificación al cargar la página (solo para curadores)
+        if (localStorage.getItem('userType') === 'curador') {
+            verificarYDesbloquearGanancias();
+        }
+        
+        // ========================================
         // SISTEMA AUTOMÁTICO DE LIBERACIÓN DE PUNTOS
         // ========================================
         
-        async function verificarYLiberarPuntos(){
-            try {
-                // Obtener todos los envíos en tracking que NO han liberado puntos
-                const { data: trackings, error: errorTracking } = await supabaseClient
-                    .from('envios_tracking')
-                    .select('*')
-                    .eq('puntos_liberados', false)
-                    .is('fecha_retiro', null); // Solo envíos que NO han sido retirados
-                
-                if (errorTracking) throw errorTracking;
-                
-                if (!trackings || trackings.length === 0) {
-                    console.log('No hay envíos pendientes de liberar puntos');
-                    return;
-                }
-                
-                console.log(`📊 Verificando ${trackings.length} envíos pendientes...`);
-                
-                const ahora = new Date();
-                let puntosLiberados = 0;
-                
-                for (const tracking of trackings) {
-                    const fechaAceptacion = new Date(tracking.fecha_aceptacion);
-                    const diasTranscurridos = Math.floor((ahora - fechaAceptacion) / (1000 * 60 * 60 * 24));
-                    
-                    // Si han pasado 4 días o más, liberar punto
-                    if (diasTranscurridos >= 4) {
-                        
-                        // Sumar 1 punto al curador
-                        const { data: usuario, error: errorUser } = await supabaseClient
-                            .from('usuarios')
-                            .select('puntos')
-                            .eq('id', tracking.curador_id)
-                            .single();
-                        
-                        if (errorUser) {
-                            console.error('Error al obtener usuario:', errorUser);
-                            continue;
-                        }
-                        
-                        const nuevosPuntos = (usuario.puntos || 0) + 1;
-                        
-                        const { error: errorUpdate } = await supabaseClient
-                            .from('usuarios')
-                            .update({ puntos: nuevosPuntos })
-                            .eq('id', tracking.curador_id);
-                        
-                        if (errorUpdate) {
-                            console.error('Error al actualizar puntos:', errorUpdate);
-                            continue;
-                        }
-                        
-                        // Marcar como liberado
-                        const { error: errorMark } = await supabaseClient
-                            .from('envios_tracking')
-                            .update({ puntos_liberados: true })
-                            .eq('id', tracking.id);
-                        
-                        if (errorMark) {
-                            console.error('Error al marcar tracking:', errorMark);
-                            continue;
-                        }
-                        
-                        puntosLiberados++;
-                        console.log(`✅ Punto liberado para curador ${tracking.curador_id}`);
-                    }
-                }
-                
-                if (puntosLiberados > 0) {
-                    console.log(`🎉 Total puntos liberados: ${puntosLiberados}`);
-                    // Actualizar display si es el curador actual
-                    const userId = localStorage.getItem('userId');
-                    if (userId) {
-                        await cargarPuntosCurador();
-                    }
-                }
-                
-            } catch (err) {
-                console.error('Error en verificarYLiberarPuntos:', err);
-            }
-        }
-        
-        // Función para registrar retiro de canción (cuando curador la quita antes de tiempo)
-        async function registrarRetiroCancion(envioId){
-            try {
-                const { error } = await supabaseClient
-                    .from('envios_tracking')
-                    .update({ 
-                        fecha_retiro: new Date().toISOString(),
-                        puntos_liberados: false // No gana punto si retira antes
-                    })
-                    .eq('envio_id', envioId);
-                
-                if (error) throw error;
-                
-                console.log('❌ Retiro registrado - NO se liberará punto');
-                
-            } catch (err) {
-                console.error('Error al registrar retiro:', err);
-            }
-        }
-        
-        // Ejecutar verificación cada vez que el curador abre su panel
-        async function inicializarCurador(){
-            const userType = localStorage.getItem('userType');
-            if (userType === 'curador') {
-                console.log('🔄 Verificando puntos pendientes...');
-                await verificarYLiberarPuntos();
-            }
-        }
         
         // ========================================
         // FIN SISTEMA DE PUNTOS
