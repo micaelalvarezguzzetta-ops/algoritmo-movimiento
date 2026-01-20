@@ -5145,22 +5145,44 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
                 if (error) {
                     console.error('Error cargando historial:', error);
+                    // Intentar sin JOIN si falla
+                    const { data: enviosSinJoin, error: error2 } = await supabaseClient
+                        .from('envios_canciones')
+                        .select('*')
+                        .eq('artista_id', userId)
+                        .order('created_at', { ascending: false });
+                    
+                    if (error2) {
+                        console.error('Error cargando historial (sin join):', error2);
+                        return;
+                    }
+                    
+                    // Usar envíos sin JOIN
+                    renderHistorialEnvios(enviosSinJoin || []);
                     return;
                 }
                 
-                const container = document.getElementById('historialEnviosList');
+                renderHistorialEnvios(envios || []);
                 
-                if (!envios || envios.length === 0) {
-                    container.innerHTML = `
-                        <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
-                            <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
-                            <p>No has enviado música aún</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                container.innerHTML = envios.map(envio => {
+            } catch (err) {
+                console.error('Error en cargarHistorialEnvios:', err);
+            }
+        }
+        
+        function renderHistorialEnvios(envios) {
+            const container = document.getElementById('historialEnviosList');
+            
+            if (!envios || envios.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
+                        <p>No has enviado música aún</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = envios.map(envio => {
                     const estadoColors = {
                         'pendiente': { bg: 'rgba(251, 191, 36, 0.2)', border: '#fbbf24', text: '#fbbf24', label: '⏳ Pendiente' },
                         'aceptado': { bg: 'rgba(16, 185, 129, 0.2)', border: '#10b981', text: '#10b981', label: '✅ Aceptado' },
@@ -5265,10 +5287,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         </div>
                     `;
                 }).join('');
-                
-            } catch (err) {
-                console.error('Error en cargarHistorialEnvios:', err);
-            }
         }
         
         async function reportarEnvio(envioId, cancionNombre) {
