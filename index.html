@@ -6197,62 +6197,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                   'Funcionalidad disponible próximamente');
         }
         
-        async function aceptarEnvio(envioId, cancion, tipo, esGratis = false){
-            const ganancia = esGratis ? '0€ (ganas 1 punto)' : (tipo === 'premium' ? '0.60€' : '0.23€');
-            const dias = tipo === 'premium' ? '10 días' : esGratis ? '4 días' : '5 días';
-            const recompensa = esGratis ? '\n\n🌟 Este es un envío GRATIS\nGanarás 1 PUNTO después de mantener la canción 4 días' : '';
-            
-            if(!confirm('✅ ¿ACEPTAR ENVÍO?\n\n' +
-                      'Canción: ' + cancion + '\n' +
-                      'Ganancia: ' + ganancia + '\n' +
-                      'Debes mantenerla mínimo: ' + dias + recompensa + '\n\n' +
-                      '¿Aceptar y agregar a la playlist?')){
-                return;
-            }
-            
-            try {
-                const userId = localStorage.getItem('userId');
-                
-                // Actualizar estado del envío a "aceptado"
-                const { error: errorEnvio } = await supabaseClient
-                    .from('envios')
-                    .update({ 
-                        estado: 'aceptado',
-                        updated_at: new Date().toISOString()
-                    })
-                    .eq('id', envioId);
-                
-                if (errorEnvio) throw errorEnvio;
-                
-                // Si es envío GRATIS, registrar en tracking para puntos
-                if (esGratis) {
-                    const { error: errorTracking } = await supabaseClient
-                        .from('envios_tracking')
-                        .insert([{
-                            envio_id: envioId,
-                            curador_id: userId,
-                            fecha_aceptacion: new Date().toISOString(),
-                            puntos_liberados: false
-                        }]);
-                    
-                    if (errorTracking) throw errorTracking;
-                }
-                
-                alert('🎉 ENVÍO ACEPTADO\n\n' +
-                      'La canción se agregará a tu playlist.\n\n' +
-                      (esGratis ? 
-                        '🌟 Ganarás 1 PUNTO después de 4 días\n\nRecuerda: Si retiras la canción antes, NO ganarás el punto.' :
-                        'Tu ganancia de ' + ganancia + ' se desbloqueará después de ' + dias + '.\n\n' +
-                        '⚠️ Recuerda: Si eliminas la canción antes de tiempo, se devolverá el 75% al artista.'));
-                
-                // Recargar envíos
-                location.reload();
-                
-            } catch (err) {
-                console.error('Error al aceptar envío:', err);
-                alert('❌ Error al aceptar envío. Intenta de nuevo.');
-            }
-        }
         
         // ========================================
         // SISTEMA AUTOMÁTICO DE LIBERACIÓN DE PUNTOS
