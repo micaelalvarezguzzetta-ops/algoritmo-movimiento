@@ -4647,6 +4647,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             
             try {
                 console.log('🔍 Verificando playlist ID:', spotifyId);
+                console.log('👤 Usuario ID:', userId);
                 
                 // Llamar a Edge Function para verificar
                 const response = await fetch('https://wesmqqaijlmqhctrtaje.supabase.co/functions/v1/verificar-playlist', {
@@ -4661,11 +4662,14 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     })
                 });
                 
+                console.log('📡 Response status:', response.status);
+                
                 const result = await response.json();
                 
-                console.log('📡 Respuesta:', result);
+                console.log('📡 Respuesta completa:', result);
                 
                 if (!response.ok) {
+                    console.error('❌ Error en respuesta:', result);
                     throw new Error(result.error || 'Error al verificar playlist');
                 }
                 
@@ -4675,8 +4679,10 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 await cargarPlaylistsDisponibles();
                 
             } catch (err) {
-                console.error('❌ Error:', err);
-                alert(`⚠️ ${err.message}`);
+                console.error('❌ Error completo:', err);
+                console.error('❌ Error message:', err.message);
+                console.error('❌ Error stack:', err.stack);
+                alert(`⚠️ Error al verificar playlist\n\nDetalles: ${err.message}\n\nRevisa la consola (F12) para más información.`);
             } finally {
                 if (btn) {
                     btn.disabled = false;
@@ -7501,83 +7507,54 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             // Limpiar URL
             window.history.replaceState({}, document.title, '/');
             
-            console.log('✅ Código de Spotify recibido:', code);
+            console.log('✅ Código de Spotify recibido');
             
-            // Verificar si está en proceso de registro
-            const isRegistering = localStorage.getItem('spotify_registering');
+            const isRegistering = localStorage.getItem('spotify_registering') === 'true';
+            const userId = localStorage.getItem('userId');
             
-            if (isRegistering === 'true') {
-                // CREAR NUEVA CUENTA (sin verificar token por ahora)
-                const nombre = prompt('¿Cuál es tu nombre?', 'Curador');
-                const email = prompt('¿Cuál es tu email?');
+            try {
+                // Llamar a Edge Function para intercambiar código por tokens
+                const response = await fetch('https://wesmqqaijlmqhctrtaje.supabase.co/functions/v1/spotify-callback', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
+                    },
+                    body: JSON.stringify({
+                        code: code,
+                        userId: userId,
+                        isRegistering: isRegistering
+                    })
+                });
                 
-                if (!nombre || !email) {
-                    alert('⚠️ Necesitas proporcionar nombre y email');
-                    localStorage.removeItem('spotify_registering');
-                    return;
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Error al conectar con Spotify');
                 }
                 
-                try {
-                    const { data: nuevoUsuario, error } = await supabaseClient
-                        .from('usuarios')
-                        .insert({
-                            nombre: nombre,
-                            email: email,
-                            tipo: 'curador',
-                            creditos: 0,
-                            puntos: 20,
-                            balance: 0,
-                            spotify_access_token: code, // Guardamos el código por ahora
-                            spotify_user_id: email, // Temporal
-                            envios_gratis_restantes: 3,
-                            ultimo_reset_envios: new Date().toISOString()
-                        })
-                        .select()
-                        .single();
-                    
-                    if (error) {
-                        console.error('Error creando usuario:', error);
-                        alert(`⚠️ Error al crear cuenta: ${error.message}`);
-                        localStorage.removeItem('spotify_registering');
-                        return;
-                    }
-                    
-                    // Guardar sesión
+                if (result.isNew) {
+                    // Nueva cuenta creada
                     localStorage.setItem('userRegistered', 'true');
-                    localStorage.setItem('userId', nuevoUsuario.id);
-                    localStorage.setItem('userName', nuevoUsuario.nombre);
-                    localStorage.setItem('userEmail', nuevoUsuario.email);
+                    localStorage.setItem('userId', result.user.id);
+                    localStorage.setItem('userName', result.user.nombre);
+                    localStorage.setItem('userEmail', result.user.email);
                     localStorage.setItem('userType', 'curador');
                     localStorage.removeItem('spotify_registering');
                     
-                    alert(`✅ ¡Cuenta creada!\n\nBienvenido ${nuevoUsuario.nombre}\n\n🎁 Has recibido 20 puntos de bienvenida`);
+                    alert(`✅ ¡Cuenta creada con Spotify!\n\nBienvenido ${result.user.nombre}\n\n🎁 Has recibido 20 puntos de bienvenida`);
                     location.reload();
-                    
-                } catch (err) {
-                    console.error('Error:', err);
-                    alert('⚠️ Error al crear cuenta. Intenta de nuevo.');
+                } else {
+                    // Solo conectó Spotify
                     localStorage.removeItem('spotify_registering');
-                }
-                
-            } else {
-                // SOLO CONECTAR SPOTIFY
-                const userId = localStorage.getItem('userId');
-                
-                try {
-                    await supabaseClient
-                        .from('usuarios')
-                        .update({
-                            spotify_access_token: code,
-                            spotify_user_id: userId
-                        })
-                        .eq('id', userId);
-                    
-                    alert('✅ ¡Spotify conectado!\n\nAhora puedes agregar tus playlists.');
+                    alert('✅ ¡Spotify conectado exitosamente!\n\nAhora puedes agregar tus playlists verificadas.');
                     verificarEstadoSpotify();
-                } catch (err) {
-                    console.error('Error:', err);
-                    alert('⚠️ Error al conectar Spotify.');
                 }
+                
+            } catch (err) {
+                console.error('Error:', err);
+                alert(`⚠️ ${err.message}`);
+                localStorage.removeItem('spotify_registering');
             }
         }
         
