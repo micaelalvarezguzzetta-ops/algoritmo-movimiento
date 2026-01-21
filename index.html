@@ -1002,29 +1002,17 @@
         </div>
     </div>
 
-    <!-- MODAL AGREGAR PLAYLIST MANUAL -->
+    <!-- MODAL AGREGAR PLAYLIST VERIFICADO -->
     <div class="modal" id="modalAgregarPlaylist">
         <div class="modal-content" style="max-width: 600px;">
             <button class="modal-close" onclick="closeAgregarPlaylistModal()">×</button>
             <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">➕ Agregar Playlist</h2>
-            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Pega el link de tu playlist de Spotify</p>
+            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Verificaremos automáticamente que sea tuya</p>
             
             <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 2rem;">
                 <div class="form-group">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">Link de Spotify:</label>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">Link de tu playlist de Spotify:</label>
                     <input type="text" id="playlistLinkInput" placeholder="https://open.spotify.com/playlist/..." 
-                           style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: white; font-size: 1rem;" />
-                </div>
-                
-                <div class="form-group" style="margin-top: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">Nombre de la playlist:</label>
-                    <input type="text" id="playlistNombreInput" placeholder="Ej: Trap España 2025" 
-                           style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: white; font-size: 1rem;" />
-                </div>
-                
-                <div class="form-group" style="margin-top: 1rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">Seguidores aproximados:</label>
-                    <input type="number" id="playlistSeguidoresInput" placeholder="Ej: 5000" 
                            style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: white; font-size: 1rem;" />
                 </div>
                 
@@ -1033,8 +1021,20 @@
                 </button>
             </div>
             
-            <div style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 1rem; padding: 1rem; margin-top: 1.5rem; text-align: center;">
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">
+            <div style="background: rgba(29, 185, 84, 0.1); border: 2px solid #1db954; border-radius: 1rem; padding: 1.5rem; margin-top: 1.5rem;">
+                <h3 style="color: #1db954; font-weight: 700; margin-bottom: 0.75rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <span>🔒</span>
+                    <span>Verificación Automática</span>
+                </h3>
+                <ul style="list-style: none; padding: 0; font-size: 0.9rem; color: rgba(255,255,255,0.8);">
+                    <li style="margin-bottom: 0.5rem;">✅ Verificamos que la playlist sea tuya</li>
+                    <li style="margin-bottom: 0.5rem;">✅ Obtenemos los seguidores reales</li>
+                    <li style="margin-bottom: 0.5rem;">✅ Imposible hacer trampa</li>
+                </ul>
+            </div>
+            
+            <div style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 1rem; padding: 1rem; margin-top: 1rem; text-align: center;">
+                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8);">
                     💡 Copia el link desde Spotify: Click derecho en tu playlist → Compartir → Copiar enlace
                 </p>
             </div>
@@ -4596,10 +4596,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         
         function openAgregarPlaylistModal() {
             document.getElementById('modalAgregarPlaylist').classList.add('active');
-            // Limpiar campos
+            // Limpiar campo
             document.getElementById('playlistLinkInput').value = '';
-            document.getElementById('playlistNombreInput').value = '';
-            document.getElementById('playlistSeguidoresInput').value = '';
         }
         
         function closeAgregarPlaylistModal() {
@@ -4608,11 +4606,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         
         async function agregarPlaylistManual() {
             const link = document.getElementById('playlistLinkInput').value.trim();
-            const nombre = document.getElementById('playlistNombreInput').value.trim();
-            const seguidores = parseInt(document.getElementById('playlistSeguidoresInput').value) || 0;
             
-            if (!link || !nombre) {
-                alert('⚠️ Por favor completa todos los campos');
+            if (!link) {
+                alert('⚠️ Por favor pega el link de tu playlist');
                 return;
             }
             
@@ -4629,34 +4625,55 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             
             const userId = localStorage.getItem('userId');
             
+            // Verificar que tiene Spotify conectado
+            const { data: usuario } = await supabaseClient
+                .from('usuarios')
+                .select('spotify_access_token')
+                .eq('id', userId)
+                .single();
+            
+            if (!usuario?.spotify_access_token) {
+                alert('⚠️ Primero debes conectar tu cuenta de Spotify\n\nVe al panel principal y conecta Spotify para verificar tus playlists automáticamente.');
+                closeAgregarPlaylistModal();
+                return;
+            }
+            
+            // Mostrar loading
+            const btn = event.target;
+            btn.disabled = true;
+            btn.textContent = '⏳ Verificando...';
+            
             try {
-                const { data, error } = await supabaseClient
-                    .from('playlists')
-                    .insert({
-                        curador_id: userId,
-                        nombre: nombre,
-                        genero: 'General',
-                        followers: seguidores,
-                        url_spotify: link,
-                        spotify_playlist_id: spotifyId
+                // Llamar a Edge Function para verificar
+                const response = await fetch('https://wesmqqaijlmqhctrtaje.supabase.co/functions/v1/verificar-playlist', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${supabaseClient.supabaseKey}`
+                    },
+                    body: JSON.stringify({
+                        playlistId: spotifyId,
+                        userId: userId
                     })
-                    .select()
-                    .single();
+                });
                 
-                if (error) {
-                    console.error('Error:', error);
-                    alert(`⚠️ Error al agregar playlist: ${error.message}`);
-                    return;
+                const result = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(result.error || 'Error al verificar playlist');
                 }
                 
-                alert(`✅ ¡Playlist agregada!\n\n"${nombre}" está lista para recibir envíos.`);
+                alert(`✅ ¡Playlist verificada y agregada!\n\n"${result.data.nombre}"\nSeguidores reales: ${result.data.followers}`);
                 closeAgregarPlaylistModal();
                 // Recargar playlists disponibles
                 await cargarPlaylistsDisponibles();
                 
             } catch (err) {
                 console.error('Error:', err);
-                alert('⚠️ Error inesperado. Intenta de nuevo.');
+                alert(`⚠️ ${err.message}`);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '✅ Agregar Playlist';
             }
         }
         
