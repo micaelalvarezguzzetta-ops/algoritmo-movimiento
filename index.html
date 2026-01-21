@@ -1016,7 +1016,7 @@
                            style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 0.5rem; color: white; font-size: 1rem;" />
                 </div>
                 
-                <button onclick="agregarPlaylistManual()" style="width: 100%; padding: 1rem; margin-top: 1.5rem; background: linear-gradient(135deg, #10b981, #06b6d4); border: none; border-radius: 0.75rem; color: white; font-weight: 700; cursor: pointer; font-size: 1.1rem;">
+                <button onclick="agregarPlaylistManual(event)" style="width: 100%; padding: 1rem; margin-top: 1.5rem; background: linear-gradient(135deg, #10b981, #06b6d4); border: none; border-radius: 0.75rem; color: white; font-weight: 700; cursor: pointer; font-size: 1.1rem;">
                     ✅ Agregar Playlist
                 </button>
             </div>
@@ -4604,7 +4604,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             document.getElementById('modalAgregarPlaylist').classList.remove('active');
         }
         
-        async function agregarPlaylistManual() {
+        async function agregarPlaylistManual(event) {
             const link = document.getElementById('playlistLinkInput').value.trim();
             
             if (!link) {
@@ -4639,17 +4639,21 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             }
             
             // Mostrar loading
-            const btn = event.target;
-            btn.disabled = true;
-            btn.textContent = '⏳ Verificando...';
+            const btn = event ? event.target : document.querySelector('#modalAgregarPlaylist button[onclick*="agregarPlaylistManual"]');
+            if (btn) {
+                btn.disabled = true;
+                btn.textContent = '⏳ Verificando...';
+            }
             
             try {
+                console.log('🔍 Verificando playlist ID:', spotifyId);
+                
                 // Llamar a Edge Function para verificar
                 const response = await fetch('https://wesmqqaijlmqhctrtaje.supabase.co/functions/v1/verificar-playlist', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${supabaseClient.supabaseKey}`
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
                     },
                     body: JSON.stringify({
                         playlistId: spotifyId,
@@ -4658,6 +4662,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 });
                 
                 const result = await response.json();
+                
+                console.log('📡 Respuesta:', result);
                 
                 if (!response.ok) {
                     throw new Error(result.error || 'Error al verificar playlist');
@@ -4669,11 +4675,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 await cargarPlaylistsDisponibles();
                 
             } catch (err) {
-                console.error('Error:', err);
+                console.error('❌ Error:', err);
                 alert(`⚠️ ${err.message}`);
             } finally {
-                btn.disabled = false;
-                btn.textContent = '✅ Agregar Playlist';
+                if (btn) {
+                    btn.disabled = false;
+                    btn.textContent = '✅ Agregar Playlist';
+                }
             }
         }
         
