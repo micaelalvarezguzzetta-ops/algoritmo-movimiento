@@ -5666,38 +5666,79 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 // Renderizar playlists
                 if (container) {
                     container.innerHTML = data.map(playlist => {
-                        // Calcular tipo según seguidores
+                        // Estado de la playlist
+                        let estadoBadge = '';
+                        let estadoColor = '';
+                        let estadoBg = '';
+                        
+                        if (playlist.estado === 'pendiente') {
+                            estadoBadge = '⏳ PENDIENTE REVISIÓN';
+                            estadoColor = '#fbbf24';
+                            estadoBg = 'rgba(251, 191, 36, 0.2)';
+                        } else if (playlist.estado === 'aprobada') {
+                            estadoBadge = '✅ APROBADA';
+                            estadoColor = '#10b981';
+                            estadoBg = 'rgba(16, 185, 129, 0.2)';
+                        } else if (playlist.estado === 'rechazada') {
+                            estadoBadge = '❌ RECHAZADA';
+                            estadoColor = '#ef4444';
+                            estadoBg = 'rgba(239, 68, 68, 0.2)';
+                        }
+                        
+                        // Calcular tipo según seguidores (solo si está aprobada)
                         let tipo = 'free';
                         let tipoBadge = '🎁 FREE';
                         let tipoBg = 'rgba(16, 185, 129, 0.2)';
                         
-                        if (playlist.seguidores >= 300) {
+                        if (playlist.followers >= 300) {
                             tipo = 'premium';
                             tipoBadge = '⭐ PREMIUM';
                             tipoBg = 'rgba(124, 58, 237, 0.2)';
-                        } else if (playlist.seguidores >= 100) {
+                        } else if (playlist.followers >= 100) {
                             tipo = 'standard';
                             tipoBadge = '💰 STANDARD';
                             tipoBg = 'rgba(251, 191, 36, 0.2)';
                         }
                         
                         return `
-                            <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem;">
+                            <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 2rem; margin-bottom: 1.5rem; border: 2px solid ${estadoColor}30;">
                                 <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1.5rem;">
                                     <div style="flex: 1;">
-                                        <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.75rem;">${playlist.nombre}</h3>
+                                        <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 0.75rem;">
+                                            <h3 style="font-size: 1.3rem; font-weight: 800; margin: 0;">${playlist.nombre}</h3>
+                                            <div style="background: ${estadoBg}; padding: 0.5rem 1rem; border-radius: 0.5rem; border: 2px solid ${estadoColor}; color: ${estadoColor}; font-weight: 700; font-size: 0.85rem;">
+                                                ${estadoBadge}
+                                            </div>
+                                        </div>
                                         <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1rem;">
                                             <span style="color: rgba(255,255,255,0.7);">🎵 ${playlist.genero || 'Sin género'}</span>
-                                            <span style="color: rgba(255,255,255,0.7);">👥 ${playlist.seguidores.toLocaleString()} seguidores</span>
+                                            <span style="color: rgba(255,255,255,0.7);">👥 ${(playlist.followers || 0).toLocaleString()} seguidores</span>
                                         </div>
-                                        <div style="background: ${tipoBg}; display: inline-block; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 700; font-size: 0.9rem;">
-                                            ${tipoBadge}
-                                        </div>
+                                        ${playlist.estado === 'aprobada' ? `
+                                            <div style="background: ${tipoBg}; display: inline-block; padding: 0.5rem 1rem; border-radius: 0.5rem; font-weight: 700; font-size: 0.9rem;">
+                                                ${tipoBadge}
+                                            </div>
+                                        ` : ''}
+                                        ${playlist.estado === 'rechazada' && playlist.motivo_rechazo ? `
+                                            <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 0.5rem; padding: 1rem; margin-top: 1rem;">
+                                                <div style="font-weight: 700; color: #ef4444; margin-bottom: 0.5rem;">Motivo del rechazo:</div>
+                                                <div style="color: rgba(255,255,255,0.8);">${playlist.motivo_rechazo}</div>
+                                            </div>
+                                        ` : ''}
+                                        ${playlist.estado === 'pendiente' ? `
+                                            <div style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 0.5rem; padding: 1rem; margin-top: 1rem;">
+                                                <div style="color: rgba(255,255,255,0.8); font-size: 0.9rem;">
+                                                    ⏱️ Tu playlist está siendo revisada por un administrador. Recibirás una notificación cuando sea aprobada.
+                                                </div>
+                                            </div>
+                                        ` : ''}
                                     </div>
                                     <div style="display: flex; flex-direction: column; gap: 0.75rem;">
-                                        <a href="${playlist.url_spotify}" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: rgba(30, 215, 96, 0.2); border: 2px solid rgba(30, 215, 96, 0.3); border-radius: 0.5rem; color: #1ed760; font-weight: 700; text-decoration: none; text-align: center;">
-                                            🎵 Ver en Spotify
-                                        </a>
+                                        ${playlist.url_spotify ? `
+                                            <a href="${playlist.url_spotify}" target="_blank" style="display: inline-block; padding: 0.75rem 1.5rem; background: rgba(30, 215, 96, 0.2); border: 2px solid rgba(30, 215, 96, 0.3); border-radius: 0.5rem; color: #1ed760; font-weight: 700; text-decoration: none; text-align: center;">
+                                                🎵 Ver en Spotify
+                                            </a>
+                                        ` : ''}
                                         <button data-playlist-id="${playlist.id}" data-playlist-nombre="${playlist.nombre.replace(/"/g, '&quot;')}" onclick="eliminarPlaylist(this.dataset.playlistId, this.dataset.playlistNombre)" style="padding: 0.75rem 1.5rem; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem; color: #ef4444; font-weight: 700; cursor: pointer;">
                                             🗑️ Eliminar
                                         </button>
