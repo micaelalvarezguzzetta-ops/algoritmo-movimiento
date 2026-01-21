@@ -4682,19 +4682,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 }
             }
         }
-                
-            } catch (err) {
-                console.error('❌ Error completo:', err);
-                console.error('❌ Error message:', err.message);
-                console.error('❌ Error stack:', err.stack);
-                alert(`⚠️ Error al verificar playlist\n\nDetalles: ${err.message}\n\nRevisa la consola (F12) para más información.`);
-            } finally {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.textContent = '✅ Agregar Playlist';
-                }
-            }
-        }
         
         // Cargar playlists desde Supabase
         async function cargarPlaylistsDisponibles() {
