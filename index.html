@@ -114,10 +114,11 @@
         .logo-text {
             font-family: 'Sora', sans-serif;
             font-weight: 800;
-            font-size: 1.25rem;
+            font-size: 1rem;
             background: linear-gradient(135deg, #fff, #a1a1aa);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
+            white-space: nowrap;
         }
         
         .nav-menu {
@@ -1387,8 +1388,8 @@
     <nav class="navbar" id="navbar">
         <div class="nav-container">
             <div class="logo" onclick="location.href='#'">
-                <div class="logo-icon">🎵</div>
-                <span class="logo-text">ALGORITMO</span>
+                <img src="https://raw.githubusercontent.com/micaelalvarezguzzetta-ops/algoritmo-movimiento/main/logo.png" alt="Logo" style="height: 36px; width: auto;">
+                <span class="logo-text">ALGORITMO EN MOVIMIENTO</span>
             </div>
             
             <div class="nav-menu" id="navMenu">
@@ -1774,8 +1775,8 @@
         <div class="footer-grid">
             <div class="footer-brand">
                 <div class="logo">
-                    <div class="logo-icon">🎵</div>
-                    <span class="logo-text">ALGORITMO</span>
+                    <img src="https://raw.githubusercontent.com/micaelalvarezguzzetta-ops/algoritmo-movimiento/main/logo.png" alt="Logo" style="height: 36px; width: auto;">
+                    <span class="logo-text">ALGORITMO EN MOVIMIENTO</span>
                 </div>
                 <p>La plataforma líder de promoción musical para artistas independientes. Conecta con curadores reales y haz crecer tu audiencia de forma orgánica.</p>
             </div>
@@ -9085,11 +9086,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 if (artistaPanel) {
                     artistaPanel.style.display = 'none';
                     artistaPanel.classList.add('hidden');
+                    artistaPanel.classList.remove('active');
                 }
                 
                 if (curadorPanel) {
                     curadorPanel.style.display = 'none';
                     curadorPanel.classList.add('hidden');
+                    curadorPanel.classList.remove('active');
                 }
                 
                 // Ocultar secciones que requieren login
@@ -9097,6 +9100,29 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     section.style.display = 'none';
                     section.classList.add('hidden');
                 });
+                
+                // Limpiar notificaciones
+                const notifList = document.getElementById('notificacionesList');
+                if (notifList) {
+                    notifList.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem;">No hay notificaciones</p>';
+                }
+                
+                // Limpiar modales abiertos
+                document.querySelectorAll('.modal.active').forEach(modal => {
+                    modal.classList.remove('active');
+                });
+                
+                // Ocultar botón cerrar sesión
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) {
+                    logoutBtn.classList.add('hidden');
+                }
+                
+                // Ocultar avatar
+                const userAvatar = document.getElementById('userAvatar');
+                if (userAvatar) {
+                    userAvatar.style.display = 'none';
+                }
                 
                 // Mostrar panel de autenticación
                 if (authPanel) {
@@ -9179,9 +9205,14 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 // Mostrar botón de cerrar sesión
                 document.getElementById('logoutBtn').classList.remove('hidden');
                 
+                // Mostrar avatar
+                const userAvatar = document.getElementById('userAvatar');
+                if (userAvatar) userAvatar.style.display = 'flex';
+                
                 // Mostrar secciones que requieren login
                 document.querySelectorAll('[data-require-login]').forEach(section => {
                     section.classList.remove('hidden');
+                    section.style.display = '';
                 });
                 
                 // Cargar contenido de precios según tipo de usuario
@@ -9245,6 +9276,45 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
                 // Mostrar badge de notificaciones (vacío por ahora)
                 // document.getElementById('notificationCount').style.display = 'inline-block';
+            } else {
+                // SIN SESIÓN: Ocultar todo lo que requiere login
+                console.log('🔒 Sin sesión activa, ocultando paneles...');
+                
+                // Ocultar paneles de usuario
+                const artistaPanel = document.getElementById('artistaPanel');
+                const curadorPanel = document.getElementById('curadorPanel');
+                
+                if (artistaPanel) {
+                    artistaPanel.style.display = 'none';
+                    artistaPanel.classList.add('hidden');
+                    artistaPanel.classList.remove('active');
+                }
+                
+                if (curadorPanel) {
+                    curadorPanel.style.display = 'none';
+                    curadorPanel.classList.add('hidden');
+                    curadorPanel.classList.remove('active');
+                }
+                
+                // Ocultar secciones que requieren login
+                document.querySelectorAll('[data-require-login]').forEach(section => {
+                    section.style.display = 'none';
+                    section.classList.add('hidden');
+                });
+                
+                // Ocultar botón cerrar sesión
+                const logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) logoutBtn.classList.add('hidden');
+                
+                // Ocultar avatar
+                const userAvatar = document.getElementById('userAvatar');
+                if (userAvatar) userAvatar.style.display = 'none';
+                
+                // Limpiar notificaciones
+                const notifList = document.getElementById('notificacionesList');
+                if (notifList) {
+                    notifList.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem;">No hay notificaciones</p>';
+                }
             }
         });
 
