@@ -8006,49 +8006,15 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 // Cerrar modal
                 closeLoginModal();
                 
-                // Ocultar auth panel
-                document.getElementById('authPanel').classList.add('hidden');
-                
-                // Mostrar botón de cerrar sesión
-                document.getElementById('logoutBtn').classList.remove('hidden');
-                
-                // Mostrar secciones que requieren login
-                document.querySelectorAll('[data-require-login]').forEach(section => {
-                    section.classList.remove('hidden');
-                });
-                
-                // Cargar contenido de precios según tipo de usuario
-                cargarSeccionPrecios();
-                
-                // Mostrar panel según tipo
-                document.getElementById('artistaPanel').classList.remove('active');
-                document.getElementById('curadorPanel').classList.remove('active');
-                
-                if (data.tipo === 'artista') {
-                    document.getElementById('artistaPanel').classList.add('active');
-                    document.getElementById('artistaName').textContent = data.nombre;
-                    // Actualizar créditos en navbar
-                    document.getElementById('creditosStandard').textContent = data.creditos || 0;
-                    // Actualizar inicial en avatar
-                    document.getElementById('userInitial').textContent = data.nombre.charAt(0).toUpperCase();
-                } else {
-                    document.getElementById('curadorPanel').classList.add('active');
-                    document.getElementById('curadorName').textContent = data.nombre;
-                    // Cargar puntos del curador
-                    document.getElementById('curadorPuntosDisplay').textContent = data.puntos || 0;
-                    // Actualizar inicial en avatar
-                    document.getElementById('userInitial').textContent = data.nombre.charAt(0).toUpperCase();
-                    // Verificar y liberar puntos pendientes
-                    setTimeout(() => {
-                        inicializarCurador();
-                    }, 1000);
-                }
-                
+                // Mostrar mensaje de éxito ANTES de otras operaciones
                 alert('✅ Bienvenido de nuevo, ' + data.nombre + '!');
+                
+                // Recargar página para aplicar todos los cambios correctamente
+                location.reload();
                 
             } catch (err) {
                 console.error('❌ Error:', err);
-                alert('⚠️ Error al iniciar sesión');
+                alert('⚠️ Email o contraseña incorrectos');
             }
             
             return false;
