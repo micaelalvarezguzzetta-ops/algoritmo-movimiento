@@ -1399,6 +1399,7 @@
             
             <div class="nav-menu" id="navMenu">
                 <a href="#como-funciona">Cómo Funciona</a>
+                <a href="#servicios">Servicios</a>
                 <a href="#precios">Precios</a>
                 <a href="#testimonios">Opiniones</a>
                 <a href="#faq">FAQ</a>
@@ -1443,21 +1444,6 @@
             <button class="btn-secondary" onclick="document.getElementById('como-funciona').scrollIntoView({behavior: 'smooth'})">
                 Ver cómo funciona
             </button>
-        </div>
-        
-        <div class="hero-stats">
-            <div class="stat-item">
-                <div class="stat-value" id="statCampanas">2.5K+</div>
-                <div class="stat-label">Campañas Entregadas</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="statArtistas">5K+</div>
-                <div class="stat-label">Artistas Activos</div>
-            </div>
-            <div class="stat-item">
-                <div class="stat-value" id="statStreams">10M+</div>
-                <div class="stat-label">Streams Generados</div>
-            </div>
         </div>
         
         <div class="trust-section">
@@ -1548,6 +1534,85 @@
                 <div class="step-icon">📈</div>
                 <h3 class="step-title">Recibe resultados</h3>
                 <p class="step-desc">Los curadores revisan tu música en 7 días. Recibe feedback y añadidos a playlists reales.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- SERVICES SECTION -->
+    <section class="section" id="servicios">
+        <div class="section-header">
+            <span class="section-badge">Servicios</span>
+            <h2 class="section-title">Todo lo que necesitas</h2>
+            <p class="section-subtitle">Herramientas profesionales para impulsar tu carrera musical</p>
+        </div>
+        
+        <div class="steps-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+            <div class="step-card" onclick="openSpotifyModal()" style="cursor: pointer;">
+                <div class="step-icon">🎵</div>
+                <h3 class="step-title">Enviar Música</h3>
+                <p class="step-desc">Conecta Spotify y envía tu música a playlists verificadas</p>
+            </div>
+            <div class="step-card" onclick="openPlaylistsTOPModal()" style="cursor: pointer;">
+                <div class="step-icon">🏆</div>
+                <h3 class="step-title">Playlists TOP</h3>
+                <p class="step-desc">Accede a las playlists con más seguidores</p>
+            </div>
+            <div class="step-card" onclick="openEstadisticasModal()" style="cursor: pointer;">
+                <div class="step-icon">📊</div>
+                <h3 class="step-title">Analytics</h3>
+                <p class="step-desc">Estadísticas detalladas de tus campañas</p>
+            </div>
+            <div class="step-card" onclick="openSmartLinkModal()" style="cursor: pointer;">
+                <div class="step-icon">🔗</div>
+                <h3 class="step-title">SmartLink</h3>
+                <p class="step-desc">Crea enlaces únicos para tu música</p>
+            </div>
+            <div class="step-card" onclick="openMasteringModal()" style="cursor: pointer;">
+                <div class="step-icon">🎚️</div>
+                <h3 class="step-title">Mastering IA</h3>
+                <p class="step-desc">Mejora el sonido con inteligencia artificial</p>
+            </div>
+            <div class="step-card" onclick="openPortadasModal()" style="cursor: pointer;">
+                <div class="step-icon">🎨</div>
+                <h3 class="step-title">Portadas IA</h3>
+                <p class="step-desc">Genera portadas profesionales gratis</p>
+            </div>
+            <div class="step-card" onclick="openAnalisisModal()" style="cursor: pointer;">
+                <div class="step-icon">🔍</div>
+                <h3 class="step-title">Análisis Artista</h3>
+                <p class="step-desc">Analiza tu perfil de Spotify</p>
+            </div>
+            <div class="step-card" onclick="openAfiliadosModal()" style="cursor: pointer;">
+                <div class="step-icon">🤝</div>
+                <h3 class="step-title">Afiliados</h3>
+                <p class="step-desc">Gana dinero invitando artistas</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- RESOURCES SECTION -->
+    <section class="section" id="recursos">
+        <div class="section-header">
+            <span class="section-badge">Recursos</span>
+            <h2 class="section-title">Aprende y crece</h2>
+            <p class="section-subtitle">Guías, consejos y novedades para tu carrera</p>
+        </div>
+        
+        <div class="steps-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+            <div class="step-card" onclick="openPitchGuiaModal()" style="cursor: pointer; background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(139,92,246,0.05));">
+                <div class="step-icon">📝</div>
+                <h3 class="step-title">Guía de Pitch</h3>
+                <p class="step-desc">Aprende a escribir pitches que conquisten a los curadores</p>
+            </div>
+            <div class="step-card" onclick="openNovedadesModal()" style="cursor: pointer; background: linear-gradient(135deg, rgba(236,72,153,0.1), rgba(236,72,153,0.05));">
+                <div class="step-icon">✨</div>
+                <h3 class="step-title">Novedades</h3>
+                <p class="step-desc">Últimas actualizaciones y nuevas funciones</p>
+            </div>
+            <div class="step-card" onclick="openEventosModal()" style="cursor: pointer; background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(59,130,246,0.05));">
+                <div class="step-icon">📅</div>
+                <h3 class="step-title">Eventos</h3>
+                <p class="step-desc">Próximos eventos y oportunidades</p>
             </div>
         </div>
     </section>
@@ -1663,6 +1728,24 @@
                 <button class="pack-btn" onclick="window.open('https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207', '_blank')">
                     Comprar Pack
                 </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- STATS SECTION -->
+    <section class="section" id="estadisticas-section" style="padding-top: 2rem; padding-bottom: 2rem;">
+        <div class="hero-stats" style="justify-content: center;">
+            <div class="stat-item">
+                <div class="stat-value" id="statCampanas">2.5K+</div>
+                <div class="stat-label">Campañas Entregadas</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statArtistas">5K+</div>
+                <div class="stat-label">Artistas Activos</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="statStreams">10M+</div>
+                <div class="stat-label">Streams Generados</div>
             </div>
         </div>
     </section>
@@ -1783,7 +1866,7 @@
                     <img src="https://raw.githubusercontent.com/micaelalvarezguzzetta-ops/algoritmo-movimiento/main/logo.png" alt="Logo" style="height: 36px; width: auto;">
                     <span class="logo-text">ALGORITMO EN MOVIMIENTO</span>
                 </div>
-                <p>La plataforma líder de promoción musical para artistas independientes. Conecta con curadores reales y haz crecer tu audiencia de forma orgánica.</p>
+                <p><strong>La plataforma #1 de promoción musical para artistas de habla hispana.</strong> Conecta con curadores reales de Latinoamérica y España. Haz crecer tu audiencia de forma orgánica con playlists en español.</p>
             </div>
             
             <div class="footer-column">
