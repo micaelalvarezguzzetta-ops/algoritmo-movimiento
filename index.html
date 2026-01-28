@@ -850,6 +850,11 @@
             display: block;
         }
         
+        /* Ocultar elementos que requieren login por defecto */
+        [data-require-login] {
+            display: none;
+        }
+        
         .panel-header {
             background: var(--bg-card);
             border: 1px solid var(--border-color);
@@ -1512,7 +1517,7 @@
             <div class="auth-divider">o</div>
             
             <p class="auth-switch">
-                ¿Ya tienes cuenta? <a href="#" onclick="openLoginModal()">Iniciar sesión</a>
+                ¿Ya tienes cuenta? <a href="javascript:void(0)" onclick="openLoginModal(); return false;">Iniciar sesión</a>
             </p>
         </div>
     </section>
@@ -3887,206 +3892,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         </div>
     </div>
 
-    <!-- MODAL MIS PUNTOS (CURADOR) -->
-            <div style="display: grid; gap: 1.5rem;">
-                
-                <!-- Envío 1 - Pendiente -->
-                <div class="envio-card" data-status="pendiente" style="background: rgba(255,255,255,0.05); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 1rem; padding: 1.5rem;">
-                    <div style="display: flex; gap: 1.5rem; align-items: start;">
-                        <!-- Cover -->
-                        <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #ec4899, #8b5cf6); border-radius: 0.5rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
-                            🎵
-                        </div>
-                        
-                        <!-- Info -->
-                        <div style="flex: 1;">
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
-                                <div>
-                                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.25rem;">Noche de Verano</h3>
-                                    <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem;">Bad Bunny feat. Rauw Alejandro</p>
-                                </div>
-                                <div style="background: rgba(251, 191, 36, 0.2); padding: 0.5rem 1rem; border-radius: 1rem; color: #fbbf24; font-weight: 700; font-size: 0.9rem;">
-                                    ⏱ Pendiente
-                                </div>
-                            </div>
-                            
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                                <div><strong>Playlist:</strong> Reggaeton 2026</div>
-                                <div><strong>Tipo:</strong> 💎 PREMIUM (0.50€)</div>
-                                <div><strong>Género:</strong> Reggaeton</div>
-                                <div><strong>Duración:</strong> 3:24</div>
-                            </div>
-                            
-                            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-                                <button onclick="reproducirCancion('Noche de Verano')" style="padding: 0.6rem 1.2rem; background: rgba(16, 185, 129, 0.2); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 0.5rem; color: #10b981; font-weight: 700; cursor: pointer;">
-                                    ▶️ Reproducir
-                                </button>
-                                <button onclick="verPerfilArtista('Bad Bunny')" style="padding: 0.6rem 1.2rem; background: rgba(59, 130, 246, 0.2); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 0.5rem; color: #60a5fa; font-weight: 700; cursor: pointer;">
-                                    👤 Ver artista
-                                </button>
-                            </div>
-                            
-                            <div style="display: flex; gap: 1rem;">
-                                <button onclick="aceptarEnvio('Noche de Verano', 'premium')" style="flex: 1; padding: 0.75rem; background: linear-gradient(135deg, #10b981, #06b6d4); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                                    ✅ Aceptar (+0.50€)
-                                </button>
-                                <button onclick="rechazarEnvio('Noche de Verano')" style="flex: 1; padding: 0.75rem; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem; color: #ef4444; font-weight: 700; cursor: pointer;">
-                                    ❌ Rechazar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Envío 2 - Pendiente -->
-                <div class="envio-card" data-status="pendiente" style="background: rgba(255,255,255,0.05); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 1rem; padding: 1.5rem;">
-                    <div style="display: flex; gap: 1.5rem; align-items: start;">
-                        <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 0.5rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
-                            🎤
-                        </div>
-                        
-                        <div style="flex: 1;">
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
-                                <div>
-                                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.25rem;">Fuego Latino</h3>
-                                    <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem;">J Balvin</p>
-                                </div>
-                                <div style="background: rgba(251, 191, 36, 0.2); padding: 0.5rem 1rem; border-radius: 1rem; color: #fbbf24; font-weight: 700; font-size: 0.9rem;">
-                                    ⏱ Pendiente
-                                </div>
-                            </div>
-                            
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                                <div><strong>Playlist:</strong> Reggaeton 2026</div>
-                                <div><strong>Tipo:</strong> 📦 STANDARD (0.20€)</div>
-                                <div><strong>Género:</strong> Trap</div>
-                                <div><strong>Duración:</strong> 2:58</div>
-                            </div>
-                            
-                            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-                                <button onclick="reproducirCancion('Fuego Latino')" style="padding: 0.6rem 1.2rem; background: rgba(16, 185, 129, 0.2); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 0.5rem; color: #10b981; font-weight: 700; cursor: pointer;">
-                                    ▶️ Reproducir
-                                </button>
-                                <button onclick="verPerfilArtista('J Balvin')" style="padding: 0.6rem 1.2rem; background: rgba(59, 130, 246, 0.2); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 0.5rem; color: #60a5fa; font-weight: 700; cursor: pointer;">
-                                    👤 Ver artista
-                                </button>
-                            </div>
-                            
-                            <div style="display: flex; gap: 1rem;">
-                                <button onclick="aceptarEnvio('Fuego Latino', 'standard')" style="flex: 1; padding: 0.75rem; background: linear-gradient(135deg, #10b981, #06b6d4); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                                    ✅ Aceptar (+0.20€)
-                                </button>
-                                <button onclick="rechazarEnvio('Fuego Latino')" style="flex: 1; padding: 0.75rem; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem; color: #ef4444; font-weight: 700; cursor: pointer;">
-                                    ❌ Rechazar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Envío 3 - Aceptado -->
-                <div class="envio-card" data-status="aceptado" style="background: rgba(255,255,255,0.05); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem; padding: 1.5rem; opacity: 0.7;">
-                    <div style="display: flex; gap: 1.5rem; align-items: start;">
-                        <div style="width: 100px; height: 100px; background: linear-gradient(135deg, #10b981, #06b6d4); border-radius: 0.5rem; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 2.5rem;">
-                            ✅
-                        </div>
-                        
-                        <div style="flex: 1;">
-                            <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
-                                <div>
-                                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.25rem;">Baila Conmigo</h3>
-                                    <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem;">Daddy Yankee</p>
-                                </div>
-                                <div style="background: rgba(16, 185, 129, 0.2); padding: 0.5rem 1rem; border-radius: 1rem; color: #10b981; font-weight: 700; font-size: 0.9rem;">
-                                    ✅ Aceptado
-                                </div>
-                            </div>
-                            
-                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; font-size: 0.9rem;">
-                                <div><strong>Playlist:</strong> Trap Elite</div>
-                                <div><strong>Tipo:</strong> 💎 PREMIUM (0.50€)</div>
-                                <div><strong>Agregada:</strong> Hace 2 días</div>
-                                <div><strong>Días restantes:</strong> 8/10</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL MIS PLAYLISTS (CURADOR) -->
-    <div class="modal" id="modalMisPlaylists">
-        <div class="modal-content" style="max-width: 1000px;">
-            <button class="modal-close" onclick="closeMisPlaylistsModal()">×</button>
-            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">🎵 Mis Playlists</h2>
-            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Gestiona tus playlists y configura la recepción de envíos</p>
-            
-            <!-- Botón agregar nueva playlist -->
-            <button onclick="openAgregarPlaylistModal()" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #10b981, #06b6d4); border: none; border-radius: 0.75rem; color: white; font-weight: 700; font-size: 1.1rem; cursor: pointer; margin-bottom: 2rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
-                <span style="font-size: 1.5rem;">➕</span>
-                <span>Agregar Nueva Playlist</span>
-            </button>
-            
-            <!-- Lista de playlists del curador -->
-            <div id="playlistsCuradorList" style="display: grid; gap: 1.5rem;">
-                <!-- Las playlists se cargan dinámicamente -->
-            </div>
-            
-            <!-- Info adicional -->
-            <div style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 1rem; padding: 1.5rem; margin-top: 2rem; text-align: center;">
-                <p style="font-size: 0.95rem; color: rgba(255,255,255,0.8);">
-                    💡 <strong>Tip:</strong> Mantén tus playlists activas y actualizadas para recibir más envíos y aumentar tus ganancias
-                </p>
-            </div>
-        </div>
-    </div>
-                                    <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">Seguidores</div>
-                                    <div style="font-size: 1.3rem; font-weight: 800; color: #ec4899;">18,720</div>
-                                </div>
-                                <div>
-                                    <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">Canciones</div>
-                                    <div style="font-size: 1.3rem; font-weight: 800; color: #8b5cf6;">150</div>
-                                </div>
-                                <div>
-                                    <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">Envíos pendientes</div>
-                                    <div style="font-size: 1.3rem; font-weight: 800; color: #6b7280;">0</div>
-                                </div>
-                                <div>
-                                    <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">Ganancias/mes</div>
-                                    <div style="font-size: 1.3rem; font-weight: 800; color: #10b981;">€220</div>
-                                </div>
-                            </div>
-                            
-                            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
-                                <button onclick="editarPlaylist(&apos;Trap Elite&apos;)" style="padding: 0.6rem 1.2rem; background: rgba(124, 58, 237, 0.2); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 0.5rem; color: #a78bfa; font-weight: 700; cursor: pointer;">
-                                    ✏️ Editar
-                                </button>
-                                <button onclick="verEstadisticasPlaylist(&apos;Trap Elite&apos;)" style="padding: 0.6rem 1.2rem; background: rgba(59, 130, 246, 0.2); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 0.5rem; color: #60a5fa; font-weight: 700; cursor: pointer;">
-                                    📊 Estadísticas
-                                </button>
-                                <button onclick="toggleRecepcion(&apos;Trap Elite&apos;, false)" style="padding: 0.6rem 1.2rem; background: rgba(16, 185, 129, 0.2); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 0.5rem; color: #10b981; font-weight: 700; cursor: pointer;">
-                                    ▶️ Reanudar envíos
-                                </button>
-                                <button onclick="verEnSpotify('https://open.spotify.com/playlist/...')" style="padding: 0.6rem 1.2rem; background: rgba(16, 185, 129, 0.2); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 0.5rem; color: #10b981; font-weight: 700; cursor: pointer;">
-                                    🎵 Ver en Spotify
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-            </div>
-            
-            <!-- Info adicional -->
-            <div style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 1rem; padding: 1.5rem; margin-top: 2rem; text-align: center;">
-                <p style="font-size: 0.95rem; color: rgba(255,255,255,0.8);">
-                    💡 <strong>Tip:</strong> Mantén tus playlists activas y actualizadas para recibir más envíos y aumentar tus ganancias
-                </p>
-            </div>
-        </div>
-    </div>
 
     <!-- MODAL MIS PUNTOS (CURADOR) -->
     <div class="modal" id="modalMisPuntos">
@@ -8141,12 +7946,22 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         // ========================================
         // FUNCIONES DE LOGIN
         // ========================================
-        function openLoginModal() {
-            document.getElementById('loginModal').classList.add('active');
+        window.openLoginModal = function() {
+            console.log('🔓 Abriendo modal de login...');
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                modal.classList.add('active');
+                console.log('✅ Modal de login abierto');
+            } else {
+                console.error('❌ Modal de login no encontrado');
+            }
         }
         
-        function closeLoginModal() {
-            document.getElementById('loginModal').classList.remove('active');
+        window.closeLoginModal = function() {
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
         }
         
         async function handleLogin(event) {
