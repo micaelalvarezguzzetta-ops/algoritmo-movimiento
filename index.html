@@ -850,7 +850,7 @@
             display: block;
         }
         
-        /* NO usar data-require-login para paneles - se controlan por clase active */
+        .hidden { display: none !important; }
         
         .panel-header {
             background: var(--bg-card);
@@ -5385,14 +5385,11 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             const artistaPanel = document.getElementById('artistaPanel');
             const curadorPanel = document.getElementById('curadorPanel');
             
-            artistaPanel.style.display = 'none';
             artistaPanel.classList.remove('active');
-            curadorPanel.style.display = 'none';
             curadorPanel.classList.remove('active');
             
             if(userType === 'artista'){
                 console.log('🎨 Activando panel de ARTISTA');
-                artistaPanel.style.display = 'block';
                 artistaPanel.classList.add('active');
                 document.getElementById('artistaName').textContent = name;
                 // Actualizar créditos en navbar
@@ -5408,7 +5405,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
             } else if(userType === 'curador'){
                 console.log('💰 Activando panel de CURADOR');
-                curadorPanel.style.display = 'block';
                 curadorPanel.classList.add('active');
                 document.getElementById('curadorName').textContent = name;
                 document.getElementById('curadorPuntosDisplay').textContent = '0';
@@ -5433,6 +5429,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 // Cambiar contenido de secciones para curadores
                 cambiarComoFuncionaACurador();
                 cambiarServiciosACurador();
+                
+                // Cargar precios de curador
+                cargarSeccionPrecios();
             }
             
             document.getElementById('logoutBtn').classList.remove('hidden');
@@ -9239,18 +9238,15 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             const artistaPanel = document.getElementById('artistaPanel');
             const curadorPanel = document.getElementById('curadorPanel');
             
-            // SIEMPRE ocultar ambos paneles primero
-            if (artistaPanel) {
-                artistaPanel.style.display = 'none';
-                artistaPanel.classList.remove('active');
-            }
-            if (curadorPanel) {
-                curadorPanel.style.display = 'none';
-                curadorPanel.classList.remove('active');
-            }
+            // SIEMPRE ocultar ambos paneles primero (quitar active)
+            if (artistaPanel) artistaPanel.classList.remove('active');
+            if (curadorPanel) curadorPanel.classList.remove('active');
             
             if (userRegistered === 'true' && userId) {
                 console.log('✅ Sesión activa - Tipo:', userType);
+                
+                // Ocultar panel de autenticación
+                document.getElementById('authPanel').classList.add('hidden');
                 
                 // Mostrar botón de cerrar sesión
                 document.getElementById('logoutBtn').classList.remove('hidden');
@@ -9272,12 +9268,10 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 if (userType === 'artista') {
                     console.log('🎵 Mostrando panel de ARTISTA');
                     if (artistaPanel) {
-                        artistaPanel.style.display = 'block';
                         artistaPanel.classList.add('active');
                     }
                     // Asegurar que el panel de curador está oculto
                     if (curadorPanel) {
-                        curadorPanel.style.display = 'none';
                         curadorPanel.classList.remove('active');
                     }
                     // Actualizar nombre
@@ -9292,16 +9286,21 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 } else if (userType === 'curador') {
                     console.log('🎧 Mostrando panel de CURADOR');
                     if (curadorPanel) {
-                        curadorPanel.style.display = 'block';
                         curadorPanel.classList.add('active');
                     }
                     // Asegurar que el panel de artista está oculto
                     if (artistaPanel) {
-                        artistaPanel.style.display = 'none';
                         artistaPanel.classList.remove('active');
                     }
                     // Actualizar nombre
                     document.getElementById('curadorName').textContent = userName || 'Curador';
+                    
+                    // CAMBIAR TÍTULO HERO PARA CURADORES
+                    const heroTitle = document.getElementById('heroTitle');
+                    const heroSubtitle = document.getElementById('heroSubtitle');
+                    if (heroTitle) heroTitle.textContent = 'Gana dinero mientras ayudas a los artistas';
+                    if (heroSubtitle) heroSubtitle.textContent = 'Monetiza tus playlists y descubre nueva música de calidad';
+                    
                     // Verificar estado de Spotify
                     await verificarEstadoSpotify();
                     
