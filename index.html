@@ -1534,7 +1534,7 @@
                     💰<span class="badge" id="creditosStandard">0</span>
                 </button>
                 <button class="nav-icon-btn" onclick="openNotificacionesModal()" title="Notificaciones">
-                    🔔<span class="badge notification-badge hidden" id="notificationCount">0</span>
+                    🔔<span class="badge notification-badge" id="notificationCount" style="display: none;">0</span>
                 </button>
                 <div class="user-avatar" id="userAvatar" onclick="openPerfilModal()" style="display: none;">
                     <span id="userInitial">U</span>
@@ -3394,17 +3394,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             <div id="notificacionesList" style="display: grid; gap: 1rem;">
                 <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
                     <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
-                    <p>No tienes notificaciones</p>
+                    <p>Cargando notificaciones...</p>
                 </div>
-            </div>
-        </div>
-    </div>
-                            </p>
-                            <p style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Hace 3 días</p>
-                        </div>
-                    </div>
-                </div>
-                
             </div>
             
             <button onclick="marcarTodasLeidas()" style="width: 100%; margin-top: 2rem; padding: 1rem; background: rgba(124, 58, 237, 0.2); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 0.75rem; color: #a78bfa; font-weight: 700; cursor: pointer;">
@@ -6517,32 +6508,49 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             if (!userId) return;
             
             try {
+                // Obtener envíos sin JOIN
                 const { data: envios, error } = await supabaseClient
                     .from('envios_canciones')
-                    .select('*, playlists(nombre, url_spotify)')
+                    .select('*')
                     .eq('artista_id', userId)
                     .order('created_at', { ascending: false });
                 
                 if (error) {
                     console.error('Error cargando historial:', error);
-                    // Intentar sin JOIN si falla
-                    const { data: enviosSinJoin, error: error2 } = await supabaseClient
-                        .from('envios_canciones')
-                        .select('*')
-                        .eq('artista_id', userId)
-                        .order('created_at', { ascending: false });
-                    
-                    if (error2) {
-                        console.error('Error cargando historial (sin join):', error2);
-                        return;
-                    }
-                    
-                    // Usar envíos sin JOIN
-                    renderHistorialEnvios(enviosSinJoin || []);
                     return;
                 }
                 
-                renderHistorialEnvios(envios || []);
+                if (!envios || envios.length === 0) {
+                    renderHistorialEnvios([]);
+                    return;
+                }
+                
+                // Obtener IDs únicos de playlists
+                const playlistIds = [...new Set(envios.map(e => e.playlist_id).filter(id => id))];
+                
+                // Obtener nombres y URLs de playlists
+                let playlistsMap = {};
+                if (playlistIds.length > 0) {
+                    const { data: playlists, error: playlistError } = await supabaseClient
+                        .from('playlists')
+                        .select('id, nombre, url_spotify')
+                        .in('id', playlistIds);
+                    
+                    if (!playlistError && playlists) {
+                        playlists.forEach(p => {
+                            playlistsMap[p.id] = { nombre: p.nombre, url_spotify: p.url_spotify };
+                        });
+                    }
+                    console.log('📋 Playlists mapeadas para historial:', playlistsMap);
+                }
+                
+                // Añadir info de playlist a cada envío
+                const enviosConPlaylist = envios.map(envio => ({
+                    ...envio,
+                    playlists: playlistsMap[envio.playlist_id] || { nombre: envio.playlist_nombre || 'Playlist', url_spotify: null }
+                }));
+                
+                renderHistorialEnvios(enviosConPlaylist);
                 
             } catch (err) {
                 console.error('Error en cargarHistorialEnvios:', err);
@@ -8939,23 +8947,36 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         
         async function actualizarContadorNotificaciones() {
             const userId = localStorage.getItem('userId');
-            if (!userId) return;
+            if (!userId) {
+                console.log('⚠️ No hay userId para notificaciones');
+                return;
+            }
             
             try {
+                console.log('🔔 Buscando notificaciones para usuario:', userId);
+                
                 const { data, error } = await supabaseClient
                     .from('notificaciones')
                     .select('id')
                     .eq('usuario_id', userId)
                     .eq('leida', false);
                 
-                if (!error && data) {
-                    const badge = document.getElementById('notificationCount');
-                    if (data.length > 0) {
-                        badge.textContent = data.length;
-                        badge.style.display = 'inline-block';
-                    } else {
-                        badge.style.display = 'none';
-                    }
+                console.log('🔔 Resultado notificaciones:', { data, error });
+                
+                const badge = document.getElementById('notificationCount');
+                if (!badge) {
+                    console.error('❌ Badge de notificaciones no encontrado');
+                    return;
+                }
+                
+                if (!error && data && data.length > 0) {
+                    console.log('🔔 Notificaciones no leídas:', data.length);
+                    badge.textContent = data.length;
+                    badge.style.display = 'inline-block';
+                    badge.classList.remove('hidden');
+                } else {
+                    console.log('🔔 Sin notificaciones no leídas');
+                    badge.style.display = 'none';
                 }
             } catch (err) {
                 console.error('Error actualizando contador notificaciones:', err);
