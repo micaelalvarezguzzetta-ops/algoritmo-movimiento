@@ -850,10 +850,7 @@
             display: block;
         }
         
-        /* Ocultar elementos que requieren login por defecto */
-        [data-require-login] {
-            display: none;
-        }
+        /* NO usar data-require-login para paneles - se controlan por clase active */
         
         .panel-header {
             background: var(--bg-card);
@@ -1636,7 +1633,7 @@
     </section>
 
     <!-- PANEL DE ARTISTA -->
-    <div class="user-panel" id="artistaPanel" data-require-login>
+    <div class="user-panel" id="artistaPanel">
         <div class="panel-header">
             <h2>🎵 Bienvenido, <span id="artistaName">Artista</span></h2>
             <p style="color: var(--text-secondary); margin-top: 0.5rem;">Promociona tu música en las mejores playlists</p>
@@ -1682,7 +1679,7 @@
     </div>
     
     <!-- PANEL DE CURADOR -->
-    <div class="user-panel" id="curadorPanel" data-require-login>
+    <div class="user-panel" id="curadorPanel">
         <div class="panel-header">
             <h2>🎧 Bienvenido, <span id="curadorName">Curador</span></h2>
             
@@ -1769,7 +1766,8 @@
     </section>
 
     <!-- SERVICES SECTION -->
-    <section class="section" id="servicios">
+    <!-- SERVICIOS -->
+    <section class="section" id="servicios" style="display: none;">
         <div class="section-header">
             <span class="section-badge">Servicios</span>
             <h2 class="section-title">Todo lo que necesitas</h2>
@@ -1820,8 +1818,8 @@
         </div>
     </section>
 
-    <!-- RESOURCES SECTION -->
-    <section class="section" id="recursos">
+    <!-- RECURSOS -->
+    <section class="section" id="recursos" style="display: none;">
         <div class="section-header">
             <span class="section-badge">Recursos</span>
             <h2 class="section-title">Aprende y crece</h2>
@@ -5401,6 +5399,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 document.getElementById('creditosStandard').textContent = data[0].creditos || 0;
                 // Actualizar inicial en avatar
                 document.getElementById('userInitial').textContent = name.charAt(0).toUpperCase();
+                
+                // MOSTRAR SECCIONES DE ARTISTA
+                const serviciosSection = document.getElementById('servicios');
+                const recursosSection = document.getElementById('recursos');
+                if (serviciosSection) serviciosSection.style.display = 'block';
+                if (recursosSection) recursosSection.style.display = 'block';
+                
             } else if(userType === 'curador'){
                 console.log('💰 Activando panel de CURADOR');
                 curadorPanel.style.display = 'block';
@@ -5418,6 +5423,16 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 const heroSubtitle = document.getElementById('heroSubtitle');
                 if (heroTitle) heroTitle.textContent = 'Gana dinero mientras ayudas a los artistas';
                 if (heroSubtitle) heroSubtitle.textContent = 'Monetiza tus playlists y descubre nueva música de calidad';
+                
+                // OCULTAR SECCIONES DE ARTISTA PARA CURADORES
+                const serviciosSection = document.getElementById('servicios');
+                const recursosSection = document.getElementById('recursos');
+                if (serviciosSection) serviciosSection.style.display = 'none';
+                if (recursosSection) recursosSection.style.display = 'none';
+                
+                // Cambiar contenido de secciones para curadores
+                cambiarComoFuncionaACurador();
+                cambiarServiciosACurador();
             }
             
             document.getElementById('logoutBtn').classList.remove('hidden');
@@ -9267,6 +9282,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     }
                     // Actualizar nombre
                     document.getElementById('artistaName').textContent = userName || 'Artista';
+                    
+                    // MOSTRAR SECCIONES DE ARTISTA
+                    const serviciosSection = document.getElementById('servicios');
+                    const recursosSection = document.getElementById('recursos');
+                    if (serviciosSection) serviciosSection.style.display = 'block';
+                    if (recursosSection) recursosSection.style.display = 'block';
+                    
                 } else if (userType === 'curador') {
                     console.log('🎧 Mostrando panel de CURADOR');
                     if (curadorPanel) {
@@ -9282,6 +9304,16 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     document.getElementById('curadorName').textContent = userName || 'Curador';
                     // Verificar estado de Spotify
                     await verificarEstadoSpotify();
+                    
+                    // OCULTAR SECCIONES DE ARTISTA PARA CURADORES
+                    const serviciosSection = document.getElementById('servicios');
+                    const recursosSection = document.getElementById('recursos');
+                    if (serviciosSection) serviciosSection.style.display = 'none';
+                    if (recursosSection) recursosSection.style.display = 'none';
+                    
+                    // Cambiar contenido de secciones para curadores
+                    cambiarComoFuncionaACurador();
+                    cambiarServiciosACurador();
                 }
                 
                 // Cargar contenido de precios según tipo de usuario
