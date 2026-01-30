@@ -5365,15 +5365,35 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 // OCULTAR SECCIONES DE ARTISTA PARA CURADORES
                 const serviciosSection = document.getElementById('servicios');
                 const recursosSection = document.getElementById('recursos');
+                const preciosSection = document.getElementById('precios');
                 if (serviciosSection) serviciosSection.style.display = 'none';
                 if (recursosSection) recursosSection.style.display = 'none';
+                if (preciosSection) preciosSection.style.display = 'none';
+                
+                // CAMBIAR NAVBAR PARA CURADORES
+                const navMenu = document.getElementById('navMenu');
+                if (navMenu) {
+                    navMenu.innerHTML = `
+                        <a href="#como-funciona">Cómo Funciona</a>
+                        <a href="#" onclick="openMisPlaylistsModal(); return false;">Mis Playlists</a>
+                        <a href="#" onclick="openEnviosRecibidosModal(); return false;">Envíos</a>
+                        <a href="#" onclick="openGananciasModal(); return false;">Ganancias</a>
+                        <a href="#" onclick="openPremiumCuradorModal(); return false;">Destacar Playlist</a>
+                        <a href="#" onclick="openAfiliadosModal(); return false;">Afiliados</a>
+                        <a href="#faq">FAQ</a>
+                    `;
+                }
+                
+                // Cambiar botón créditos por puntos
+                const btnCreditos = document.querySelector('.nav-icon-btn[onclick="openCreditosModal()"]');
+                if (btnCreditos) {
+                    btnCreditos.innerHTML = '⭐<span class="badge" id="creditosStandard">0</span>';
+                    btnCreditos.setAttribute('onclick', 'openMisPuntosModal()');
+                    btnCreditos.setAttribute('title', 'Mis Puntos');
+                }
                 
                 // Cambiar contenido de secciones para curadores
                 cambiarComoFuncionaACurador();
-                cambiarServiciosACurador();
-                
-                // Cargar precios de curador
-                cargarSeccionPrecios();
             }
             
             document.getElementById('logoutBtn').classList.remove('hidden');
@@ -5489,27 +5509,39 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     // Cambiar títulos hero para curadores
                     document.getElementById('heroTitle').textContent = 'Gana dinero mientras ayudas a los artistas';
                     document.getElementById('heroSubtitle').textContent = 'Monetiza tus playlists y descubre nueva música de calidad';
-                    // Cambiar mensajes de notificaciones para curadores
-                    document.getElementById('notifBienvenidaMensaje').textContent = 'Gracias por registrarte. Comienza a generar dinero mientras ayudas a los artistas.';
-                    document.getElementById('notifEstadisticasMensaje').textContent = 'Revisa el rendimiento de tus playlists y ganancias';
-                    document.getElementById('notifAceptadaTitulo').textContent = '¡Has ganado dinero!';
-                    document.getElementById('notifAceptadaMensaje').textContent = 'Aceptaste "Amanecer Urbano" en tu playlist "Urbano Top 100". Has ganado 0.50€ 💰';
-                    document.getElementById('notifPendienteTitulo').textContent = 'Nuevo envío recibido';
-                    document.getElementById('notifPendienteMensaje').textContent = 'Tienes un nuevo envío "Noches de Verano" esperando tu revisión en "Trap España". ⏰ Tienes 7 días para responder antes de que se elimine la solicitud.';
-                    // Cambiar botones del navbar para curadores
-                    document.getElementById('navBtn1').onclick = function(){ openPremiumCuradorModal(); };
-                    document.getElementById('navBtn1').title = 'Destacar Playlist (14.99€/mes)';
-                    document.getElementById('navBtn1').innerHTML = '⭐<span class="badge">0</span>';
-                    document.getElementById('navBtn2').onclick = function(){ openCanjearGananciasModal(); };
-                    document.getElementById('navBtn2').title = 'Canjear Ganancias';
-                    document.getElementById('navBtn2').innerHTML = '💰<span class="badge" id="balanceCanjeable">450€</span>';
-                    document.getElementById('navBtn3').style.display = 'inline-flex';
+                    
+                    // OCULTAR SECCIONES DE ARTISTA
+                    const serviciosSection = document.getElementById('servicios');
+                    const recursosSection = document.getElementById('recursos');
+                    const preciosSection = document.getElementById('precios');
+                    if (serviciosSection) serviciosSection.style.display = 'none';
+                    if (recursosSection) recursosSection.style.display = 'none';
+                    if (preciosSection) preciosSection.style.display = 'none';
+                    
+                    // CAMBIAR NAVBAR PARA CURADORES
+                    const navMenu = document.getElementById('navMenu');
+                    if (navMenu) {
+                        navMenu.innerHTML = `
+                            <a href="#como-funciona">Cómo Funciona</a>
+                            <a href="#" onclick="openMisPlaylistsModal(); return false;">Mis Playlists</a>
+                            <a href="#" onclick="openEnviosRecibidosModal(); return false;">Envíos</a>
+                            <a href="#" onclick="openGananciasModal(); return false;">Ganancias</a>
+                            <a href="#" onclick="openPremiumCuradorModal(); return false;">Destacar Playlist</a>
+                            <a href="#" onclick="openAfiliadosModal(); return false;">Afiliados</a>
+                            <a href="#faq">FAQ</a>
+                        `;
+                    }
+                    
+                    // Cambiar botón créditos por puntos
+                    const btnCreditos = document.querySelector('.nav-icon-btn[onclick="openCreditosModal()"]');
+                    if (btnCreditos) {
+                        btnCreditos.innerHTML = '⭐<span class="badge" id="creditosStandard">0</span>';
+                        btnCreditos.setAttribute('onclick', 'openMisPuntosModal()');
+                        btnCreditos.setAttribute('title', 'Mis Puntos');
+                    }
+                    
                     // Cambiar sección "Cómo Funciona" para curadores
                     cambiarComoFuncionaACurador();
-                    // Cambiar sección "Servicios" para curadores
-                    cambiarServiciosACurador();
-                    // Cambiar herramienta "Análisis" para curadores
-                    cambiarAnalisisACurador();
                 } else {
                     console.log('🎨 Restaurando panel de ARTISTA');
                     document.getElementById('artistaPanel').classList.add('active');
@@ -9259,16 +9291,41 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     // OCULTAR SECCIONES DE ARTISTA PARA CURADORES
                     const serviciosSection = document.getElementById('servicios');
                     const recursosSection = document.getElementById('recursos');
+                    const preciosSection = document.getElementById('precios');
                     if (serviciosSection) serviciosSection.style.display = 'none';
                     if (recursosSection) recursosSection.style.display = 'none';
+                    if (preciosSection) preciosSection.style.display = 'none';
+                    
+                    // CAMBIAR NAVBAR PARA CURADORES
+                    const navMenu = document.getElementById('navMenu');
+                    if (navMenu) {
+                        navMenu.innerHTML = `
+                            <a href="#como-funciona">Cómo Funciona</a>
+                            <a href="#" onclick="openMisPlaylistsModal(); return false;">Mis Playlists</a>
+                            <a href="#" onclick="openEnviosRecibidosModal(); return false;">Envíos</a>
+                            <a href="#" onclick="openGananciasModal(); return false;">Ganancias</a>
+                            <a href="#" onclick="openPremiumCuradorModal(); return false;">Destacar Playlist</a>
+                            <a href="#" onclick="openAfiliadosModal(); return false;">Afiliados</a>
+                            <a href="#faq">FAQ</a>
+                        `;
+                    }
+                    
+                    // Cambiar botón créditos por puntos
+                    const btnCreditos = document.querySelector('.nav-icon-btn[onclick="openCreditosModal()"]');
+                    if (btnCreditos) {
+                        btnCreditos.innerHTML = '⭐<span class="badge" id="creditosStandard">0</span>';
+                        btnCreditos.setAttribute('onclick', 'openMisPuntosModal()');
+                        btnCreditos.setAttribute('title', 'Mis Puntos');
+                    }
                     
                     // Cambiar contenido de secciones para curadores
                     cambiarComoFuncionaACurador();
-                    cambiarServiciosACurador();
                 }
                 
-                // Cargar contenido de precios según tipo de usuario
-                cargarSeccionPrecios();
+                // Cargar contenido de precios SOLO para artistas
+                if (userType === 'artista') {
+                    cargarSeccionPrecios();
+                }
                 
                 // Cargar contador de notificaciones
                 await actualizarContadorNotificaciones();
