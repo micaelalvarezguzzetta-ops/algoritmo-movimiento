@@ -8568,17 +8568,30 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         
         function calcularTiempoTranscurrido(fecha) {
             const ahora = new Date();
-            const entonces = new Date(fecha);
+            // Supabase guarda en UTC, asegurarnos de interpretarlo correctamente
+            let entonces;
+            if (typeof fecha === 'string' && !fecha.endsWith('Z') && !fecha.includes('+')) {
+                // Si no tiene indicador de zona horaria, asumir UTC
+                entonces = new Date(fecha + 'Z');
+            } else {
+                entonces = new Date(fecha);
+            }
+            
             const diff = ahora - entonces;
             
-            const minutos = Math.floor(diff / 60000);
+            // Si la diferencia es negativa (fecha futura por zona horaria), mostrar "Ahora mismo"
+            if (diff < 0) return 'Ahora mismo';
+            
+            const segundos = Math.floor(diff / 1000);
+            const minutos = Math.floor(segundos / 60);
             const horas = Math.floor(minutos / 60);
             const dias = Math.floor(horas / 24);
             
-            if (minutos < 1) return 'Ahora mismo';
+            if (segundos < 60) return 'Ahora mismo';
             if (minutos < 60) return `Hace ${minutos} minuto${minutos > 1 ? 's' : ''}`;
             if (horas < 24) return `Hace ${horas} hora${horas > 1 ? 's' : ''}`;
-            return `Hace ${dias} día${dias > 1 ? 's' : ''}`;
+            if (dias === 1) return 'Ayer';
+            return `Hace ${dias} días`;
         }
         
         function verNotificacion(tipo, envioId) {
