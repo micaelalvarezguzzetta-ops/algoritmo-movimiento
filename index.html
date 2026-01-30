@@ -1374,6 +1374,133 @@
             }
         }
         
+        /* ==================== PLAYLIST ITEMS ==================== */
+        .playlist-item {
+            background: var(--bg-card);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .playlist-item:hover {
+            border-color: var(--accent-primary);
+            background: var(--bg-card-hover);
+        }
+        
+        .playlist-item.selected {
+            border-color: var(--accent-green);
+            background: rgba(16, 185, 129, 0.1);
+        }
+        
+        .playlist-checkbox {
+            width: 24px;
+            height: 24px;
+            min-width: 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            background: var(--bg-secondary);
+        }
+        
+        .playlist-item:hover .playlist-checkbox {
+            border-color: var(--accent-primary);
+        }
+        
+        .playlist-item.selected .playlist-checkbox {
+            background: var(--accent-green);
+            border-color: var(--accent-green);
+        }
+        
+        .playlist-checkbox-icon {
+            color: white;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        
+        .playlist-item.selected .playlist-checkbox-icon {
+            opacity: 1;
+        }
+        
+        .playlist-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            flex: 1;
+        }
+        
+        .playlist-cover {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-pink));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .playlist-info {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .playlist-name {
+            font-weight: 700;
+            font-size: 1rem;
+            margin-bottom: 0.25rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .playlist-curator {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+        
+        .playlist-stats {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .playlist-price {
+            font-weight: 800;
+            font-size: 1rem;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            white-space: nowrap;
+        }
+        
+        .playlist-price.price-free {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+        }
+        
+        .playlist-price.price-standard {
+            background: rgba(251, 191, 36, 0.2);
+            color: #fbbf24;
+        }
+        
+        .playlist-price.price-premium {
+            background: rgba(236, 72, 153, 0.2);
+            color: #ec4899;
+        }
+
         /* ==================== UTILITY CLASSES ==================== */
         .hidden { display: none !important; }
         .text-center { text-align: center; }
@@ -1916,82 +2043,105 @@
     </footer>
 
     <!-- USER PANELS (se muestran después del login) -->
+    <!-- PANEL DE ARTISTA -->
     <div class="user-panel" id="artistaPanel" data-require-login>
         <div class="panel-header">
-            <h2>🎤 Panel de Artista</h2>
-            <p>Bienvenido, <span id="artistaName">Artista</span>. Gestiona tus campañas y promociona tu música.</p>
+            <h2>🎵 Bienvenido, <span id="artistaName">Artista</span></h2>
+            <p style="color: var(--text-secondary); margin-top: 0.5rem;">Promociona tu música en las mejores playlists</p>
         </div>
         
         <div class="panel-grid">
-            <div class="panel-card" onclick="openEnviarMusicaModal()">
-                <div class="panel-card-icon">🚀</div>
+            <div class="panel-card" onclick="openSpotifyModal()">
+                <div class="panel-card-icon">🎵</div>
                 <h3 class="panel-card-title">Enviar Música</h3>
-                <p class="panel-card-desc">Envía tu canción a playlists verificadas</p>
+                <p class="panel-card-desc">Conecta Spotify y envía tu canción</p>
             </div>
-            <div class="panel-card" onclick="openMisEnviosModal()">
+            <div class="panel-card" onclick="openHistorialModal()">
+                <div class="panel-card-icon">📋</div>
+                <h3 class="panel-card-title">Historial de Envíos</h3>
+                <p class="panel-card-desc">Ver todos tus envíos</p>
+            </div>
+            <div class="panel-card" onclick="openEstadisticasModal()">
                 <div class="panel-card-icon">📊</div>
-                <h3 class="panel-card-title">Mis Envíos</h3>
-                <p class="panel-card-desc">Revisa el estado de tus campañas</p>
+                <h3 class="panel-card-title">Estadísticas</h3>
+                <p class="panel-card-desc">Ver analytics de tus campañas</p>
             </div>
-            <div class="panel-card" onclick="openCreditosModal()">
-                <div class="panel-card-icon">💰</div>
-                <h3 class="panel-card-title">Mis Créditos</h3>
-                <p class="panel-card-desc">Gestiona tu saldo y compra créditos</p>
+            <div class="panel-card" onclick="openMasteringModal()">
+                <div class="panel-card-icon">🎚️</div>
+                <h3 class="panel-card-title">Mastering IA</h3>
+                <p class="panel-card-desc">1 gratis/mes - 4.99€</p>
             </div>
-            <div class="panel-card" onclick="openPlaylistsTOPModal()">
-                <div class="panel-card-icon">🎯</div>
-                <h3 class="panel-card-title">Playlists TOP</h3>
-                <p class="panel-card-desc">Descubre las mejores playlists</p>
+            <div class="panel-card" onclick="openPortadasModal()">
+                <div class="panel-card-icon">🎨</div>
+                <h3 class="panel-card-title">Portadas IA</h3>
+                <p class="panel-card-desc">100% Gratis</p>
             </div>
             <div class="panel-card" onclick="openSmartLinkModal()">
                 <div class="panel-card-icon">🔗</div>
-                <h3 class="panel-card-title">SmartLinks</h3>
-                <p class="panel-card-desc">Crea enlaces inteligentes para tu música</p>
+                <h3 class="panel-card-title">SmartLink</h3>
+                <p class="panel-card-desc">Enlace único - 1.99€</p>
             </div>
-            <div class="panel-card" onclick="openEstadisticasModal()">
-                <div class="panel-card-icon">📈</div>
-                <h3 class="panel-card-title">Estadísticas</h3>
-                <p class="panel-card-desc">Analiza el rendimiento de tus campañas</p>
+            <div class="panel-card" onclick="openCreditosModal()">
+                <div class="panel-card-icon">💳</div>
+                <h3 class="panel-card-title">Créditos</h3>
+                <p class="panel-card-desc">Comprar créditos: 1.50€ - 3.00€</p>
             </div>
         </div>
     </div>
     
+    <!-- PANEL DE CURADOR -->
     <div class="user-panel" id="curadorPanel" data-require-login>
         <div class="panel-header">
-            <h2>🎧 Panel de Curador</h2>
-            <p>Bienvenido, <span id="curadorName">Curador</span>. Gestiona tus playlists y gana dinero.</p>
+            <h2>🎧 Bienvenido, <span id="curadorName">Curador</span></h2>
+            
+            <!-- Estado conexión Spotify -->
+            <div id="spotifyConnectionStatus" style="margin-top: 1rem;">
+                <!-- Se llenará dinámicamente -->
+            </div>
+            
+            <!-- Display de Puntos -->
+            <div style="background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 1.25rem; border-radius: 1rem; margin-top: 1rem; text-align: center;">
+                <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Mis Puntos</div>
+                <div style="font-size: 2.5rem; font-weight: 900;" id="curadorPuntosDisplay">0</div>
+                <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.25rem;">Canjea por promoción</div>
+            </div>
         </div>
         
         <div class="panel-grid">
-            <div class="panel-card" onclick="openEnviosRecibidosModal()">
-                <div class="panel-card-icon">📬</div>
-                <h3 class="panel-card-title">Envíos Recibidos</h3>
-                <p class="panel-card-desc">Revisa las canciones pendientes</p>
-            </div>
-            <div class="panel-card" onclick="openMisPlaylistsModal()">
-                <div class="panel-card-icon">📋</div>
-                <h3 class="panel-card-title">Mis Playlists</h3>
-                <p class="panel-card-desc">Gestiona tus playlists verificadas</p>
-            </div>
-            <div class="panel-card" onclick="openGananciasModal()">
-                <div class="panel-card-icon">💵</div>
-                <h3 class="panel-card-title">Mis Ganancias</h3>
-                <p class="panel-card-desc">Revisa tus ingresos y retira fondos</p>
-            </div>
-            <div class="panel-card" onclick="openMisPuntosModal()">
+            <div class="panel-card" onclick="openMisPuntosModal()" style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1)); border: 2px solid rgba(251, 191, 36, 0.4);">
                 <div class="panel-card-icon">⭐</div>
                 <h3 class="panel-card-title">Mis Puntos</h3>
-                <p class="panel-card-desc">Puntos de reputación y beneficios</p>
+                <p class="panel-card-desc">Canjear y gestionar puntos</p>
+            </div>
+            <div class="panel-card" onclick="openMisPlaylistsModal()">
+                <div class="panel-card-icon">🎵</div>
+                <h3 class="panel-card-title">Mis Playlists</h3>
+                <p class="panel-card-desc">Gestionar playlists</p>
+            </div>
+            <div class="panel-card" onclick="openEnviosRecibidosModal()">
+                <div class="panel-card-icon">📨</div>
+                <h3 class="panel-card-title">Envíos Recibidos</h3>
+                <p class="panel-card-desc">Revisar nuevas canciones</p>
+            </div>
+            <div class="panel-card" onclick="openGananciasModal()">
+                <div class="panel-card-icon">💰</div>
+                <h3 class="panel-card-title">Ganancias</h3>
+                <p class="panel-card-desc">Ver ingresos acumulados</p>
+            </div>
+            <div class="panel-card" onclick="openPremiumCuradorModal()">
+                <div class="panel-card-icon">🏆</div>
+                <h3 class="panel-card-title">Destacar Playlist</h3>
+                <p class="panel-card-desc">Aparecer en TOP</p>
             </div>
             <div class="panel-card" onclick="openEstadisticasCuradorModal()">
                 <div class="panel-card-icon">📊</div>
-                <h3 class="panel-card-title">Estadísticas</h3>
-                <p class="panel-card-desc">Analiza el rendimiento de tus playlists</p>
+                <h3 class="panel-card-title">Analytics</h3>
+                <p class="panel-card-desc">Estadísticas de playlists</p>
             </div>
-            <div class="panel-card" onclick="conectarSpotify()">
-                <div class="panel-card-icon">🎵</div>
-                <h3 class="panel-card-title">Conectar Spotify</h3>
-                <p class="panel-card-desc">Vincula tu cuenta de Spotify</p>
+            <div class="panel-card" onclick="openPagosModal()">
+                <div class="panel-card-icon">💳</div>
+                <h3 class="panel-card-title">Retirar Fondos</h3>
+                <p class="panel-card-desc">Transferir ganancias</p>
             </div>
         </div>
     </div>
@@ -6034,6 +6184,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
                 return `
                 <div class="playlist-item ${isSelected ? 'selected' : ''}" onclick="togglePlaylist('${p.id}')">
+                    <div class="playlist-checkbox">
+                        <span class="playlist-checkbox-icon">✓</span>
+                    </div>
                     <div class="playlist-header">
                         <div class="playlist-cover">🎵</div>
                         <div class="playlist-info">
