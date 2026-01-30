@@ -6395,6 +6395,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                             artista_id: userId,
                             curador_id: playlistData.curador_id,
                             playlist_id: playlistId,
+                            playlist_nombre: playlistData.nombre,
                             cancion_url: selectedSong.url,
                             cancion_id: selectedSong.id,
                             cancion_nombre: selectedSong.name || 'Canción sin nombre',
@@ -7445,9 +7446,10 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             if (!userId) return;
             
             try {
+                // Obtener envíos con información de la playlist
                 const { data: envios, error } = await supabaseClient
                     .from('envios_canciones')
-                    .select('*')
+                    .select('*, playlists(nombre)')
                     .eq('curador_id', userId)
                     .order('created_at', { ascending: false });
                 
@@ -7476,6 +7478,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     };
                     
                     const estado = estadoColors[envio.estado] || estadoColors['pendiente'];
+                    
+                    // Obtener nombre de playlist
+                    const playlistNombre = envio.playlists?.nombre || envio.playlist_nombre || 'Playlist';
                     
                     // Calcular días restantes si está aceptado
                     let contadorHTML = '';
@@ -7519,7 +7524,10 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                             <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
                                 <div style="flex: 1;">
                                     <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem;">${envio.cancion_nombre || 'Canción sin nombre'}</h3>
-                                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Por ${envio.artista_nombre || 'Artista'}</p>
+                                    <p style="color: rgba(255,255,255,0.7); margin-bottom: 0.5rem;">Por ${envio.artista_nombre || 'Artista'}</p>
+                                    <p style="color: #7c3aed; font-weight: 600; font-size: 0.95rem;">
+                                        🎵 Para: <span style="color: white;">${playlistNombre}</span>
+                                    </p>
                                     
                                     ${envio.cancion_id ? `
                                         <div style="margin-top: 1rem;">
