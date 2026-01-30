@@ -1551,12 +1551,12 @@
             Más de 5,000 artistas confían en nosotros
         </div>
         
-        <h1 class="hero-title">
+        <h1 class="hero-title" id="heroTitle">
             Lleva tu música a las<br>
             <span class="highlight">playlists más grandes</span>
         </h1>
         
-        <p class="hero-subtitle">
+        <p class="hero-subtitle" id="heroSubtitle">
             Conecta directamente con curadores verificados de Spotify. 
             Promoción musical real, streams orgánicos y crecimiento genuino.
         </p>
@@ -1849,113 +1849,55 @@
     <section class="section" id="precios" data-require-login>
         <div class="section-header">
             <span class="section-badge">Precios</span>
-            <h2 class="section-title">Planes para cada artista</h2>
-            <p class="section-subtitle">Elige el plan que mejor se adapte a tus objetivos</p>
+            <h2 class="section-title" id="preciosTitulo">Planes para cada artista</h2>
+            <p class="section-subtitle" id="preciosSubtitulo">Elige el plan que mejor se adapte a tus objetivos</p>
         </div>
         
-        <div class="pricing-grid">
-            <!-- FREE -->
-            <div class="pricing-card">
-                <div class="pricing-icon">🎁</div>
-                <h3 class="pricing-name">Plan Gratis</h3>
-                <p class="pricing-desc">Perfecto para empezar</p>
-                <div class="pricing-price">
-                    <span class="price-amount">0€</span>
-                    <span class="price-period">/ mes</span>
-                </div>
-                <ul class="pricing-features">
-                    <li><span class="check">✓</span> 3 envíos gratis al mes</li>
-                    <li><span class="check">✓</span> Playlists FREE verificadas</li>
-                    <li><span class="check">✓</span> Respuesta en 7 días</li>
-                    <li><span class="check">✓</span> Dashboard de resultados</li>
-                </ul>
-                <button class="pricing-btn pricing-btn-free" onclick="handlePricingClick('gratis')">
-                    Comenzar Gratis
-                </button>
-            </div>
-            
-            <!-- STANDARD -->
-            <div class="pricing-card">
-                <div class="pricing-icon">⭐</div>
-                <h3 class="pricing-name">Standard</h3>
-                <p class="pricing-desc">Playlists de 100-299 seguidores</p>
-                <div class="pricing-price">
-                    <span class="price-amount">1.50€</span>
-                    <span class="price-period">/ envío</span>
-                </div>
-                <ul class="pricing-features">
-                    <li><span class="check">✓</span> Playlists verificadas</li>
-                    <li><span class="check">✓</span> Respuesta en 48-72h</li>
-                    <li><span class="check">✓</span> Feedback del curador</li>
-                    <li><span class="check">✓</span> Reembolso si rechazado</li>
-                </ul>
-                <button class="pricing-btn pricing-btn-standard" onclick="handlePricingClick('standard')">
-                    Comprar Créditos
-                </button>
-            </div>
-            
-            <!-- PREMIUM -->
-            <div class="pricing-card featured">
-                <span class="pricing-badge">Más Popular</span>
-                <div class="pricing-icon">💎</div>
-                <h3 class="pricing-name">Premium</h3>
-                <p class="pricing-desc">Playlists de +300 seguidores</p>
-                <div class="pricing-price">
-                    <span class="price-amount">3.00€</span>
-                    <span class="price-period">/ envío</span>
-                </div>
-                <ul class="pricing-features">
-                    <li><span class="check">✓</span> Playlists TOP verificadas</li>
-                    <li><span class="check">✓</span> Respuesta en 24-48h</li>
-                    <li><span class="check">✓</span> Mayor exposición</li>
-                    <li><span class="check">✓</span> Prioridad en revisión</li>
-                    <li><span class="check">✓</span> Reembolso garantizado</li>
-                </ul>
-                <button class="pricing-btn pricing-btn-premium" onclick="handlePricingClick('premium')">
-                    Comprar Premium
-                </button>
-            </div>
+        <div id="preciosContenido" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; max-width: 1000px; margin: 0 auto;">
+            <!-- Se genera dinámicamente según tipo de usuario -->
         </div>
         
-        <!-- PACKS -->
-        <div class="section-header mt-4">
-            <span class="section-badge">Ahorra 15%</span>
-            <h2 class="section-title">Paquetes Especiales</h2>
-        </div>
-        
-        <div class="packs-grid">
-            <div class="pack-card">
-                <div class="pack-icon">📦</div>
-                <h3 class="pack-name">Pack €10</h3>
-                <div class="pack-price">€8.50</div>
-                <p class="pack-credits">en créditos</p>
-                <span class="pack-save">✓ Ahorra €1.50</span>
-                <button class="pack-btn" onclick="window.open('https://buy.stripe.com/aFa14oe6j59V5J7d850x209', '_blank')">
-                    Comprar Pack
-                </button>
+        <!-- PACKS - Solo para artistas -->
+        <div id="packsSection">
+            <div class="section-header mt-4">
+                <span class="section-badge">Ahorra 15%</span>
+                <h2 class="section-title">Paquetes Especiales</h2>
             </div>
             
-            <div class="pack-card popular">
-                <span class="pack-badge">Más Popular</span>
-                <div class="pack-icon">🎁</div>
-                <h3 class="pack-name">Pack €25</h3>
-                <div class="pack-price">€21.25</div>
-                <p class="pack-credits">en créditos</p>
-                <span class="pack-save">✓ Ahorra €3.75</span>
-                <button class="pack-btn" onclick="window.open('https://buy.stripe.com/dRm5kEgerfOz5J79VT0x208', '_blank')">
-                    Comprar Pack
-                </button>
-            </div>
-            
-            <div class="pack-card">
-                <div class="pack-icon">💎</div>
-                <h3 class="pack-name">Pack €50</h3>
-                <div class="pack-price">€42.50</div>
-                <p class="pack-credits">en créditos</p>
-                <span class="pack-save">✓ Ahorra €7.50</span>
-                <button class="pack-btn" onclick="window.open('https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207', '_blank')">
-                    Comprar Pack
-                </button>
+            <div class="packs-grid">
+                <div class="pack-card">
+                    <div class="pack-icon">📦</div>
+                    <h3 class="pack-name">Pack €10</h3>
+                    <div class="pack-price">€8.50</div>
+                    <p class="pack-credits">en créditos</p>
+                    <span class="pack-save">✓ Ahorra €1.50</span>
+                    <button class="pack-btn" onclick="window.open('https://buy.stripe.com/aFa14oe6j59V5J7d850x209', '_blank')">
+                        Comprar Pack
+                    </button>
+                </div>
+                
+                <div class="pack-card popular">
+                    <span class="pack-badge">Más Popular</span>
+                    <div class="pack-icon">🎁</div>
+                    <h3 class="pack-name">Pack €25</h3>
+                    <div class="pack-price">€21.25</div>
+                    <p class="pack-credits">en créditos</p>
+                    <span class="pack-save">✓ Ahorra €3.75</span>
+                    <button class="pack-btn" onclick="window.open('https://buy.stripe.com/dRm5kEgerfOz5J79VT0x208', '_blank')">
+                        Comprar Pack
+                    </button>
+                </div>
+                
+                <div class="pack-card">
+                    <div class="pack-icon">💎</div>
+                    <h3 class="pack-name">Pack €50</h3>
+                    <div class="pack-price">€42.50</div>
+                    <p class="pack-credits">en créditos</p>
+                    <span class="pack-save">✓ Ahorra €7.50</span>
+                    <button class="pack-btn" onclick="window.open('https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207', '_blank')">
+                        Comprar Pack
+                    </button>
+                </div>
             </div>
         </div>
     </section>
@@ -5918,11 +5860,21 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             const titulo = document.getElementById('preciosTitulo');
             const subtitulo = document.getElementById('preciosSubtitulo');
             const contenido = document.getElementById('preciosContenido');
+            const packsSection = document.getElementById('packsSection');
+            
+            if (!titulo || !subtitulo || !contenido) {
+                console.error('❌ No se encontraron elementos de precios');
+                return;
+            }
             
             if (userType === 'curador') {
                 // Para curadores: ¿Cuánto gano?
                 titulo.textContent = '¿CUÁNTO GANO?';
                 subtitulo.textContent = 'Gana dinero revisando música';
+                
+                // Ocultar packs (solo para artistas)
+                if (packsSection) packsSection.style.display = 'none';
+                
                 contenido.innerHTML = `
                     <!-- PLAYLISTS FREE (<100 seguidores) -->
                     <div style="text-align: center; padding: 2rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem;">
