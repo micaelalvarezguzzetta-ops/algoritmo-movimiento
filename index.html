@@ -1561,7 +1561,7 @@
             Promoción musical real, streams orgánicos y crecimiento genuino.
         </p>
         
-        <div class="hero-cta">
+        <div class="hero-cta" id="heroCta">
             <button class="btn-primary" onclick="document.getElementById('authPanel').scrollIntoView({behavior: 'smooth'})">
                 Comenzar Ahora →
             </button>
@@ -1739,11 +1739,11 @@
     <section class="section" id="como-funciona">
         <div class="section-header">
             <span class="section-badge">Cómo Funciona</span>
-            <h2 class="section-title">Tres pasos hacia el éxito</h2>
-            <p class="section-subtitle">Un proceso simple y transparente para impulsar tu música</p>
+            <h2 class="section-title" id="comoFuncionaTitulo">Tres pasos hacia el éxito</h2>
+            <p class="section-subtitle" id="comoFuncionaSubtitulo">Un proceso simple y transparente para impulsar tu música</p>
         </div>
         
-        <div class="steps-grid">
+        <div class="steps-grid" id="comoFuncionaSteps">
             <div class="step-card">
                 <div class="step-number">1</div>
                 <div class="step-icon">🔍</div>
@@ -3745,6 +3745,30 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
     </div>
 
     <!-- MODAL GANANCIAS (CURADOR) -->
+    <!-- MODAL MIS PLAYLISTS (CURADOR) -->
+    <div class="modal" id="modalMisPlaylists">
+        <div class="modal-content" style="max-width: 900px;">
+            <button class="modal-close" onclick="closeMisPlaylistsModal()">×</button>
+            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 0.5rem;">🎵 Mis Playlists</h2>
+            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Gestiona tus playlists y recibe envíos de artistas</p>
+            
+            <!-- Botón añadir playlist -->
+            <div style="text-align: center; margin-bottom: 2rem;">
+                <button onclick="openAgregarPlaylistModal()" style="padding: 1rem 2rem; background: linear-gradient(135deg, #7c3aed, #ec4899); border: none; border-radius: 0.75rem; color: white; font-weight: 700; cursor: pointer; font-size: 1rem;">
+                    ➕ Añadir Nueva Playlist
+                </button>
+            </div>
+            
+            <!-- Lista de playlists -->
+            <div id="playlistsCuradorList">
+                <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                    <div style="font-size: 4rem; margin-bottom: 1rem;">🎵</div>
+                    <p>Cargando playlists...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="modal" id="modalGanancias">
         <div class="modal-content" style="max-width: 900px;">
             <button class="modal-close" onclick="closeGananciasModal()">×</button>
@@ -5313,6 +5337,10 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             
             // Ocultar formulario
             document.getElementById('authPanel').classList.add('hidden');
+            
+            // Ocultar botones "Comenzar Ahora" del hero
+            const heroCta = document.getElementById('heroCta');
+            if (heroCta) heroCta.style.display = 'none';
             
             // Mostrar panel correcto según tipo de usuario
             console.log('═══════════════════════════════════');
@@ -7315,36 +7343,47 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         }
         
         function cambiarComoFuncionaACurador(){
-            document.getElementById('comoFuncionaTitulo').textContent = 'CÓMO FUNCIONA PARA CURADORES';
-            document.getElementById('comoFuncionaSubtitulo').textContent = 'Monetiza tus playlists en 5 sencillos pasos';
+            const titulo = document.getElementById('comoFuncionaTitulo');
+            const subtitulo = document.getElementById('comoFuncionaSubtitulo');
+            const steps = document.getElementById('comoFuncionaSteps');
             
-            document.getElementById('comoFuncionaSteps').innerHTML = `
-                <div class="step">
-                    <div class="step-circle gradient-purple">1</div>
-                    <h3 class="step-title">Registra tus Playlists</h3>
-                    <p class="step-description">Conecta tus playlists de Spotify con la plataforma. Proporciona el enlace y tu ID de Spotify para verificar que eres el propietario.</p>
-                </div>
-                <div class="step">
-                    <div class="step-circle gradient-pink">2</div>
-                    <h3 class="step-title">Configura tus Preferencias</h3>
-                    <p class="step-description">Define qué géneros aceptas, escribe una descripción de tu playlist y establece tus criterios de calidad. Esto ayuda a que recibas solo música relevante.</p>
-                </div>
-                <div class="step">
-                    <div class="step-circle gradient-blue">3</div>
-                    <h3 class="step-title">Recibe Envíos de Artistas</h3>
-                    <p class="step-description">Los artistas enviarán sus canciones a tus playlists. Recibirás notificaciones y tendrás 7 días para revisar cada envío en tu panel "Envíos Recibidos".</p>
-                </div>
-                <div class="step">
-                    <div class="step-circle gradient-yellow">4</div>
-                    <h3 class="step-title">Acepta o Rechaza</h3>
-                    <p class="step-description">Escucha la canción, revisa el perfil del artista y decide. Si aceptas, ganas 0.20€ (STANDARD) o 0.50€ (PREMIUM). Si rechazas, indica el motivo para ayudar al artista.</p>
-                </div>
-                <div class="step">
-                    <div class="step-circle" style="background: linear-gradient(135deg, #34d399, #10b981);">5</div>
-                    <h3 class="step-title">Gana Dinero</h3>
-                    <p class="step-description">Mantén la canción el tiempo mínimo (5 o 10 días). Tu pago se desbloquea automáticamente. Retira cuando quieras (mín. 20€) o canjea por destacar playlists.</p>
-                </div>
-            `;
+            if (titulo) titulo.textContent = 'Cómo funciona para Curadores';
+            if (subtitulo) subtitulo.textContent = 'Monetiza tus playlists en 5 sencillos pasos';
+            
+            if (steps) {
+                steps.innerHTML = `
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <div class="step-icon">📋</div>
+                        <h3 class="step-title">Registra tus Playlists</h3>
+                        <p class="step-desc">Conecta tus playlists de Spotify. Proporciona el enlace para verificar que eres el propietario.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <div class="step-icon">⚙️</div>
+                        <h3 class="step-title">Configura Preferencias</h3>
+                        <p class="step-desc">Define qué géneros aceptas y establece tus criterios de calidad para recibir música relevante.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <div class="step-icon">📨</div>
+                        <h3 class="step-title">Recibe Envíos</h3>
+                        <p class="step-desc">Los artistas enviarán canciones a tus playlists. Tienes 7 días para revisar cada envío.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">4</div>
+                        <div class="step-icon">✅</div>
+                        <h3 class="step-title">Acepta o Rechaza</h3>
+                        <p class="step-desc">Escucha la canción y decide. Ganas 0.20€ (STANDARD) o 0.45€ (PREMIUM) por aceptación.</p>
+                    </div>
+                    <div class="step-card">
+                        <div class="step-number">5</div>
+                        <div class="step-icon">💰</div>
+                        <h3 class="step-title">Gana Dinero</h3>
+                        <p class="step-desc">Mantén la canción el tiempo mínimo. Retira tus ganancias cuando quieras (mín. 10€).</p>
+                    </div>
+                `;
+            }
         }
         
         function cambiarServiciosACurador(){
@@ -9231,6 +9270,10 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
                 // Ocultar panel de autenticación
                 document.getElementById('authPanel').classList.add('hidden');
+                
+                // Ocultar botones "Comenzar Ahora" del hero
+                const heroCta = document.getElementById('heroCta');
+                if (heroCta) heroCta.style.display = 'none';
                 
                 // Mostrar botón de cerrar sesión
                 document.getElementById('logoutBtn').classList.remove('hidden');
