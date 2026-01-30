@@ -5384,13 +5384,19 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             console.log('🔍 userType === "curador":', userType === 'curador');
             console.log('═══════════════════════════════════');
             
-            // IMPORTANTE: Primero ocultar ambos paneles
-            document.getElementById('artistaPanel').classList.remove('active');
-            document.getElementById('curadorPanel').classList.remove('active');
+            // IMPORTANTE: Primero ocultar AMBOS paneles completamente
+            const artistaPanel = document.getElementById('artistaPanel');
+            const curadorPanel = document.getElementById('curadorPanel');
+            
+            artistaPanel.style.display = 'none';
+            artistaPanel.classList.remove('active');
+            curadorPanel.style.display = 'none';
+            curadorPanel.classList.remove('active');
             
             if(userType === 'artista'){
                 console.log('🎨 Activando panel de ARTISTA');
-                document.getElementById('artistaPanel').classList.add('active');
+                artistaPanel.style.display = 'block';
+                artistaPanel.classList.add('active');
                 document.getElementById('artistaName').textContent = name;
                 // Actualizar créditos en navbar
                 document.getElementById('creditosStandard').textContent = data[0].creditos || 0;
@@ -5398,7 +5404,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 document.getElementById('userInitial').textContent = name.charAt(0).toUpperCase();
             } else if(userType === 'curador'){
                 console.log('💰 Activando panel de CURADOR');
-                document.getElementById('curadorPanel').classList.add('active');
+                curadorPanel.style.display = 'block';
+                curadorPanel.classList.add('active');
                 document.getElementById('curadorName').textContent = name;
                 document.getElementById('curadorPuntosDisplay').textContent = '0';
                 // Actualizar inicial en avatar
@@ -5408,29 +5415,10 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     inicializarCurador();
                 }, 1000);
                 // Cambiar títulos hero para curadores
-                document.getElementById('heroTitle').textContent = 'Gana dinero mientras ayudas a los artistas';
-                document.getElementById('heroSubtitle').textContent = 'Monetiza tus playlists y descubre nueva música de calidad';
-                // Cambiar mensajes de notificaciones para curadores
-                document.getElementById('notifBienvenidaMensaje').textContent = 'Gracias por registrarte. Comienza a generar dinero mientras ayudas a los artistas.';
-                document.getElementById('notifEstadisticasMensaje').textContent = 'Revisa el rendimiento de tus playlists y ganancias';
-                document.getElementById('notifAceptadaTitulo').textContent = '¡Has ganado dinero!';
-                document.getElementById('notifAceptadaMensaje').textContent = 'Aceptaste "Amanecer Urbano" en tu playlist "Urbano Top 100". Has ganado 0.50€ 💰';
-                document.getElementById('notifPendienteTitulo').textContent = 'Nuevo envío recibido';
-                document.getElementById('notifPendienteMensaje').textContent = 'Tienes un nuevo envío "Noches de Verano" esperando tu revisión en "Trap España". ⏰ Tienes 7 días para responder antes de que se elimine la solicitud.';
-                // Cambiar botones del navbar para curadores
-                document.getElementById('navBtn1').onclick = function(){ openPremiumCuradorModal(); };
-                document.getElementById('navBtn1').title = 'Destacar Playlist (14.99€/mes)';
-                document.getElementById('navBtn1').innerHTML = '⭐<span class="badge">0</span>';
-                document.getElementById('navBtn2').onclick = function(){ openCanjearGananciasModal(); };
-                document.getElementById('navBtn2').title = 'Canjear Ganancias';
-                document.getElementById('navBtn2').innerHTML = '💰<span class="badge" id="balanceCanjeable">450€</span>';
-                document.getElementById('navBtn3').style.display = 'inline-flex';
-                // Cambiar sección "Cómo Funciona" para curadores
-                cambiarComoFuncionaACurador();
-                // Cambiar sección "Servicios" para curadores
-                cambiarServiciosACurador();
-                // Cambiar herramienta "Análisis" para curadores
-                cambiarAnalisisACurador();
+                const heroTitle = document.getElementById('heroTitle');
+                const heroSubtitle = document.getElementById('heroSubtitle');
+                if (heroTitle) heroTitle.textContent = 'Gana dinero mientras ayudas a los artistas';
+                if (heroSubtitle) heroSubtitle.textContent = 'Monetiza tus playlists y descubre nueva música de calidad';
             }
             
             document.getElementById('logoutBtn').classList.remove('hidden');
@@ -9218,7 +9206,23 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             const userId = localStorage.getItem('userId');
             const userName = localStorage.getItem('userName');
             
+            // Referencias a los paneles
+            const artistaPanel = document.getElementById('artistaPanel');
+            const curadorPanel = document.getElementById('curadorPanel');
+            
+            // SIEMPRE ocultar ambos paneles primero
+            if (artistaPanel) {
+                artistaPanel.style.display = 'none';
+                artistaPanel.classList.remove('active');
+            }
+            if (curadorPanel) {
+                curadorPanel.style.display = 'none';
+                curadorPanel.classList.remove('active');
+            }
+            
             if (userRegistered === 'true' && userId) {
+                console.log('✅ Sesión activa - Tipo:', userType);
+                
                 // Mostrar botón de cerrar sesión
                 document.getElementById('logoutBtn').classList.remove('hidden');
                 
@@ -9226,22 +9230,51 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 const userAvatar = document.getElementById('userAvatar');
                 if (userAvatar) userAvatar.style.display = 'flex';
                 
-                // Mostrar secciones que requieren login
+                // Mostrar secciones generales que requieren login (EXCEPTO los paneles)
                 document.querySelectorAll('[data-require-login]').forEach(section => {
-                    section.classList.remove('hidden');
-                    section.style.display = '';
+                    // NO mostrar los paneles aquí - se manejan por separado
+                    if (section.id !== 'artistaPanel' && section.id !== 'curadorPanel') {
+                        section.classList.remove('hidden');
+                        section.style.display = '';
+                    }
                 });
+                
+                // MOSTRAR SOLO EL PANEL CORRECTO SEGÚN TIPO DE USUARIO
+                if (userType === 'artista') {
+                    console.log('🎵 Mostrando panel de ARTISTA');
+                    if (artistaPanel) {
+                        artistaPanel.style.display = 'block';
+                        artistaPanel.classList.add('active');
+                    }
+                    // Asegurar que el panel de curador está oculto
+                    if (curadorPanel) {
+                        curadorPanel.style.display = 'none';
+                        curadorPanel.classList.remove('active');
+                    }
+                    // Actualizar nombre
+                    document.getElementById('artistaName').textContent = userName || 'Artista';
+                } else if (userType === 'curador') {
+                    console.log('🎧 Mostrando panel de CURADOR');
+                    if (curadorPanel) {
+                        curadorPanel.style.display = 'block';
+                        curadorPanel.classList.add('active');
+                    }
+                    // Asegurar que el panel de artista está oculto
+                    if (artistaPanel) {
+                        artistaPanel.style.display = 'none';
+                        artistaPanel.classList.remove('active');
+                    }
+                    // Actualizar nombre
+                    document.getElementById('curadorName').textContent = userName || 'Curador';
+                    // Verificar estado de Spotify
+                    await verificarEstadoSpotify();
+                }
                 
                 // Cargar contenido de precios según tipo de usuario
                 cargarSeccionPrecios();
                 
                 // Cargar contador de notificaciones
                 await actualizarContadorNotificaciones();
-                
-                // Si es curador, verificar estado de Spotify
-                if (userType === 'curador') {
-                    await verificarEstadoSpotify();
-                }
                 
                 // Cargar inicial del usuario en avatar
                 if (userName) {
