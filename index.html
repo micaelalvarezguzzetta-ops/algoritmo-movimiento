@@ -7447,15 +7447,30 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             
             try {
                 // Obtener envíos con información de la playlist
-                const { data: envios, error } = await supabaseClient
+                // Intentar con JOIN primero
+                let envios = null;
+                const { data: enviosConJoin, error } = await supabaseClient
                     .from('envios_canciones')
                     .select('*, playlists(nombre)')
                     .eq('curador_id', userId)
                     .order('created_at', { ascending: false });
                 
                 if (error) {
-                    console.error('Error cargando envíos:', error);
-                    return;
+                    console.error('Error cargando envíos con JOIN:', error);
+                    // Intentar sin JOIN si falla
+                    const { data: enviosSinJoin, error: error2 } = await supabaseClient
+                        .from('envios_canciones')
+                        .select('*')
+                        .eq('curador_id', userId)
+                        .order('created_at', { ascending: false });
+                    
+                    if (error2) {
+                        console.error('Error cargando envíos (sin join):', error2);
+                        return;
+                    }
+                    envios = enviosSinJoin;
+                } else {
+                    envios = enviosConJoin;
                 }
                 
                 const container = document.getElementById('enviosRecibidosList');
@@ -7469,6 +7484,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     `;
                     return;
                 }
+                
+                console.log('📨 Envíos cargados:', envios.length);
                 
                 container.innerHTML = envios.map(envio => {
                     const estadoColors = {
