@@ -1728,6 +1728,16 @@
                 <h3 class="panel-card-title">Analytics</h3>
                 <p class="panel-card-desc">Estadísticas de playlists</p>
             </div>
+            <div class="panel-card" onclick="openAfiliadosModal()">
+                <div class="panel-card-icon">🤝</div>
+                <h3 class="panel-card-title">Afiliados</h3>
+                <p class="panel-card-desc">Gana por referidos</p>
+            </div>
+            <div class="panel-card" onclick="openServiciosCuradorModal()">
+                <div class="panel-card-icon">🎁</div>
+                <h3 class="panel-card-title">Servicios</h3>
+                <p class="panel-card-desc">Canjear puntos</p>
+            </div>
             <div class="panel-card" onclick="openPagosModal()">
                 <div class="panel-card-icon">💳</div>
                 <h3 class="panel-card-title">Retirar Fondos</h3>
@@ -4082,6 +4092,91 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     • Los puntos se liberan después de mantener la canción 4 días<br>
                     • Los puntos NO caducan, se acumulan indefinidamente<br>
                     • Puedes canjear cuando quieras, sin límite de veces
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL SERVICIOS CURADOR -->
+    <div class="modal" id="modalServiciosCurador">
+        <div class="modal-content" style="max-width: 800px;">
+            <button class="modal-close" onclick="closeServiciosCuradorModal()">×</button>
+            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 0.5rem;">🎁 Servicios para Curadores</h2>
+            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Canjea tus puntos por servicios exclusivos</p>
+            
+            <!-- Balance de puntos -->
+            <div style="background: linear-gradient(135deg, #f59e0b, #ef4444); border-radius: 1rem; padding: 1.5rem; text-align: center; margin-bottom: 2rem;">
+                <div style="font-size: 0.9rem; opacity: 0.9;">Tus Puntos Disponibles</div>
+                <div style="font-size: 3rem; font-weight: 900;" id="serviciosPuntosBalance">0</div>
+            </div>
+            
+            <!-- Grid de servicios -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1.5rem;">
+                
+                <!-- Envío a Playlists Gratis -->
+                <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎵</div>
+                    <h3 style="font-weight: 800; margin-bottom: 0.5rem;">Envío a Playlists</h3>
+                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 1rem;">1 envío gratuito a playlists FREE</p>
+                    <div style="font-size: 1.5rem; font-weight: 900; color: #10b981; margin-bottom: 1rem;">15 puntos</div>
+                    <button onclick="canjearServicioCurador('envio_playlist', 15)" style="width: 100%; padding: 0.75rem; background: #10b981; color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer;">
+                        Canjear
+                    </button>
+                </div>
+                
+                <!-- Promo TikTok -->
+                <div style="background: rgba(236, 72, 153, 0.1); border: 2px solid rgba(236, 72, 153, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">📱</div>
+                    <h3 style="font-weight: 800; margin-bottom: 0.5rem;">Promo TikTok</h3>
+                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 1rem;">Promoción de tu playlist en TikTok</p>
+                    <div style="font-size: 1.5rem; font-weight: 900; color: #ec4899; margin-bottom: 1rem;">70 puntos</div>
+                    <button onclick="canjearServicioCurador('promo_tiktok', 70)" style="width: 100%; padding: 0.75rem; background: #ec4899; color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer;">
+                        Canjear
+                    </button>
+                </div>
+                
+                <!-- Playlist TOP -->
+                <div style="background: rgba(139, 92, 246, 0.1); border: 2px solid rgba(139, 92, 246, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🏆</div>
+                    <h3 style="font-weight: 800; margin-bottom: 0.5rem;">Playlist TOP</h3>
+                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 1rem;">Destacar en sección TOP por 7 días</p>
+                    <div style="font-size: 1.5rem; font-weight: 900; color: #8b5cf6; margin-bottom: 1rem;">150 puntos</div>
+                    <button onclick="canjearServicioCurador('playlist_top', 150)" style="width: 100%; padding: 0.75rem; background: #8b5cf6; color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer;">
+                        Canjear
+                    </button>
+                </div>
+                
+                <!-- Mastering IA -->
+                <div style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎛️</div>
+                    <h3 style="font-weight: 800; margin-bottom: 0.5rem;">Mastering IA</h3>
+                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 1rem;">Masteriza una canción con IA</p>
+                    <div style="font-size: 1.5rem; font-weight: 900; color: #3b82f6; margin-bottom: 1rem;">50 puntos</div>
+                    <button onclick="canjearServicioCurador('mastering_ia', 50)" style="width: 100%; padding: 0.75rem; background: #3b82f6; color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer;">
+                        Canjear
+                    </button>
+                </div>
+                
+                <!-- Creador de Portadas IA -->
+                <div style="background: rgba(249, 115, 22, 0.1); border: 2px solid rgba(249, 115, 22, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎨</div>
+                    <h3 style="font-weight: 800; margin-bottom: 0.5rem;">Portadas IA</h3>
+                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 1rem;">Crea portadas con inteligencia artificial</p>
+                    <div style="font-size: 1.5rem; font-weight: 900; color: #f97316; margin-bottom: 1rem;">40 puntos</div>
+                    <button onclick="canjearServicioCurador('portadas_ia', 40)" style="width: 100%; padding: 0.75rem; background: #f97316; color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer;">
+                        Canjear
+                    </button>
+                </div>
+                
+            </div>
+            
+            <!-- Info -->
+            <div style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.2); border-radius: 0.75rem; padding: 1rem; margin-top: 2rem;">
+                <div style="font-weight: 800; margin-bottom: 0.5rem; color: #3b82f6;">ℹ️ ¿Cómo funciona?</div>
+                <div style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">
+                    • Ganas 1 punto por cada envío FREE que aceptes<br>
+                    • Canjea tus puntos por servicios exclusivos<br>
+                    • Los puntos NO caducan, acumúlalos sin límite
                 </div>
             </div>
         </div>
@@ -6997,6 +7092,86 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             document.getElementById('modalMisPuntos').classList.remove('active');
         }
         
+        // ========================================
+        // MODAL SERVICIOS CURADOR
+        // ========================================
+        async function openServiciosCuradorModal(){
+            document.getElementById('modalServiciosCurador').classList.add('active');
+            await cargarPuntosCurador();
+        }
+        
+        function closeServiciosCuradorModal(){
+            document.getElementById('modalServiciosCurador').classList.remove('active');
+        }
+        
+        async function canjearServicioCurador(servicio, puntos){
+            const userId = localStorage.getItem('userId');
+            if (!userId) {
+                alert('⚠️ Debes iniciar sesión');
+                return;
+            }
+            
+            // Obtener puntos actuales
+            const { data: usuario, error } = await supabaseClient
+                .from('usuarios')
+                .select('puntos')
+                .eq('id', userId)
+                .single();
+            
+            if (error) {
+                alert('⚠️ Error al verificar puntos');
+                return;
+            }
+            
+            const puntosActuales = usuario.puntos || 0;
+            
+            if (puntosActuales < puntos) {
+                alert(`⚠️ No tienes suficientes puntos.\n\nNecesitas: ${puntos} puntos\nTienes: ${puntosActuales} puntos`);
+                return;
+            }
+            
+            const serviciosNombres = {
+                'envio_playlist': 'Envío a Playlists FREE',
+                'promo_tiktok': 'Promo TikTok',
+                'playlist_top': 'Destacar en Playlist TOP',
+                'mastering_ia': 'Mastering IA',
+                'portadas_ia': 'Creador de Portadas IA'
+            };
+            
+            if (!confirm(`🎁 CANJEAR SERVICIO\n\nServicio: ${serviciosNombres[servicio]}\nCosto: ${puntos} puntos\n\n¿Confirmar canje?`)) {
+                return;
+            }
+            
+            try {
+                // Descontar puntos
+                const { error: updateError } = await supabaseClient
+                    .from('usuarios')
+                    .update({ puntos: puntosActuales - puntos })
+                    .eq('id', userId);
+                
+                if (updateError) throw updateError;
+                
+                // Registrar canje
+                await supabaseClient
+                    .from('canjes')
+                    .insert({
+                        curador_id: userId,
+                        tipo: servicio,
+                        puntos: puntos,
+                        estado: 'pendiente'
+                    });
+                
+                alert(`✅ ¡CANJE EXITOSO!\n\nServicio: ${serviciosNombres[servicio]}\nPuntos usados: ${puntos}\nPuntos restantes: ${puntosActuales - puntos}\n\n📧 Te contactaremos para completar el servicio.`);
+                
+                // Actualizar displays
+                await cargarPuntosCurador();
+                
+            } catch(err) {
+                console.error('Error en canje:', err);
+                alert('⚠️ Error al procesar el canje. Intenta de nuevo.');
+            }
+        }
+        
         async function cargarPuntosCurador(){
             try {
                 const userId = localStorage.getItem('userId');
@@ -7015,10 +7190,12 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 const puntosBalance = document.getElementById('puntosBalance');
                 const curadorPuntosDisplay = document.getElementById('curadorPuntosDisplay');
                 const creditosStandard = document.getElementById('creditosStandard');
+                const serviciosPuntosBalance = document.getElementById('serviciosPuntosBalance');
                 
                 if (puntosBalance) puntosBalance.textContent = puntos;
                 if (curadorPuntosDisplay) curadorPuntosDisplay.textContent = puntos;
                 if (creditosStandard) creditosStandard.textContent = puntos;
+                if (serviciosPuntosBalance) serviciosPuntosBalance.textContent = puntos;
                 
                 console.log('⭐ Puntos del curador cargados:', puntos);
                 
@@ -8622,6 +8799,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         window.openPrivacidadModal = openPrivacidadModal;
         window.openContactoModal = openContactoModal;
         window.openEquipoModal = openEquipoModal;
+        window.openServiciosCuradorModal = openServiciosCuradorModal;
+        window.closeServiciosCuradorModal = closeServiciosCuradorModal;
+        window.canjearServicioCurador = canjearServicioCurador;
         
         // ========================================
         // FUNCIONES DE LOGIN
