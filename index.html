@@ -1527,6 +1527,7 @@
                 <a href="#precios">Precios</a>
                 <a href="#testimonios">Opiniones</a>
                 <a href="#faq">FAQ</a>
+                <a href="#" onclick="openContactoModal(); return false;">Contacto</a>
             </div>
             
             <div class="nav-actions">
@@ -3765,65 +3766,30 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             <button class="modal-close" onclick="closeGananciasModal()">×</button>
             <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 2rem;">💰 Mis Ganancias</h2>
             
-            <!-- Resumen total -->
-            <div style="background: linear-gradient(135deg, #10b981, #06b6d4); border-radius: 1rem; padding: 2rem; text-align: center; margin-bottom: 2rem;">
+            <!-- Resumen total - dinámico -->
+            <div id="gananciasResumen" style="background: linear-gradient(135deg, #10b981, #06b6d4); border-radius: 1rem; padding: 2rem; text-align: center; margin-bottom: 2rem;">
                 <div style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.5rem;">Balance Total</div>
-                <div style="font-size: 3rem; font-weight: 900; margin-bottom: 0.5rem;">€560.40</div>
-                <div style="font-size: 0.9rem; opacity: 0.8;">💵 Disponible para retirar: €450.00</div>
-                <div style="font-size: 0.9rem; opacity: 0.8;">⏳ Pendiente (en proceso): €110.40</div>
+                <div id="gananciasTotalBalance" style="font-size: 3rem; font-weight: 900; margin-bottom: 0.5rem;">€0.00</div>
+                <div id="gananciasDisponible" style="font-size: 0.9rem; opacity: 0.8;">💵 Disponible para retirar: €0.00</div>
+                <div id="gananciasPendiente" style="font-size: 0.9rem; opacity: 0.8;">⏳ Pendiente (en proceso): €0.00</div>
             </div>
             
-            <!-- Ganancias por playlist -->
+            <!-- Ganancias por playlist - dinámico -->
             <div style="margin-bottom: 2rem;">
                 <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem;">📊 Ganancias por Playlist</h3>
-                <div style="display: grid; gap: 1rem;">
-                    <div style="background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 0.75rem; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.25rem;">🔥 Reggaeton 2026</div>
-                            <div style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">89 envíos aceptados</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 1.5rem; font-weight: 800; color: #10b981;">€340.00</div>
-                            <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">Este mes</div>
-                        </div>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 0.75rem; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.25rem;">💎 Trap Elite</div>
-                            <div style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">55 envíos aceptados</div>
-                        </div>
-                        <div style="text-align: right;">
-                            <div style="font-size: 1.5rem; font-weight: 800; color: #10b981;">€220.40</div>
-                            <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">Este mes</div>
-                        </div>
+                <div id="gananciasPorPlaylist" style="display: grid; gap: 1rem;">
+                    <div style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                        Cargando...
                     </div>
                 </div>
             </div>
             
-            <!-- Historial de pagos -->
+            <!-- Historial de retiros - dinámico -->
             <div>
                 <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 1rem;">📝 Historial de Retiros</h3>
-                <div style="display: grid; gap: 0.75rem;">
-                    <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: 600;">15 Dic 2025</div>
-                            <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">PayPal: m***********<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="4524052228242c296b262a28">[email&#160;protected]</a></div>
-                        </div>
-                        <div style="color: #10b981; font-weight: 700;">+€280.00</div>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: 600;">01 Dic 2025</div>
-                            <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">Transferencia bancaria</div>
-                        </div>
-                        <div style="color: #10b981; font-weight: 700;">+€520.00</div>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
-                        <div>
-                            <div style="font-weight: 600;">18 Nov 2025</div>
-                            <div style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">PayPal: m***********<a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="c8a988afa5a9a1a4e6aba7a5">[email&#160;protected]</a></div>
-                        </div>
-                        <div style="color: #10b981; font-weight: 700;">+€340.00</div>
+                <div id="gananciasHistorialRetiros" style="display: grid; gap: 0.75rem;">
+                    <div style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                        No hay retiros registrados
                     </div>
                 </div>
             </div>
@@ -3901,70 +3867,36 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             <button class="modal-close" onclick="closeEstadisticasCuradorModal()">×</button>
             <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 2rem;">📊 Analytics del Curador</h2>
             
-            <!-- Stats generales -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+            <!-- Stats generales - dinámico -->
+            <div id="analyticsCuradorStats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
                 <div style="background: linear-gradient(135deg, #ec4899, #8b5cf6); border-radius: 1rem; padding: 1.5rem; text-align: center;">
                     <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Total Seguidores</div>
-                    <div style="font-size: 2.5rem; font-weight: 900;">44,150</div>
-                    <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">↗️ +3,240 este mes</div>
+                    <div id="analyticsTotalSeguidores" style="font-size: 2.5rem; font-weight: 900;">0</div>
+                    <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">En todas tus playlists</div>
                 </div>
                 <div style="background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Envíos Totales</div>
-                    <div style="font-size: 2.5rem; font-weight: 900;">156</div>
-                    <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">Este mes</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Envíos Recibidos</div>
+                    <div id="analyticsTotalEnvios" style="font-size: 2.5rem; font-weight: 900;">0</div>
+                    <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">Total histórico</div>
                 </div>
                 <div style="background: linear-gradient(135deg, #10b981, #06b6d4); border-radius: 1rem; padding: 1.5rem; text-align: center;">
                     <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Tasa Aceptación</div>
-                    <div style="font-size: 2.5rem; font-weight: 900;">57%</div>
-                    <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">89 aceptados</div>
+                    <div id="analyticsTasaAceptacion" style="font-size: 2.5rem; font-weight: 900;">0%</div>
+                    <div id="analyticsAceptados" style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">0 aceptados</div>
                 </div>
                 <div style="background: linear-gradient(135deg, #f59e0b, #ef4444); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Ganancias</div>
-                    <div style="font-size: 2.5rem; font-weight: 900;">€560</div>
-                    <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">Este mes</div>
+                    <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.5rem;">Ganancias Totales</div>
+                    <div id="analyticsGanancias" style="font-size: 2.5rem; font-weight: 900;">€0</div>
+                    <div style="font-size: 0.85rem; opacity: 0.8; margin-top: 0.5rem;">Acumulado</div>
                 </div>
             </div>
             
-            <!-- Gráfico simulado -->
-            <div style="background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem;">
-                <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">📈 Crecimiento de Seguidores (Últimos 6 meses)</h3>
-                <div style="height: 200px; display: flex; align-items: flex-end; justify-content: space-around; gap: 1rem;">
-                    <div style="flex: 1; background: linear-gradient(180deg, #8b5cf6, transparent); height: 40%; border-radius: 0.5rem 0.5rem 0 0; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">Ago</div>
-                    <div style="flex: 1; background: linear-gradient(180deg, #8b5cf6, transparent); height: 55%; border-radius: 0.5rem 0.5rem 0 0; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">Sep</div>
-                    <div style="flex: 1; background: linear-gradient(180deg, #8b5cf6, transparent); height: 65%; border-radius: 0.5rem 0.5rem 0 0; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">Oct</div>
-                    <div style="flex: 1; background: linear-gradient(180deg, #8b5cf6, transparent); height: 75%; border-radius: 0.5rem 0.5rem 0 0; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">Nov</div>
-                    <div style="flex: 1; background: linear-gradient(180deg, #8b5cf6, transparent); height: 85%; border-radius: 0.5rem 0.5rem 0 0; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">Dic</div>
-                    <div style="flex: 1; background: linear-gradient(180deg, #10b981, transparent); height: 100%; border-radius: 0.5rem 0.5rem 0 0; display: flex; align-items: center; justify-content: center; color: white; font-weight: 700;">Ene</div>
-                </div>
-            </div>
-            
-            <!-- Rendimiento por playlist -->
+            <!-- Rendimiento por playlist - dinámico -->
             <div>
                 <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">🎵 Rendimiento por Playlist</h3>
-                <div style="display: grid; gap: 1rem;">
-                    <div style="background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 0.75rem; padding: 1.25rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <div style="font-weight: 700; font-size: 1.1rem;">🔥 Reggaeton 2026</div>
-                            <div style="background: rgba(16, 185, 129, 0.2); padding: 0.5rem 1rem; border-radius: 1rem; color: #10b981; font-weight: 700;">+9.2%</div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; font-size: 0.9rem;">
-                            <div><strong>Seguidores:</strong> 25,430</div>
-                            <div><strong>Envíos:</strong> 89</div>
-                            <div><strong>Aceptación:</strong> 65%</div>
-                            <div><strong>Ganancias:</strong> €340</div>
-                        </div>
-                    </div>
-                    <div style="background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 0.75rem; padding: 1.25rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
-                            <div style="font-weight: 700; font-size: 1.1rem;">💎 Trap Elite</div>
-                            <div style="background: rgba(16, 185, 129, 0.2); padding: 0.5rem 1rem; border-radius: 1rem; color: #10b981; font-weight: 700;">+5.8%</div>
-                        </div>
-                        <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; font-size: 0.9rem;">
-                            <div><strong>Seguidores:</strong> 18,720</div>
-                            <div><strong>Envíos:</strong> 67</div>
-                            <div><strong>Aceptación:</strong> 52%</div>
-                            <div><strong>Ganancias:</strong> €220</div>
-                        </div>
+                <div id="analyticsPlaylistsRendimiento" style="display: grid; gap: 1rem;">
+                    <div style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                        Cargando...
                     </div>
                 </div>
             </div>
@@ -3977,19 +3909,19 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             <button class="modal-close" onclick="closePagosModal()">×</button>
             <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 2rem;">💳 Retirar Fondos</h2>
             
-            <!-- Balance disponible -->
+            <!-- Balance disponible - dinámico -->
             <div style="background: linear-gradient(135deg, #10b981, #06b6d4); border-radius: 1rem; padding: 2rem; text-align: center; margin-bottom: 2rem;">
                 <div style="font-size: 1rem; opacity: 0.9; margin-bottom: 0.5rem;">Balance Disponible</div>
-                <div style="font-size: 3.5rem; font-weight: 900;">€450.00</div>
-                <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem;">Mínimo para retirar: €20.00</div>
+                <div id="retiroBalanceDisponible" style="font-size: 3.5rem; font-weight: 900;">€0.00</div>
+                <div style="font-size: 0.9rem; opacity: 0.8; margin-top: 0.5rem;">Mínimo para retirar: €10.00</div>
             </div>
             
             <!-- Formulario de retiro -->
             <form id="formRetiroFondos" style="display: grid; gap: 1.5rem;">
                 <div>
                     <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">Cantidad a retirar</label>
-                    <input type="number" id="cantidadRetiro" min="20" max="450" step="0.01" placeholder="20.00" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: white;">
-                    <small style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Mínimo: 20€ | Máximo disponible: 450€</small>
+                    <input type="number" id="cantidadRetiro" min="10" step="0.01" placeholder="10.00" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: white;">
+                    <small id="retiroLimites" style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Mínimo: €10 | Máximo disponible: €0.00</small>
                 </div>
                 
                 <div>
@@ -4026,9 +3958,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     <div style="font-weight: 700; margin-bottom: 0.5rem;">ℹ️ Información importante:</div>
                     <ul style="margin: 0; padding-left: 1.5rem; font-size: 0.9rem; color: rgba(255,255,255,0.8);">
                         <li>Los retiros se procesan en 2-5 días hábiles</li>
-                        <li>Retiros superiores a 100€: 3% de comisión</li>
-                        <li>Retiros inferiores a 100€: 5% de comisión</li>
-                        <li>Mínimo para retirar: 20€</li>
+                        <li>Sin comisiones</li>
+                        <li>Mínimo para retirar: €10</li>
                     </ul>
                 </div>
                 
@@ -5112,32 +5043,50 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
 
     <!-- MODAL CONTACTO -->
     <div class="modal" id="modalContacto">
-        <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-content" style="max-width: 700px;">
             <button class="modal-close" onclick="closeContactoModal()">×</button>
             <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">📧 Contacto</h2>
             <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">¿Necesitas ayuda? Contáctanos</p>
             
-            <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 2rem; text-align: center; margin-bottom: 2rem;">
+            <!-- Email -->
+            <div style="background: linear-gradient(135deg, #7c3aed, #ec4899); border-radius: 1rem; padding: 2rem; text-align: center; margin-bottom: 2rem;">
                 <div style="font-size: 3rem; margin-bottom: 1rem;">📬</div>
                 <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">Email de Soporte</h3>
-                <a href="/cdn-cgi/l/email-protection#2b58445b44595f4e4a474c4459425f46444e4546445d4246424e455f446b4c464a424705484446" style="color: #ec4899; font-weight: 700; font-size: 1.2rem; text-decoration: none; word-break: break-all;"><span class="__cf_email__" data-cfemail="790a1609160b0d1c18151e160b100d14161c1714160f1014101c170d16391e14181015571a1614">[email&#160;protected]</span></a>
-                <p style="color: rgba(255,255,255,0.7); margin-top: 1.5rem; font-size: 0.95rem;">Respondemos en menos de 24 horas</p>
+                <a href="mailto:algoritmoenmovimiento@gmail.com" style="color: white; font-weight: 700; font-size: 1.2rem; text-decoration: none; word-break: break-all;">algoritmoenmovimiento@gmail.com</a>
+                <p style="color: rgba(255,255,255,0.9); margin-top: 1rem; font-size: 0.95rem;">Respondemos en menos de 24 horas</p>
             </div>
             
+            <!-- Redes Sociales -->
+            <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem; text-align: center;">🌐 Síguenos en Redes</h3>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem;">
+                <a href="https://www.instagram.com/algoritmoenmovimientomusic?igsh=dmZpeGxqOHl6aTl0" target="_blank" style="background: linear-gradient(135deg, #833AB4, #E1306C, #F77737); border-radius: 1rem; padding: 1.5rem; text-align: center; text-decoration: none; color: white; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📷</div>
+                    <div style="font-weight: 700;">Instagram</div>
+                    <div style="font-size: 0.85rem; opacity: 0.9; margin-top: 0.25rem;">@algoritmoenmovimientomusic</div>
+                </a>
+                <a href="https://www.tiktok.com/@trapyrapconsciente?_r=1&_t=ZN-93QnG4rAnHq" target="_blank" style="background: linear-gradient(135deg, #00f2ea, #ff0050); border-radius: 1rem; padding: 1.5rem; text-align: center; text-decoration: none; color: white; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">🎵</div>
+                    <div style="font-weight: 700;">TikTok</div>
+                    <div style="font-size: 0.85rem; opacity: 0.9; margin-top: 0.25rem;">@trapyrapconsciente</div>
+                </a>
+                <a href="https://www.facebook.com/share/1CxxsB4Mkb/" target="_blank" style="background: linear-gradient(135deg, #1877F2, #3b5998); border-radius: 1rem; padding: 1.5rem; text-align: center; text-decoration: none; color: white; transition: transform 0.2s;" onmouseover="this.style.transform='scale(1.05)'" onmouseout="this.style.transform='scale(1)'">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">👍</div>
+                    <div style="font-weight: 700;">Facebook</div>
+                    <div style="font-size: 0.85rem; opacity: 0.9; margin-top: 0.25rem;">Algoritmo en Movimiento</div>
+                </a>
+            </div>
+            
+            <!-- Info adicional -->
             <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
                 <div style="background: rgba(255,255,255,0.05); border-radius: 0.75rem; padding: 1.5rem; text-align: center;">
                     <div style="font-size: 2rem; margin-bottom: 0.5rem;">⏰</div>
-                    <h4 style="font-weight: 700; margin-bottom: 0.5rem;">Horario</h4>
-                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Lun - Vie<br>9:00 - 18:00 CET</p>
+                    <h4 style="font-weight: 700; margin-bottom: 0.5rem;">Horario de Atención</h4>
+                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Lunes - Viernes<br>9:00 - 18:00 (CET)</p>
                 </div>
                 <div style="background: rgba(255,255,255,0.05); border-radius: 0.75rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">💬</div>
-                    <h4 style="font-weight: 700; margin-bottom: 0.5rem;">Redes Sociales</h4>
-                    <div style="display: flex; justify-content: center; gap: 1rem; margin-top: 0.75rem;">
-                        <a href="https://instagram.com" target="_blank" style="color: #ec4899; font-size: 1.5rem;">📷</a>
-                        <a href="https://facebook.com" target="_blank" style="color: #3b82f6; font-size: 1.5rem;">f</a>
-                        <a href="https://tiktok.com" target="_blank" style="color: #06b6d4; font-size: 1.5rem;">♪</a>
-                    </div>
+                    <div style="font-size: 2rem; margin-bottom: 0.5rem;">📍</div>
+                    <h4 style="font-weight: 700; margin-bottom: 0.5rem;">Ubicación</h4>
+                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">Madrid, España<br>Europa</p>
                 </div>
             </div>
         </div>
@@ -5400,6 +5349,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         <a href="#" onclick="openPremiumCuradorModal(); return false;">Destacar Playlist</a>
                         <a href="#" onclick="openAfiliadosModal(); return false;">Afiliados</a>
                         <a href="#faq">FAQ</a>
+                        <a href="#" onclick="openContactoModal(); return false;">Contacto</a>
                     `;
                 }
                 
@@ -5548,6 +5498,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                             <a href="#" onclick="openPremiumCuradorModal(); return false;">Destacar Playlist</a>
                             <a href="#" onclick="openAfiliadosModal(); return false;">Afiliados</a>
                             <a href="#faq">FAQ</a>
+                            <a href="#" onclick="openContactoModal(); return false;">Contacto</a>
                         `;
                     }
                     
@@ -6918,6 +6869,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                                                 🎵 Ver en Spotify
                                             </a>
                                         ` : ''}
+                                        <button data-playlist-id="${playlist.id}" data-playlist-url="${playlist.url_spotify || ''}" onclick="actualizarSeguidoresPlaylist(this.dataset.playlistId)" style="padding: 0.75rem 1.5rem; background: rgba(59, 130, 246, 0.2); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 0.5rem; color: #3b82f6; font-weight: 700; cursor: pointer;">
+                                            🔄 Actualizar Seguidores
+                                        </button>
                                         <button data-playlist-id="${playlist.id}" data-playlist-nombre="${playlist.nombre.replace(/"/g, '&quot;')}" onclick="eliminarPlaylist(this.dataset.playlistId, this.dataset.playlistNombre)" style="padding: 0.75rem 1.5rem; background: rgba(239, 68, 68, 0.2); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 0.5rem; color: #ef4444; font-weight: 700; cursor: pointer;">
                                             🗑️ Eliminar
                                         </button>
@@ -6961,6 +6915,56 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
             } catch (err) {
                 console.error('Error en eliminarPlaylist:', err);
+                alert('⚠️ Error inesperado. Por favor intenta de nuevo.');
+            }
+        }
+        
+        async function actualizarSeguidoresPlaylist(playlistId) {
+            const nuevoSeguidores = prompt(
+                '🔄 ACTUALIZAR SEGUIDORES\n\n' +
+                'Ingresa el número actual de seguidores de tu playlist en Spotify.\n\n' +
+                '📌 Puedes ver el número exacto en tu perfil de Spotify o en la app.\n\n' +
+                'Número de seguidores:'
+            );
+            
+            if (!nuevoSeguidores || isNaN(parseInt(nuevoSeguidores))) {
+                return;
+            }
+            
+            const seguidores = parseInt(nuevoSeguidores);
+            
+            if (seguidores < 0) {
+                alert('⚠️ El número de seguidores debe ser positivo.');
+                return;
+            }
+            
+            try {
+                const { error } = await supabaseClient
+                    .from('playlists')
+                    .update({ 
+                        followers: seguidores,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('id', playlistId);
+                
+                if (error) {
+                    console.error('Error actualizando seguidores:', error);
+                    alert('⚠️ Error al actualizar. Por favor intenta de nuevo.');
+                    return;
+                }
+                
+                // Determinar nuevo tipo
+                let nuevoTipo = 'FREE';
+                if (seguidores >= 300) nuevoTipo = 'PREMIUM';
+                else if (seguidores >= 100) nuevoTipo = 'STANDARD';
+                
+                alert(`✅ Seguidores actualizados a ${seguidores.toLocaleString()}.\n\nTipo de playlist: ${nuevoTipo}`);
+                
+                // Recargar lista
+                await cargarMisPlaylists();
+                
+            } catch (err) {
+                console.error('Error en actualizarSeguidoresPlaylist:', err);
                 alert('⚠️ Error inesperado. Por favor intenta de nuevo.');
             }
         }
@@ -7935,8 +7939,124 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             }
         }
         
-        function openGananciasModal(){
+        async function openGananciasModal(){
             document.getElementById('modalGanancias').classList.add('active');
+            await cargarGananciasReales();
+        }
+        
+        async function cargarGananciasReales() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) return;
+            
+            try {
+                // Obtener envíos aceptados del curador
+                const { data: envios, error } = await supabaseClient
+                    .from('envios_canciones')
+                    .select('*, playlists(nombre)')
+                    .eq('curador_id', userId)
+                    .eq('estado', 'aceptado');
+                
+                if (error) {
+                    console.error('Error cargando ganancias:', error);
+                    return;
+                }
+                
+                // Calcular ganancias
+                let totalDisponible = 0;
+                let totalPendiente = 0;
+                let gananciasPorPlaylist = {};
+                
+                envios?.forEach(envio => {
+                    const playlistNombre = envio.playlists?.nombre || envio.playlist_nombre || 'Playlist';
+                    
+                    // Calcular ganancia según tipo
+                    let ganancia = 0;
+                    if (envio.tipo_envio === 'standard') ganancia = 0.20;
+                    else if (envio.tipo_envio === 'premium') ganancia = 0.45;
+                    // free = 0€ pero +1 punto
+                    
+                    // Verificar si está desbloqueada (cumplió el plazo)
+                    if (envio.ganancias_desbloqueadas) {
+                        totalDisponible += ganancia;
+                    } else {
+                        // Calcular si ya pasó el plazo
+                        const diasRequeridos = envio.tipo_envio === 'free' ? 3 : envio.tipo_envio === 'standard' ? 7 : 10;
+                        const fechaAceptado = new Date(envio.fecha_aceptado);
+                        const ahora = new Date();
+                        const diasPasados = Math.floor((ahora - fechaAceptado) / (1000 * 60 * 60 * 24));
+                        
+                        if (diasPasados >= diasRequeridos) {
+                            totalDisponible += ganancia;
+                        } else {
+                            totalPendiente += ganancia;
+                        }
+                    }
+                    
+                    // Agrupar por playlist
+                    if (!gananciasPorPlaylist[playlistNombre]) {
+                        gananciasPorPlaylist[playlistNombre] = { total: 0, envios: 0 };
+                    }
+                    gananciasPorPlaylist[playlistNombre].total += ganancia;
+                    gananciasPorPlaylist[playlistNombre].envios++;
+                });
+                
+                // Obtener usuario para saldo retirado
+                const { data: usuario } = await supabaseClient
+                    .from('usuarios')
+                    .select('saldo_retirado, puntos_curador')
+                    .eq('id', userId)
+                    .single();
+                
+                const saldoRetirado = usuario?.saldo_retirado || 0;
+                const puntosCurador = usuario?.puntos_curador || 0;
+                
+                // Actualizar UI
+                const totalBalance = totalDisponible + totalPendiente;
+                document.getElementById('gananciasTotalBalance').textContent = `€${totalBalance.toFixed(2)}`;
+                document.getElementById('gananciasDisponible').textContent = `💵 Disponible para retirar: €${totalDisponible.toFixed(2)}`;
+                document.getElementById('gananciasPendiente').textContent = `⏳ Pendiente (en proceso): €${totalPendiente.toFixed(2)}`;
+                
+                // Renderizar ganancias por playlist
+                const playlistContainer = document.getElementById('gananciasPorPlaylist');
+                const playlistNames = Object.keys(gananciasPorPlaylist);
+                
+                if (playlistNames.length === 0) {
+                    playlistContainer.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
+                            <p>Aún no tienes ganancias registradas</p>
+                            <p style="font-size: 0.9rem; margin-top: 0.5rem;">Acepta envíos para comenzar a ganar</p>
+                        </div>
+                    `;
+                } else {
+                    playlistContainer.innerHTML = playlistNames.map(nombre => {
+                        const data = gananciasPorPlaylist[nombre];
+                        return `
+                            <div style="background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 0.75rem; padding: 1.25rem; display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <div style="font-weight: 700; font-size: 1.1rem; margin-bottom: 0.25rem;">🎵 ${nombre}</div>
+                                    <div style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">${data.envios} envío${data.envios > 1 ? 's' : ''} aceptado${data.envios > 1 ? 's' : ''}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <div style="font-size: 1.5rem; font-weight: 800; color: #10b981;">€${data.total.toFixed(2)}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                
+                // Historial de retiros (si existe tabla)
+                const retirosContainer = document.getElementById('gananciasHistorialRetiros');
+                retirosContainer.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                        <p>No hay retiros registrados aún</p>
+                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Mínimo para retirar: €10.00</p>
+                    </div>
+                `;
+                
+            } catch (err) {
+                console.error('Error en cargarGananciasReales:', err);
+            }
         }
         
         function closeGananciasModal(){
@@ -7978,16 +8098,109 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             }
         }
         
-        function openEstadisticasCuradorModal(){
+        async function openEstadisticasCuradorModal(){
             document.getElementById('modalEstadisticasCurador').classList.add('active');
+            await cargarAnalyticsCurador();
+        }
+        
+        async function cargarAnalyticsCurador() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) return;
+            
+            try {
+                // Obtener playlists del curador
+                const { data: playlists, error: playlistError } = await supabaseClient
+                    .from('playlists')
+                    .select('*')
+                    .eq('curador_id', userId)
+                    .eq('activa', true);
+                
+                // Obtener todos los envíos del curador
+                const { data: envios, error: enviosError } = await supabaseClient
+                    .from('envios_canciones')
+                    .select('*')
+                    .eq('curador_id', userId);
+                
+                if (playlistError || enviosError) {
+                    console.error('Error cargando analytics:', playlistError || enviosError);
+                    return;
+                }
+                
+                // Calcular estadísticas
+                const totalSeguidores = playlists?.reduce((sum, p) => sum + (p.followers || 0), 0) || 0;
+                const totalEnvios = envios?.length || 0;
+                const enviosAceptados = envios?.filter(e => e.estado === 'aceptado').length || 0;
+                const tasaAceptacion = totalEnvios > 0 ? Math.round((enviosAceptados / totalEnvios) * 100) : 0;
+                
+                // Calcular ganancias totales
+                let gananciasTotal = 0;
+                envios?.filter(e => e.estado === 'aceptado').forEach(envio => {
+                    if (envio.tipo_envio === 'standard') gananciasTotal += 0.20;
+                    else if (envio.tipo_envio === 'premium') gananciasTotal += 0.45;
+                });
+                
+                // Actualizar UI
+                document.getElementById('analyticsTotalSeguidores').textContent = totalSeguidores.toLocaleString();
+                document.getElementById('analyticsTotalEnvios').textContent = totalEnvios;
+                document.getElementById('analyticsTasaAceptacion').textContent = `${tasaAceptacion}%`;
+                document.getElementById('analyticsAceptados').textContent = `${enviosAceptados} aceptados`;
+                document.getElementById('analyticsGanancias').textContent = `€${gananciasTotal.toFixed(2)}`;
+                
+                // Calcular estadísticas por playlist
+                const container = document.getElementById('analyticsPlaylistsRendimiento');
+                
+                if (!playlists || playlists.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                            <p>No tienes playlists registradas</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = playlists.map(playlist => {
+                    const enviosPlaylist = envios?.filter(e => e.playlist_id === playlist.id) || [];
+                    const aceptadosPlaylist = enviosPlaylist.filter(e => e.estado === 'aceptado').length;
+                    const tasaPlaylist = enviosPlaylist.length > 0 ? Math.round((aceptadosPlaylist / enviosPlaylist.length) * 100) : 0;
+                    
+                    let gananciasPlaylist = 0;
+                    enviosPlaylist.filter(e => e.estado === 'aceptado').forEach(e => {
+                        if (e.tipo_envio === 'standard') gananciasPlaylist += 0.20;
+                        else if (e.tipo_envio === 'premium') gananciasPlaylist += 0.45;
+                    });
+                    
+                    const tipoBadge = playlist.followers >= 300 ? '⭐ PREMIUM' : playlist.followers >= 100 ? '💰 STANDARD' : '🎁 FREE';
+                    
+                    return `
+                        <div style="background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 0.75rem; padding: 1.25rem;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                                <div style="font-weight: 700; font-size: 1.1rem;">🎵 ${playlist.nombre}</div>
+                                <div style="background: rgba(124, 58, 237, 0.2); padding: 0.5rem 1rem; border-radius: 1rem; color: #a78bfa; font-weight: 700; font-size: 0.85rem;">${tipoBadge}</div>
+                            </div>
+                            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; font-size: 0.9rem;">
+                                <div><strong>Seguidores:</strong> ${(playlist.followers || 0).toLocaleString()}</div>
+                                <div><strong>Envíos:</strong> ${enviosPlaylist.length}</div>
+                                <div><strong>Aceptación:</strong> ${tasaPlaylist}%</div>
+                                <div><strong>Ganancias:</strong> €${gananciasPlaylist.toFixed(2)}</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (err) {
+                console.error('Error en cargarAnalyticsCurador:', err);
+            }
         }
         
         function closeEstadisticasCuradorModal(){
             document.getElementById('modalEstadisticasCurador').classList.remove('active');
         }
         
-        function openPagosModal(){
+        async function openPagosModal(){
             document.getElementById('modalPagos').classList.add('active');
+            
+            // Cargar balance disponible
+            await cargarBalanceRetiro();
             
             // Configurar evento para mostrar campos según método
             setTimeout(() => {
@@ -8007,6 +8220,60 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             }, 100);
         }
         
+        let balanceDisponibleRetiro = 0;
+        
+        async function cargarBalanceRetiro() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) return;
+            
+            try {
+                // Obtener envíos aceptados con ganancias desbloqueadas
+                const { data: envios, error } = await supabaseClient
+                    .from('envios_canciones')
+                    .select('*')
+                    .eq('curador_id', userId)
+                    .eq('estado', 'aceptado');
+                
+                if (error) {
+                    console.error('Error cargando balance:', error);
+                    return;
+                }
+                
+                // Calcular ganancias disponibles (desbloqueadas)
+                let totalDisponible = 0;
+                
+                envios?.forEach(envio => {
+                    let ganancia = 0;
+                    if (envio.tipo_envio === 'standard') ganancia = 0.20;
+                    else if (envio.tipo_envio === 'premium') ganancia = 0.45;
+                    
+                    // Verificar si está desbloqueada
+                    if (envio.ganancias_desbloqueadas) {
+                        totalDisponible += ganancia;
+                    } else {
+                        const diasRequeridos = envio.tipo_envio === 'free' ? 3 : envio.tipo_envio === 'standard' ? 7 : 10;
+                        const fechaAceptado = new Date(envio.fecha_aceptado);
+                        const ahora = new Date();
+                        const diasPasados = Math.floor((ahora - fechaAceptado) / (1000 * 60 * 60 * 24));
+                        
+                        if (diasPasados >= diasRequeridos) {
+                            totalDisponible += ganancia;
+                        }
+                    }
+                });
+                
+                balanceDisponibleRetiro = totalDisponible;
+                
+                // Actualizar UI
+                document.getElementById('retiroBalanceDisponible').textContent = `€${totalDisponible.toFixed(2)}`;
+                document.getElementById('retiroLimites').textContent = `Mínimo: €10 | Máximo disponible: €${totalDisponible.toFixed(2)}`;
+                document.getElementById('cantidadRetiro').max = totalDisponible;
+                
+            } catch (err) {
+                console.error('Error en cargarBalanceRetiro:', err);
+            }
+        }
+        
         function closePagosModal(){
             document.getElementById('modalPagos').classList.remove('active');
         }
@@ -8016,13 +8283,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             const metodo = document.getElementById('metodoPago').value;
             
             // Validaciones
-            if(!cantidad || cantidad < 20){
-                alert('⚠️ CANTIDAD INVÁLIDA\n\nEl mínimo para retirar es 20€.');
+            if(!cantidad || cantidad < 10){
+                alert('⚠️ CANTIDAD INVÁLIDA\n\nEl mínimo para retirar es €10.');
                 return;
             }
             
-            if(cantidad > 450){
-                alert('⚠️ CANTIDAD EXCEDIDA\n\nNo puedes retirar más de tu balance disponible (450€).');
+            if(cantidad > balanceDisponibleRetiro){
+                alert(`⚠️ CANTIDAD EXCEDIDA\n\nNo puedes retirar más de tu balance disponible (€${balanceDisponibleRetiro.toFixed(2)}).`);
                 return;
             }
             
@@ -8049,10 +8316,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 }
             }
             
-            // Calcular comisión: 3% si >= 100€, 5% si < 100€
-            const porcentajeComision = cantidad >= 100 ? 0.03 : 0.05;
-            const comision = cantidad * porcentajeComision;
-            const total = cantidad - comision;
+            // Sin comisiones
+            const total = cantidad;
             const metodoTexto = metodo === 'paypal' ? 'PayPal' : 'Transferencia Bancaria';
             
             alert('✅ SOLICITUD DE RETIRO ENVIADA\n\n' +
@@ -9413,6 +9678,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                             <a href="#" onclick="openPremiumCuradorModal(); return false;">Destacar Playlist</a>
                             <a href="#" onclick="openAfiliadosModal(); return false;">Afiliados</a>
                             <a href="#faq">FAQ</a>
+                            <a href="#" onclick="openContactoModal(); return false;">Contacto</a>
                         `;
                     }
                     
