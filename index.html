@@ -2031,7 +2031,7 @@
 
     <!-- FOOTER -->
     <footer class="footer">
-        <div class="footer-grid">
+        <div class="footer-grid" style="grid-template-columns: 1.5fr 1fr 1fr; gap: 3rem;">
             <div class="footer-brand">
                 <div class="logo">
                     <img src="https://raw.githubusercontent.com/micaelalvarezguzzetta-ops/algoritmo-movimiento/main/logo.png" alt="Logo" style="height: 36px; width: auto;">
@@ -2044,17 +2044,17 @@
                 <h4>Recursos</h4>
                 <ul>
                     <li><a href="#faq">FAQ</a></li>
-                    <li><a href="#" onclick="openContactoModal(); return false;">Contacto</a></li>
-                    <li><a href="#" onclick="openEquipoModal(); return false;">Equipo</a></li>
-                    <li><a href="#" onclick="openAfiliadosModal(); return false;">Afiliados</a></li>
+                    <li><a href="javascript:void(0)" onclick="openContactoModal()">Contacto</a></li>
+                    <li><a href="javascript:void(0)" onclick="openEquipoModal()">Equipo</a></li>
+                    <li><a href="javascript:void(0)" onclick="openAfiliadosModal()">Afiliados</a></li>
                 </ul>
             </div>
             
             <div class="footer-column">
                 <h4>Legal</h4>
                 <ul>
-                    <li><a href="#" onclick="openTerminosModal(); return false;">Términos</a></li>
-                    <li><a href="#" onclick="openPrivacidadModal(); return false;">Privacidad</a></li>
+                    <li><a href="javascript:void(0)" onclick="openTerminosModal()">Términos</a></li>
+                    <li><a href="javascript:void(0)" onclick="openPrivacidadModal()">Privacidad</a></li>
                 </ul>
             </div>
         </div>
@@ -5353,6 +5353,11 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     btnCreditos.setAttribute('title', 'Mis Puntos');
                 }
                 
+                // Cargar puntos del curador
+                setTimeout(async () => {
+                    await cargarPuntosCurador();
+                }, 500);
+                
                 // Cambiar contenido de secciones para curadores
                 cambiarComoFuncionaACurador();
             }
@@ -5501,6 +5506,11 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         btnCreditos.setAttribute('onclick', 'openMisPuntosModal()');
                         btnCreditos.setAttribute('title', 'Mis Puntos');
                     }
+                    
+                    // Cargar puntos del curador
+                    setTimeout(async () => {
+                        await cargarPuntosCurador();
+                    }, 500);
                     
                     // Cambiar sección "Cómo Funciona" para curadores
                     cambiarComoFuncionaACurador();
@@ -7000,8 +7010,17 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 if (error) throw error;
                 
                 const puntos = usuario.puntos || 0;
-                document.getElementById('puntosBalance').textContent = puntos;
-                document.getElementById('curadorPuntosDisplay').textContent = puntos;
+                
+                // Actualizar todos los displays de puntos
+                const puntosBalance = document.getElementById('puntosBalance');
+                const curadorPuntosDisplay = document.getElementById('curadorPuntosDisplay');
+                const creditosStandard = document.getElementById('creditosStandard');
+                
+                if (puntosBalance) puntosBalance.textContent = puntos;
+                if (curadorPuntosDisplay) curadorPuntosDisplay.textContent = puntos;
+                if (creditosStandard) creditosStandard.textContent = puntos;
+                
+                console.log('⭐ Puntos del curador cargados:', puntos);
                 
             } catch (err) {
                 console.error('Error al cargar puntos:', err);
@@ -8597,6 +8616,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             document.getElementById('modalEquipo').classList.remove('active');
         }
         
+        // Hacer funciones globales para el footer
+        window.openAfiliadosModal = openAfiliadosModal;
+        window.openTerminosModal = openTerminosModal;
+        window.openPrivacidadModal = openPrivacidadModal;
+        window.openContactoModal = openContactoModal;
+        window.openEquipoModal = openEquipoModal;
+        
         // ========================================
         // FUNCIONES DE LOGIN
         // ========================================
@@ -9764,6 +9790,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         btnCreditos.setAttribute('onclick', 'openMisPuntosModal()');
                         btnCreditos.setAttribute('title', 'Mis Puntos');
                     }
+                    
+                    // Cargar puntos del curador
+                    await cargarPuntosCurador();
                     
                     // Cambiar contenido de secciones para curadores
                     cambiarComoFuncionaACurador();
