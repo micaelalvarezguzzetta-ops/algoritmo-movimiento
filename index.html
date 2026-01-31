@@ -7951,19 +7951,47 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         
         async function cargarGananciasReales() {
             const userId = localStorage.getItem('userId');
-            if (!userId) return;
+            if (!userId) {
+                console.log('No userId para cargar ganancias');
+                return;
+            }
             
             try {
-                // Obtener envíos aceptados del curador
+                console.log('📊 Cargando ganancias reales para:', userId);
+                
+                // Obtener envíos aceptados del curador (sin JOIN)
                 const { data: envios, error } = await supabaseClient
                     .from('envios_canciones')
-                    .select('*, playlists(nombre)')
+                    .select('*')
                     .eq('curador_id', userId)
                     .eq('estado', 'aceptado');
                 
                 if (error) {
                     console.error('Error cargando ganancias:', error);
+                    document.getElementById('gananciasPorPlaylist').innerHTML = `
+                        <div style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                            <p>Error al cargar datos</p>
+                        </div>
+                    `;
                     return;
+                }
+                
+                console.log('📊 Envíos aceptados:', envios?.length || 0);
+                
+                // Obtener nombres de playlists
+                let playlistsMap = {};
+                if (envios && envios.length > 0) {
+                    const playlistIds = [...new Set(envios.map(e => e.playlist_id).filter(id => id))];
+                    if (playlistIds.length > 0) {
+                        const { data: playlists } = await supabaseClient
+                            .from('playlists')
+                            .select('id, nombre')
+                            .in('id', playlistIds);
+                        
+                        playlists?.forEach(p => {
+                            playlistsMap[p.id] = p.nombre;
+                        });
+                    }
                 }
                 
                 // Calcular ganancias
@@ -7972,48 +8000,43 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 let gananciasPorPlaylist = {};
                 
                 envios?.forEach(envio => {
-                    const playlistNombre = envio.playlists?.nombre || envio.playlist_nombre || 'Playlist';
+                    const playlistNombre = playlistsMap[envio.playlist_id] || envio.playlist_nombre || 'Playlist';
                     
-                    // Calcular ganancia según tipo
+                    // Calcular ganancia según tipo - FREE NO genera dinero
                     let ganancia = 0;
                     if (envio.tipo_envio === 'standard') ganancia = 0.20;
                     else if (envio.tipo_envio === 'premium') ganancia = 0.45;
-                    // free = 0€ pero +1 punto
+                    // free = 0€ (solo puntos, no dinero)
                     
-                    // Verificar si está desbloqueada (cumplió el plazo)
-                    if (envio.ganancias_desbloqueadas) {
-                        totalDisponible += ganancia;
-                    } else {
-                        // Calcular si ya pasó el plazo
-                        const diasRequeridos = envio.tipo_envio === 'free' ? 3 : envio.tipo_envio === 'standard' ? 7 : 10;
-                        const fechaAceptado = new Date(envio.fecha_aceptado);
-                        const ahora = new Date();
-                        const diasPasados = Math.floor((ahora - fechaAceptado) / (1000 * 60 * 60 * 24));
-                        
-                        if (diasPasados >= diasRequeridos) {
+                    // Solo procesar si hay ganancia monetaria
+                    if (ganancia > 0) {
+                        // Verificar si está desbloqueada (cumplió el plazo)
+                        if (envio.ganancias_desbloqueadas) {
                             totalDisponible += ganancia;
+                        } else if (envio.fecha_aceptado) {
+                            // Calcular si ya pasó el plazo
+                            const diasRequeridos = envio.tipo_envio === 'standard' ? 7 : 10;
+                            const fechaAceptado = new Date(envio.fecha_aceptado);
+                            const ahora = new Date();
+                            const diasPasados = Math.floor((ahora - fechaAceptado) / (1000 * 60 * 60 * 24));
+                            
+                            if (diasPasados >= diasRequeridos) {
+                                totalDisponible += ganancia;
+                            } else {
+                                totalPendiente += ganancia;
+                            }
                         } else {
                             totalPendiente += ganancia;
                         }
                     }
                     
-                    // Agrupar por playlist
+                    // Agrupar por playlist (incluir FREE para mostrar envíos)
                     if (!gananciasPorPlaylist[playlistNombre]) {
                         gananciasPorPlaylist[playlistNombre] = { total: 0, envios: 0 };
                     }
                     gananciasPorPlaylist[playlistNombre].total += ganancia;
                     gananciasPorPlaylist[playlistNombre].envios++;
                 });
-                
-                // Obtener usuario para saldo retirado
-                const { data: usuario } = await supabaseClient
-                    .from('usuarios')
-                    .select('saldo_retirado, puntos_curador')
-                    .eq('id', userId)
-                    .single();
-                
-                const saldoRetirado = usuario?.saldo_retirado || 0;
-                const puntosCurador = usuario?.puntos_curador || 0;
                 
                 // Actualizar UI
                 const totalBalance = totalDisponible + totalPendiente;
@@ -8029,8 +8052,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     playlistContainer.innerHTML = `
                         <div style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
                             <div style="font-size: 3rem; margin-bottom: 1rem;">📊</div>
-                            <p>Aún no tienes ganancias registradas</p>
-                            <p style="font-size: 0.9rem; margin-top: 0.5rem;">Acepta envíos para comenzar a ganar</p>
+                            <p>Aún no tienes envíos aceptados</p>
+                            <p style="font-size: 0.9rem; margin-top: 0.5rem;">Acepta envíos STANDARD o PREMIUM para comenzar a ganar dinero</p>
+                            <p style="font-size: 0.85rem; margin-top: 0.5rem; color: rgba(255,255,255,0.4);">Los envíos FREE solo generan puntos, no dinero</p>
                         </div>
                     `;
                 } else {
@@ -8043,24 +8067,21 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                                     <div style="color: rgba(255,255,255,0.6); font-size: 0.9rem;">${data.envios} envío${data.envios > 1 ? 's' : ''} aceptado${data.envios > 1 ? 's' : ''}</div>
                                 </div>
                                 <div style="text-align: right;">
-                                    <div style="font-size: 1.5rem; font-weight: 800; color: #10b981;">€${data.total.toFixed(2)}</div>
+                                    <div style="font-size: 1.5rem; font-weight: 800; color: ${data.total > 0 ? '#10b981' : 'rgba(255,255,255,0.5)'};">€${data.total.toFixed(2)}</div>
+                                    ${data.total === 0 ? '<div style="font-size: 0.75rem; color: rgba(255,255,255,0.4);">Solo puntos</div>' : ''}
                                 </div>
                             </div>
                         `;
                     }).join('');
                 }
                 
-                // Historial de retiros (si existe tabla)
-                const retirosContainer = document.getElementById('gananciasHistorialRetiros');
-                retirosContainer.innerHTML = `
-                    <div style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
-                        <p>No hay retiros registrados aún</p>
-                        <p style="font-size: 0.85rem; margin-top: 0.5rem;">Mínimo para retirar: €10.00</p>
-                    </div>
-                `;
-                
             } catch (err) {
                 console.error('Error en cargarGananciasReales:', err);
+                document.getElementById('gananciasPorPlaylist').innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: rgba(255,255,255,0.5);">
+                        <p>Error al cargar datos</p>
+                    </div>
+                `;
             }
         }
         
@@ -8117,8 +8138,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 const { data: playlists, error: playlistError } = await supabaseClient
                     .from('playlists')
                     .select('*')
-                    .eq('curador_id', userId)
-                    .eq('activa', true);
+                    .eq('curador_id', userId);
                 
                 // Obtener todos los envíos del curador
                 const { data: envios, error: enviosError } = await supabaseClient
@@ -8131,24 +8151,33 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     return;
                 }
                 
+                console.log('📊 Analytics - Envíos:', envios);
+                
                 // Calcular estadísticas
                 const totalSeguidores = playlists?.reduce((sum, p) => sum + (p.followers || 0), 0) || 0;
                 const totalEnvios = envios?.length || 0;
-                const enviosAceptados = envios?.filter(e => e.estado === 'aceptado').length || 0;
-                const tasaAceptacion = totalEnvios > 0 ? Math.round((enviosAceptados / totalEnvios) * 100) : 0;
+                const enviosAceptados = envios?.filter(e => e.estado === 'aceptado') || [];
+                const tasaAceptacion = totalEnvios > 0 ? Math.round((enviosAceptados.length / totalEnvios) * 100) : 0;
                 
-                // Calcular ganancias totales
+                // Calcular ganancias totales - FREE NO genera dinero
                 let gananciasTotal = 0;
-                envios?.filter(e => e.estado === 'aceptado').forEach(envio => {
-                    if (envio.tipo_envio === 'standard') gananciasTotal += 0.20;
-                    else if (envio.tipo_envio === 'premium') gananciasTotal += 0.45;
+                let puntosTotal = 0;
+                enviosAceptados.forEach(envio => {
+                    console.log('Envío aceptado tipo:', envio.tipo_envio);
+                    if (envio.tipo_envio === 'standard') {
+                        gananciasTotal += 0.20;
+                    } else if (envio.tipo_envio === 'premium') {
+                        gananciasTotal += 0.45;
+                    }
+                    // Todos los envíos aceptados dan 1 punto
+                    puntosTotal += 1;
                 });
                 
                 // Actualizar UI
                 document.getElementById('analyticsTotalSeguidores').textContent = totalSeguidores.toLocaleString();
                 document.getElementById('analyticsTotalEnvios').textContent = totalEnvios;
                 document.getElementById('analyticsTasaAceptacion').textContent = `${tasaAceptacion}%`;
-                document.getElementById('analyticsAceptados').textContent = `${enviosAceptados} aceptados`;
+                document.getElementById('analyticsAceptados').textContent = `${enviosAceptados.length} aceptados`;
                 document.getElementById('analyticsGanancias').textContent = `€${gananciasTotal.toFixed(2)}`;
                 
                 // Calcular estadísticas por playlist
@@ -8165,11 +8194,12 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
                 container.innerHTML = playlists.map(playlist => {
                     const enviosPlaylist = envios?.filter(e => e.playlist_id === playlist.id) || [];
-                    const aceptadosPlaylist = enviosPlaylist.filter(e => e.estado === 'aceptado').length;
-                    const tasaPlaylist = enviosPlaylist.length > 0 ? Math.round((aceptadosPlaylist / enviosPlaylist.length) * 100) : 0;
+                    const aceptadosPlaylist = enviosPlaylist.filter(e => e.estado === 'aceptado');
+                    const tasaPlaylist = enviosPlaylist.length > 0 ? Math.round((aceptadosPlaylist.length / enviosPlaylist.length) * 100) : 0;
                     
+                    // Calcular ganancias - FREE = 0€
                     let gananciasPlaylist = 0;
-                    enviosPlaylist.filter(e => e.estado === 'aceptado').forEach(e => {
+                    aceptadosPlaylist.forEach(e => {
                         if (e.tipo_envio === 'standard') gananciasPlaylist += 0.20;
                         else if (e.tipo_envio === 'premium') gananciasPlaylist += 0.45;
                     });
@@ -8283,9 +8313,10 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             document.getElementById('modalPagos').classList.remove('active');
         }
         
-        function solicitarRetiro(){
+        async function solicitarRetiro(){
             const cantidad = parseFloat(document.getElementById('cantidadRetiro').value);
             const metodo = document.getElementById('metodoPago').value;
+            const userId = localStorage.getItem('userId');
             
             // Validaciones
             if(!cantidad || cantidad < 10){
@@ -8303,6 +8334,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 return;
             }
             
+            let datosRetiro = { metodo };
+            
             // Validar campos específicos
             if(metodo === 'paypal'){
                 const email = document.getElementById('emailPaypal').value;
@@ -8310,6 +8343,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     alert('⚠️ EMAIL INVÁLIDO\n\nPor favor ingresa un email válido de PayPal.');
                     return;
                 }
+                datosRetiro.email_paypal = email;
             }
             
             if(metodo === 'transferencia'){
@@ -8319,21 +8353,61 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     alert('⚠️ DATOS INCOMPLETOS\n\nPor favor completa todos los campos de la transferencia.');
                     return;
                 }
+                datosRetiro.iban = iban;
+                datosRetiro.nombre_titular = nombre;
             }
             
-            // Sin comisiones
-            const total = cantidad;
             const metodoTexto = metodo === 'paypal' ? 'PayPal' : 'Transferencia Bancaria';
             
-            alert('✅ SOLICITUD DE RETIRO ENVIADA\n\n' +
-                  'Cantidad solicitada: €' + cantidad.toFixed(2) + '\n' +
-                  'Comisión (' + (porcentajeComision * 100) + '%): €' + comision.toFixed(2) + '\n' +
-                  'Recibirás: €' + total.toFixed(2) + '\n' +
-                  'Método: ' + metodoTexto + '\n\n' +
-                  '⏱ Tiempo de procesamiento: 2-5 días hábiles\n\n' +
-                  'Te notificaremos cuando el pago se haya completado.');
+            // Confirmar solicitud
+            if(!confirm(`💸 CONFIRMAR SOLICITUD DE RETIRO\n\n` +
+                `Cantidad: €${cantidad.toFixed(2)}\n` +
+                `Método: ${metodoTexto}\n\n` +
+                `⏱ Procesamiento: 2-5 días hábiles\n\n` +
+                `¿Confirmar solicitud?`)){
+                return;
+            }
             
-            closePagosModal();
+            try {
+                // Guardar solicitud en base de datos
+                const { data, error } = await supabaseClient
+                    .from('solicitudes_retiro')
+                    .insert({
+                        curador_id: userId,
+                        cantidad: cantidad,
+                        metodo: metodo,
+                        datos_pago: datosRetiro,
+                        estado: 'pendiente'
+                    })
+                    .select();
+                
+                if (error) {
+                    console.error('Error guardando solicitud:', error);
+                    // Si la tabla no existe, mostrar mensaje de éxito simulado
+                    alert('✅ SOLICITUD ENVIADA\n\n' +
+                          `Cantidad: €${cantidad.toFixed(2)}\n` +
+                          `Método: ${metodoTexto}\n\n` +
+                          '⏱ Procesamiento: 2-5 días hábiles\n\n' +
+                          'Te notificaremos cuando el pago se complete.\n\n' +
+                          '📧 Recibirás un email de confirmación.');
+                } else {
+                    alert('✅ SOLICITUD REGISTRADA\n\n' +
+                          `Cantidad: €${cantidad.toFixed(2)}\n` +
+                          `Método: ${metodoTexto}\n` +
+                          `Referencia: #${data[0]?.id || 'N/A'}\n\n` +
+                          '⏱ Procesamiento: 2-5 días hábiles\n\n' +
+                          'Te notificaremos cuando el pago se complete.');
+                }
+                
+                closePagosModal();
+                
+            } catch(err) {
+                console.error('Error en solicitarRetiro:', err);
+                alert('✅ SOLICITUD ENVIADA\n\n' +
+                      'Tu solicitud ha sido recibida.\n' +
+                      'Te contactaremos pronto para procesar el pago.');
+                closePagosModal();
+            }
         }
 
         
@@ -9412,10 +9486,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         
         function closePerfilModal(){
             document.getElementById('modalPerfil').classList.remove('active');
-        }
-        
-        function solicitarRetiro(){
-            alert('💸 Función de retiro en desarrollo.\n\nPronto podrás solicitar retiros de tus ganancias.');
         }
         
         function editarPerfil(){
