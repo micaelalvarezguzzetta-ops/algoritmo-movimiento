@@ -1527,7 +1527,7 @@
                 <a href="#precios">Precios</a>
                 <a href="#testimonios">Opiniones</a>
                 <a href="#faq">FAQ</a>
-                <a href="#" onclick="openContactoModal(); return false;">Contacto</a>
+                <a href="javascript:void(0)" onclick="window.openContactoModal()">Contacto</a>
             </div>
             
             <div class="nav-actions">
@@ -1621,6 +1621,11 @@
                 <div class="form-group">
                     <label for="password">Contraseña</label>
                     <input type="password" id="password" placeholder="Mínimo 6 caracteres" required>
+                </div>
+                <div class="form-group" id="codigoReferidoGroup" style="display: none;">
+                    <label for="codigoReferido">¿Tienes código de referido? (opcional)</label>
+                    <input type="text" id="codigoReferido" placeholder="Ej: ALGXXX123" style="text-transform: uppercase;">
+                    <small style="color: rgba(255,255,255,0.5); font-size: 0.8rem;">Obtén 20% de descuento en tu primera compra de paquetes de créditos</small>
                 </div>
                 <button type="submit" class="btn-submit">Crear cuenta gratis</button>
             </form>
@@ -5269,6 +5274,33 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         let userType = 'artista';
         console.log('📌 userType definido:', userType);
         
+        // ========================================
+        // SISTEMA DE REFERIDOS - LINK PERSONALIZADO
+        // ========================================
+        function mostrarBannerReferido(codigo) {
+            // Crear banner de bienvenida con descuento
+            const authPanel = document.getElementById('authPanel');
+            if (!authPanel) return;
+            
+            // Verificar si ya existe el banner
+            if (document.getElementById('bannerReferidoWelcome')) return;
+            
+            const banner = document.createElement('div');
+            banner.id = 'bannerReferidoWelcome';
+            banner.style.cssText = 'background: linear-gradient(135deg, #10b981, #06b6d4); border-radius: 1rem; padding: 1.25rem; margin-bottom: 1.5rem; text-align: center; animation: pulse 2s infinite;';
+            banner.innerHTML = `
+                <div style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">🎁 ¡ENLACE DE REFERIDO ACTIVADO!</div>
+                <div style="font-size: 1rem; margin-bottom: 0.5rem;">Regístrate y obtén <strong>20% de descuento</strong></div>
+                <div style="font-size: 0.85rem; opacity: 0.9;">en tu primera compra de paquetes de créditos</div>
+            `;
+            
+            // Insertar al inicio del panel
+            authPanel.insertBefore(banner, authPanel.firstChild);
+            
+            // Seleccionar automáticamente "Artista" y mostrar el campo de código
+            selectUserType('artista');
+        }
+        
         // Función para seleccionar tipo de usuario
         function selectUserType(tipo) {
             userType = tipo;
@@ -5276,13 +5308,25 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             
             const btnArtista = document.getElementById('btnArtista');
             const btnCurador = document.getElementById('btnCurador');
+            const codigoReferidoGroup = document.getElementById('codigoReferidoGroup');
+            const inputCodigo = document.getElementById('codigoReferido');
             
             if (tipo === 'artista') {
                 if (btnArtista) btnArtista.classList.add('active');
                 if (btnCurador) btnCurador.classList.remove('active');
+                // Mostrar campo de código de referido solo para artistas
+                if (codigoReferidoGroup) codigoReferidoGroup.style.display = 'block';
+                
+                // Auto-rellenar código desde URL si existe
+                const codigoGuardado = localStorage.getItem('codigoReferidoURL');
+                if (codigoGuardado && inputCodigo && !inputCodigo.value) {
+                    inputCodigo.value = codigoGuardado;
+                }
             } else {
                 if (btnCurador) btnCurador.classList.add('active');
                 if (btnArtista) btnArtista.classList.remove('active');
+                // Ocultar campo de código de referido para curadores
+                if (codigoReferidoGroup) codigoReferidoGroup.style.display = 'none';
             }
         }
         
@@ -5297,8 +5341,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             const name = document.getElementById('name').value.trim();
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value.trim();
+            const codigoReferidoInput = document.getElementById('codigoReferido')?.value.trim().toUpperCase() || '';
             
-            console.log('Datos:', {name, email, password: password ? '***' : 'vacío', userType});
+            console.log('Datos:', {name, email, password: password ? '***' : 'vacío', userType, codigoReferido: codigoReferidoInput});
             
             
             if(!name){
@@ -5314,6 +5359,28 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             if(!password){
                 alert('⚠️ Por favor ingresa tu contraseña');
                 return false;
+            }
+            
+            // Validar código de referido si se proporcionó
+            let referidoPorId = null;
+            let tieneDescuentoPrimeraCompra = false;
+            
+            if (codigoReferidoInput && userType === 'artista') {
+                const { data: afiliado, error: afiliadoError } = await supabaseClient
+                    .from('solicitudes_afiliados')
+                    .select('*')
+                    .eq('codigo_afiliado', codigoReferidoInput)
+                    .eq('estado', 'aprobado')
+                    .single();
+                
+                if (afiliadoError || !afiliado) {
+                    alert('⚠️ El código de referido no es válido o no está aprobado.\n\nPuedes continuar sin código o verificar que esté bien escrito.');
+                    return false;
+                }
+                
+                referidoPorId = afiliado.user_id || afiliado.id;
+                tieneDescuentoPrimeraCompra = true;
+                console.log('✅ Código de referido válido:', codigoReferidoInput, 'Afiliado:', afiliado.nombre);
             }
             
             console.log('✅ Todos los datos validados, guardando en Supabase...');
@@ -5332,7 +5399,10 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         tipo: userType,
                         creditos: userType === 'artista' ? 4.5 : 0,
                         balance: 0,
-                        codigo_referido: codigoReferido
+                        codigo_referido: codigoReferido,
+                        referido_por: referidoPorId,
+                        codigo_afiliado_usado: codigoReferidoInput || null,
+                        descuento_primera_compra: tieneDescuentoPrimeraCompra
                     }])
                     .select();
                 
@@ -5355,6 +5425,28 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 localStorage.setItem('userType', userType);
                 localStorage.setItem('userId', data[0].id);
                 localStorage.setItem('userCreditos', data[0].creditos);
+                
+                // Guardar código de afiliado para comisiones recurrentes
+                if (codigoReferidoInput) {
+                    localStorage.setItem('codigoAfiliadoDelUsuario', codigoReferidoInput);
+                }
+                
+                if (tieneDescuentoPrimeraCompra) {
+                    localStorage.setItem('descuentoPrimeraCompra', 'true');
+                }
+                
+                // Limpiar código de URL después del registro exitoso
+                localStorage.removeItem('codigoReferidoURL');
+                
+                // Mostrar mensaje de bienvenida con descuento si aplica
+                if (tieneDescuentoPrimeraCompra) {
+                    alert('🎉 ¡Bienvenido ' + name + '!\n\n' +
+                          '✅ Código de referido aplicado correctamente.\n\n' +
+                          '🎁 Tienes 20% de descuento en tu primera compra de PAQUETES de créditos.\n\n' +
+                          '💡 Usa el cupón BIENVENIDO20 al comprar.\n' +
+                          '⚠️ Válido solo una vez.\n\n' +
+                          '¡Disfruta de la plataforma!');
+                }
                 
             } catch (err) {
                 console.error('❌ Error:', err);
@@ -5430,13 +5522,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 if (navMenu) {
                     navMenu.innerHTML = `
                         <a href="#como-funciona">Cómo Funciona</a>
-                        <a href="#" onclick="openMisPlaylistsModal(); return false;">Mis Playlists</a>
-                        <a href="#" onclick="openEnviosRecibidosModal(); return false;">Envíos</a>
-                        <a href="#" onclick="openGananciasModal(); return false;">Ganancias</a>
-                        <a href="#" onclick="openPremiumCuradorModal(); return false;">Destacar Playlist</a>
-                        <a href="#" onclick="openAfiliadosModal(); return false;">Afiliados</a>
+                        <a href="javascript:void(0)" onclick="window.openMisPlaylistsModal()">Mis Playlists</a>
+                        <a href="javascript:void(0)" onclick="window.openEnviosRecibidosModal()">Envíos</a>
+                        <a href="javascript:void(0)" onclick="window.openGananciasModal()">Ganancias</a>
+                        <a href="javascript:void(0)" onclick="window.openPremiumCuradorModal()">Destacar Playlist</a>
+                        <a href="javascript:void(0)" onclick="window.openAfiliadosModal()">Afiliados</a>
                         <a href="#faq">FAQ</a>
-                        <a href="#" onclick="openContactoModal(); return false;">Contacto</a>
+                        <a href="javascript:void(0)" onclick="window.openContactoModal()">Contacto</a>
                     `;
                 }
                 
@@ -5584,13 +5676,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     if (navMenu) {
                         navMenu.innerHTML = `
                             <a href="#como-funciona">Cómo Funciona</a>
-                            <a href="#" onclick="openMisPlaylistsModal(); return false;">Mis Playlists</a>
-                            <a href="#" onclick="openEnviosRecibidosModal(); return false;">Envíos</a>
-                            <a href="#" onclick="openGananciasModal(); return false;">Ganancias</a>
-                            <a href="#" onclick="openPremiumCuradorModal(); return false;">Destacar Playlist</a>
-                            <a href="#" onclick="openAfiliadosModal(); return false;">Afiliados</a>
+                            <a href="javascript:void(0)" onclick="window.openMisPlaylistsModal()">Mis Playlists</a>
+                            <a href="javascript:void(0)" onclick="window.openEnviosRecibidosModal()">Envíos</a>
+                            <a href="javascript:void(0)" onclick="window.openGananciasModal()">Ganancias</a>
+                            <a href="javascript:void(0)" onclick="window.openPremiumCuradorModal()">Destacar Playlist</a>
+                            <a href="javascript:void(0)" onclick="window.openAfiliadosModal()">Afiliados</a>
                             <a href="#faq">FAQ</a>
-                            <a href="#" onclick="openContactoModal(); return false;">Contacto</a>
+                            <a href="javascript:void(0)" onclick="window.openContactoModal()">Contacto</a>
                         `;
                     }
                     
@@ -8630,17 +8722,91 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             }
         }
         
-        function openCreditosModal(){
+        async function openCreditosModal(){
             if(!isUserRegistered()){ showRegisterAlert(); return; }
-            document.getElementById('modalCreditos').classList.add('active');
+            
+            const modal = document.getElementById('modalCreditos');
+            modal.classList.add('active');
+            
+            // Verificar si tiene descuento de primera compra
+            const userId = localStorage.getItem('userId');
+            let tieneDescuento = localStorage.getItem('descuentoPrimeraCompra') === 'true';
+            
+            // También verificar en la BD por si acaso
+            if (userId && !tieneDescuento) {
+                try {
+                    const { data: usuario } = await supabaseClient
+                        .from('usuarios')
+                        .select('descuento_primera_compra, primera_compra_realizada')
+                        .eq('id', userId)
+                        .single();
+                    
+                    if (usuario && usuario.descuento_primera_compra && !usuario.primera_compra_realizada) {
+                        tieneDescuento = true;
+                        localStorage.setItem('descuentoPrimeraCompra', 'true');
+                    }
+                } catch(err) {
+                    console.log('Error verificando descuento:', err);
+                }
+            }
+            
+            // Mostrar/ocultar banner de descuento
+            let bannerDescuento = document.getElementById('bannerDescuentoPrimeraCompra');
+            if (!bannerDescuento) {
+                // Crear el banner si no existe
+                const modalContent = modal.querySelector('.modal-content');
+                const titulo = modalContent.querySelector('h2');
+                bannerDescuento = document.createElement('div');
+                bannerDescuento.id = 'bannerDescuentoPrimeraCompra';
+                bannerDescuento.style.cssText = 'background: linear-gradient(135deg, #10b981, #06b6d4); border-radius: 1rem; padding: 1.25rem; margin-bottom: 1.5rem; text-align: center; display: none;';
+                bannerDescuento.innerHTML = `
+                    <div style="font-size: 1.5rem; margin-bottom: 0.5rem;">🎁 ¡DESCUENTO DE BIENVENIDA!</div>
+                    <div style="font-size: 1.1rem; margin-bottom: 0.5rem;">Usa el cupón <strong style="background: rgba(0,0,0,0.3); padding: 0.3rem 0.8rem; border-radius: 0.5rem;">BIENVENIDO20</strong></div>
+                    <div style="font-size: 0.9rem; opacity: 0.9;">20% de descuento en tu primera compra de <strong>PAQUETES</strong></div>
+                    <div style="font-size: 0.75rem; opacity: 0.7; margin-top: 0.5rem;">⚠️ Válido solo una vez • Solo en paquetes especiales</div>
+                `;
+                titulo.parentNode.insertBefore(bannerDescuento, titulo.nextSibling.nextSibling);
+            }
+            
+            if (tieneDescuento) {
+                bannerDescuento.style.display = 'block';
+            } else {
+                bannerDescuento.style.display = 'none';
+            }
         }
         
         function closeCreditosModal(){
             document.getElementById('modalCreditos').classList.remove('active');
         }
         
-        function comprarCredito(tipo, precio){
-            // Redirigir directamente a Stripe Payment Link
+        async function comprarCredito(tipo, precio){
+            const userId = localStorage.getItem('userId');
+            const codigoAfiliado = localStorage.getItem('codigoAfiliadoDelUsuario');
+            
+            // Registrar comisión para el afiliado (15% de CADA compra)
+            if (codigoAfiliado && userId) {
+                const monto = tipo === 'standard' ? 1.50 : 3.00;
+                const comision = monto * 0.15;
+                
+                try {
+                    await supabaseClient
+                        .from('comisiones_afiliados')
+                        .insert({
+                            codigo_afiliado: codigoAfiliado,
+                            usuario_comprador_id: userId,
+                            monto_compra: monto,
+                            comision: comision,
+                            tipo_compra: 'credito_' + tipo,
+                            estado: 'pendiente'
+                        });
+                    
+                    console.log('💰 Comisión de afiliado registrada:', comision.toFixed(2) + '€');
+                } catch(err) {
+                    console.log('Error registrando comisión:', err);
+                }
+            }
+            
+            // Redirigir a Stripe Payment Link (sin descuento en créditos individuales)
             if(tipo === 'standard'){
                 window.open('https://buy.stripe.com/eVq28s2nBaufb3r6JH0x20a', '_blank');
             } else if(tipo === 'premium'){
@@ -8648,7 +8814,65 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             }
         }
         
-        function comprarPaquete(monto, creditos){
+        async function comprarPaquete(monto, creditos){
+            const userId = localStorage.getItem('userId');
+            const tieneDescuento = localStorage.getItem('descuentoPrimeraCompra') === 'true';
+            
+            // Si tiene descuento de primera compra (solo aplica en paquetes)
+            if (tieneDescuento) {
+                const usarDescuento = confirm(
+                    '🎁 ¡Tienes 20% de descuento de bienvenida!\n\n' +
+                    'En la página de pago de Stripe, usa el cupón:\n' +
+                    'BIENVENIDO20\n\n' +
+                    'Precio original: €' + monto + '\n' +
+                    'Con descuento: €' + (monto * 0.8).toFixed(2) + '\n\n' +
+                    '⚠️ Este descuento es válido solo una vez.\n\n' +
+                    '¿Continuar con la compra?'
+                );
+                
+                if (!usarDescuento) return;
+                
+                // Marcar que ya usó el descuento
+                localStorage.removeItem('descuentoPrimeraCompra');
+                
+                // Actualizar en la BD
+                if (userId) {
+                    try {
+                        await supabaseClient
+                            .from('usuarios')
+                            .update({ primera_compra_realizada: true })
+                            .eq('id', userId);
+                    } catch(err) {
+                        console.log('Error actualizando primera compra:', err);
+                    }
+                }
+            }
+            
+            // ========================================
+            // REGISTRAR COMISIÓN PARA EL AFILIADO (15% de CADA compra)
+            // ========================================
+            const codigoAfiliado = localStorage.getItem('codigoAfiliadoDelUsuario');
+            if (codigoAfiliado && userId) {
+                const comision = monto * 0.15; // 15% de comisión
+                
+                try {
+                    await supabaseClient
+                        .from('comisiones_afiliados')
+                        .insert({
+                            codigo_afiliado: codigoAfiliado,
+                            usuario_comprador_id: userId,
+                            monto_compra: monto,
+                            comision: comision,
+                            tipo_compra: 'paquete_creditos',
+                            estado: 'pendiente'
+                        });
+                    
+                    console.log('💰 Comisión de afiliado registrada:', comision + '€ para', codigoAfiliado);
+                } catch(err) {
+                    console.log('Error registrando comisión:', err);
+                }
+            }
+            
             // Redirigir a Stripe Payment Link según el monto
             if(monto === 10){
                 window.open('https://buy.stripe.com/aFa14oe6j59V5J7d850x209', '_blank');
@@ -8803,6 +9027,12 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         window.closeServiciosCuradorModal = closeServiciosCuradorModal;
         window.canjearServicioCurador = canjearServicioCurador;
         
+        // Funciones del navbar del curador
+        window.openMisPlaylistsModal = openMisPlaylistsModal;
+        window.openEnviosRecibidosModal = openEnviosRecibidosModal;
+        window.openGananciasModal = openGananciasModal;
+        window.openPremiumCuradorModal = openPremiumCuradorModal;
+        
         // ========================================
         // FUNCIONES DE LOGIN
         // ========================================
@@ -8862,6 +9092,16 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 localStorage.setItem('userType', data.tipo);
                 localStorage.setItem('userId', data.id);
                 localStorage.setItem('userCreditos', data.creditos);
+                
+                // Cargar código de afiliado si el usuario fue referido
+                if (data.codigo_afiliado_usado) {
+                    localStorage.setItem('codigoAfiliadoDelUsuario', data.codigo_afiliado_usado);
+                }
+                
+                // Verificar si tiene descuento pendiente
+                if (data.descuento_primera_compra && !data.primera_compra_realizada) {
+                    localStorage.setItem('descuentoPrimeraCompra', 'true');
+                }
                 
                 // Cerrar modal
                 closeLoginModal();
@@ -9838,14 +10078,18 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             
             const youtube = prompt('🎥 ¿Tienes canal de YouTube? (opcional)\n\nDeja el link o escribe "no"');
             
-            // Generar código de afiliado único
+            // Generar código de afiliado único (se enviará por email cuando se apruebe)
             const codigoAfiliado = 'ALG' + nombre.substring(0,3).toUpperCase() + Math.random().toString(36).substring(2,6).toUpperCase();
+            
+            // Obtener user_id si está logueado
+            const userId = localStorage.getItem('userId');
             
             try {
                 // Guardar en Supabase
                 const { data, error } = await supabaseClient
                     .from('solicitudes_afiliados')
                     .insert({
+                        user_id: userId || null,
                         nombre: nombre,
                         email: email,
                         instagram: instagram || null,
@@ -9857,7 +10101,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
                 if (error) {
                     console.error('Error guardando solicitud:', error);
-                    // Si la tabla no existe, mostrar mensaje igual
                 }
                 
                 alert('🎉 ¡SOLICITUD ENVIADA!\n\n' +
@@ -9867,10 +10110,11 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                       (instagram ? 'Instagram: ' + instagram + '\n' : '') +
                       (youtube && youtube.toLowerCase() !== 'no' ? 'YouTube: ' + youtube + '\n' : '') +
                       '\n⏱ Procesaremos tu solicitud en las próximas 24 horas.\n\n' +
-                      '📧 Recibirás en tu email:\n' +
+                      '📧 Cuando seas aprobado recibirás:\n' +
                       '• Tu link de afiliado personalizado\n' +
-                      '• Instrucciones para promover\n' +
-                      '• Tu código de descuento: ' + codigoAfiliado + '\n\n' +
+                      '• Tu código de referido único\n' +
+                      '• Instrucciones para promover\n\n' +
+                      '🔔 Te notificaremos cuando seas aprobado.\n\n' +
                       '¡Bienvenido al equipo! 🚀');
                 
             } catch(err) {
@@ -9884,11 +10128,94 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         }
         
         // ========================================
+        // VERIFICAR AFILIADOS APROBADOS
+        // ========================================
+        async function verificarAfiliadoAprobado() {
+            const userId = localStorage.getItem('userId');
+            const userEmail = localStorage.getItem('userEmail');
+            if (!userId && !userEmail) return;
+            
+            try {
+                // Buscar si hay una solicitud aprobada sin notificar
+                const { data: solicitudes, error } = await supabaseClient
+                    .from('solicitudes_afiliados')
+                    .select('*')
+                    .eq('estado', 'aprobado')
+                    .eq('notificado', false)
+                    .or(`user_id.eq.${userId},email.eq.${userEmail}`);
+                
+                if (error || !solicitudes || solicitudes.length === 0) return;
+                
+                // Para cada solicitud aprobada, crear notificación
+                for (const solicitud of solicitudes) {
+                    // Crear notificación
+                    if (userId) {
+                        await supabaseClient
+                            .from('notificaciones')
+                            .insert({
+                                usuario_id: userId,
+                                tipo: 'afiliado_aprobado',
+                                titulo: '🎉 ¡Bienvenido al programa de Afiliados!',
+                                mensaje: `Tu solicitud ha sido aprobada. Tu código de afiliado es: ${solicitud.codigo_afiliado}. Compártelo y gana 15% de comisión por cada venta.`,
+                                leida: false
+                            });
+                    }
+                    
+                    // Marcar como notificado
+                    await supabaseClient
+                        .from('solicitudes_afiliados')
+                        .update({ notificado: true })
+                        .eq('id', solicitud.id);
+                    
+                    console.log('✅ Afiliado notificado:', solicitud.nombre);
+                }
+                
+                // Actualizar contador de notificaciones
+                await actualizarContadorNotificaciones();
+                
+            } catch (err) {
+                console.error('Error verificando afiliado:', err);
+            }
+        }
+        
+        // ========================================
         // CARGAR DATOS AL INICIAR PÁGINA
         // ========================================
         
         window.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 Página cargada');
+            
+            // ========================================
+            // DETECTAR LINK DE REFERIDO (?ref=CODIGO)
+            // ========================================
+            const urlParams = new URLSearchParams(window.location.search);
+            const refCode = urlParams.get('ref');
+            
+            if (refCode) {
+                console.log('🔗 Link de referido detectado:', refCode);
+                localStorage.setItem('codigoReferidoURL', refCode.toUpperCase());
+                
+                // Auto-rellenar el campo de código si existe
+                const inputCodigo = document.getElementById('codigoReferido');
+                if (inputCodigo) {
+                    inputCodigo.value = refCode.toUpperCase();
+                }
+                
+                // Mostrar banner de bienvenida con descuento
+                mostrarBannerReferido(refCode.toUpperCase());
+                
+                // Limpiar la URL (quitar ?ref=)
+                window.history.replaceState({}, document.title, window.location.pathname);
+            } else {
+                // Verificar si hay código guardado de una visita anterior
+                const codigoGuardado = localStorage.getItem('codigoReferidoURL');
+                if (codigoGuardado) {
+                    const inputCodigo = document.getElementById('codigoReferido');
+                    if (inputCodigo) {
+                        inputCodigo.value = codigoGuardado;
+                    }
+                }
+            }
             
             // Manejar callback de Spotify (si viene de autenticación)
             await manejarCallbackSpotify();
@@ -9986,13 +10313,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     if (navMenu) {
                         navMenu.innerHTML = `
                             <a href="#como-funciona">Cómo Funciona</a>
-                            <a href="#" onclick="openMisPlaylistsModal(); return false;">Mis Playlists</a>
-                            <a href="#" onclick="openEnviosRecibidosModal(); return false;">Envíos</a>
-                            <a href="#" onclick="openGananciasModal(); return false;">Ganancias</a>
-                            <a href="#" onclick="openPremiumCuradorModal(); return false;">Destacar Playlist</a>
-                            <a href="#" onclick="openAfiliadosModal(); return false;">Afiliados</a>
+                            <a href="javascript:void(0)" onclick="window.openMisPlaylistsModal()">Mis Playlists</a>
+                            <a href="javascript:void(0)" onclick="window.openEnviosRecibidosModal()">Envíos</a>
+                            <a href="javascript:void(0)" onclick="window.openGananciasModal()">Ganancias</a>
+                            <a href="javascript:void(0)" onclick="window.openPremiumCuradorModal()">Destacar Playlist</a>
+                            <a href="javascript:void(0)" onclick="window.openAfiliadosModal()">Afiliados</a>
                             <a href="#faq">FAQ</a>
-                            <a href="#" onclick="openContactoModal(); return false;">Contacto</a>
+                            <a href="javascript:void(0)" onclick="window.openContactoModal()">Contacto</a>
                         `;
                     }
                     
@@ -10018,6 +10345,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
                 // Cargar contador de notificaciones
                 await actualizarContadorNotificaciones();
+                
+                // Verificar si el usuario tiene solicitud de afiliado aprobada
+                await verificarAfiliadoAprobado();
                 
                 // Cargar inicial del usuario en avatar
                 if (userName) {
