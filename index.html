@@ -3832,7 +3832,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             <div style="background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem;">
                 <div style="text-align: center; margin-bottom: 1rem;">
                     <div style="font-size: 3rem; font-weight: 900; color: #8b5cf6;">14.99€</div>
-                    <div style="color: rgba(255,255,255,0.7);">por mes / por playlist</div>
+                    <div style="color: rgba(255,255,255,0.7);">pago único / 30 días</div>
                 </div>
                 <div style="background: rgba(251, 191, 36, 0.1); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 0.75rem; padding: 1rem; text-align: center;">
                     <div style="color: #fbbf24; font-weight: 700; margin-bottom: 0.25rem;">⚠️ Límite de plazas</div>
@@ -3856,7 +3856,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     Cancelar
                 </button>
                 <button onclick="activarPremiumPlaylist()" style="flex: 1; padding: 1rem; background: linear-gradient(135deg, #8b5cf6, #ec4899); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                    ⭐ Activar por 14.99€/mes
+                    ⭐ Pagar 14.99€ y Activar
                 </button>
             </div>
         </div>
@@ -7694,7 +7694,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             // Cambiar Playlist TOP para que sea "Destacar tu Playlist"
             document.getElementById('servicioPlaylistTOP').onclick = function(){ openPremiumCuradorModal(); };
             document.getElementById('playlistTOPTitulo').textContent = 'Destacar tu Playlist';
-            document.getElementById('playlistTOPDesc').textContent = '14.99€/mes';
+            document.getElementById('playlistTOPDesc').textContent = '14.99€ (30 días)';
             
             // Cambiar Analytics para que sea "Analytics de Curador"
             document.getElementById('servicioAnalytics').onclick = function(){ openEstadisticasCuradorModal(); };
@@ -8451,15 +8451,15 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 return;
             }
             
-            if(!confirm('⭐ CONFIRMAR SOLICITUD PREMIUM\n\n' +
-                      'Precio: 14.99€/mes\n' +
+            if(!confirm('⭐ CONFIRMAR PAGO\n\n' +
+                      'Precio: 14.99€ (pago único)\n' +
+                      'Duración: 30 días destacada\n\n' +
                       'Beneficios:\n' +
                       '• Aparece en sección TOP\n' +
                       '• Badge PREMIUM\n' +
-                      '• 10x más envíos\n' +
-                      '• Analytics avanzados\n\n' +
-                      'Se enviará tu solicitud al administrador.\n\n' +
-                      '¿Confirmar solicitud?')){
+                      '• 10x más envíos\n\n' +
+                      'Serás redirigido a Stripe para completar el pago.\n\n' +
+                      '¿Continuar?')){
                 return;
             }
             
@@ -8471,44 +8471,32 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     .eq('id', playlistId)
                     .single();
                 
-                // Guardar solicitud en Supabase
-                const { error } = await supabaseClient
-                    .from('solicitudes_destacar')
-                    .insert({
+                // Llamar a la API de Stripe
+                const response = await fetch('https://algoritmo-admin.vercel.app/api/create-checkout-destacar', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
                         curador_id: userId,
                         curador_nombre: userName,
                         curador_email: userEmail,
                         playlist_id: playlistId,
-                        playlist_nombre: playlist?.nombre || 'Playlist',
-                        precio: 14.99,
-                        estado: 'pendiente'
-                    });
+                        playlist_nombre: playlist?.nombre || 'Playlist'
+                    })
+                });
                 
-                if (error) {
-                    console.error('Error guardando solicitud:', error);
-                    
-                    // Si la tabla no existe, mostrar mensaje alternativo
-                    if (error.code === '42P01') {
-                        alert('⚠️ FUNCIÓN EN DESARROLLO\n\n' +
-                              'Esta funcionalidad estará disponible próximamente.\n\n' +
-                              'Contacta al administrador si deseas destacar tu playlist.');
-                    } else {
-                        alert('❌ Error al enviar solicitud. Intenta de nuevo.');
-                    }
-                    return;
+                const data = await response.json();
+                
+                if (data.success && data.url) {
+                    // Redirigir a Stripe Checkout
+                    window.location.href = data.url;
+                } else {
+                    console.error('Error:', data);
+                    alert('❌ Error al crear sesión de pago.\n\n' + (data.error || 'Intenta de nuevo.'));
                 }
-                
-                alert('🎉 ¡SOLICITUD ENVIADA!\n\n' +
-                      'Tu solicitud para destacar la playlist ha sido enviada.\n\n' +
-                      '📧 Recibirás un email con los detalles de pago.\n' +
-                      '⏳ Tiempo de activación: 24-48 horas\n\n' +
-                      'Gracias por confiar en nosotros.');
-                      
-                closePremiumCuradorModal();
                 
             } catch (err) {
                 console.error('Error:', err);
-                alert('❌ Error al procesar solicitud');
+                alert('❌ Error al procesar. Intenta de nuevo.');
             }
         }
         
@@ -10286,9 +10274,39 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             console.log('🚀 Página cargada');
             
             // ========================================
-            // DETECTAR LINK DE REFERIDO (?ref=CODIGO)
+            // DETECTAR PAGO EXITOSO DE DESTACAR PLAYLIST
             // ========================================
             const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.get('destacar_success') === 'true') {
+                const playlistId = urlParams.get('playlist_id');
+                console.log('✅ Pago de destacar exitoso para playlist:', playlistId);
+                
+                // Mostrar mensaje de éxito
+                setTimeout(() => {
+                    alert('🎉 ¡PAGO COMPLETADO!\n\n' +
+                          'Tu playlist ahora está DESTACADA.\n\n' +
+                          '✨ Aparecerá en la sección TOP\n' +
+                          '📈 Comenzarás a recibir más envíos\n' +
+                          '⏱️ Duración: 30 días\n\n' +
+                          '¡Gracias por tu confianza!');
+                }, 500);
+                
+                // Limpiar URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            
+            if (urlParams.get('destacar_cancel') === 'true') {
+                console.log('❌ Pago cancelado');
+                setTimeout(() => {
+                    alert('⚠️ Pago cancelado\n\nNo se realizó ningún cargo.');
+                }, 500);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            
+            // ========================================
+            // DETECTAR LINK DE REFERIDO (?ref=CODIGO)
+            // ========================================
             const refCode = urlParams.get('ref');
             
             if (refCode) {
