@@ -10624,4 +10624,14 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         current = stat.target;
                         clearInterval(timer);
                     }
-                    if (st
+                    if (stat.suffix === 'M+') {
+                        stat.element.textContent = Math.floor(current) + stat.suffix;
+                    } else {
+                        stat.element.textContent = Math.floor(current).toLocaleString() + stat.suffix;
+                    }
+                }, 30);
+            });
+        }
+    </script>
+</body>
+</html>
