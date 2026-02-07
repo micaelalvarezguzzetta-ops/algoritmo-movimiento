@@ -1689,11 +1689,6 @@
         <div class="panel-header">
             <h2>🎧 Bienvenido, <span id="curadorName">Curador</span></h2>
             
-            <!-- Estado conexión Spotify -->
-            <div id="spotifyConnectionStatus" style="margin-top: 1rem;">
-                <!-- Se llenará dinámicamente -->
-            </div>
-            
             <!-- Display de Puntos -->
             <div style="background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 1.25rem; border-radius: 1rem; margin-top: 1rem; text-align: center;">
                 <div style="font-size: 0.9rem; opacity: 0.9; margin-bottom: 0.25rem;">Mis Puntos</div>
@@ -2086,7 +2081,7 @@
                 <a href="https://www.facebook.com/share/1CxxsB4Mkb/" target="_blank" title="Facebook">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 </a>
-                <a href="mailto:soportealgoritmoenmovimiento@gmail.com" title="Email">
+                <a href="/cdn-cgi/l/email-protection#9deef2edf2efe9f8fcf1faf2eff4e9f0f2f8f3f0f2ebf4f0f4f8f3e9f2ddfaf0fcf4f1b3fef2f0" title="Email">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
                 </a>
             </div>
@@ -3849,10 +3844,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             <!-- Seleccionar playlist -->
             <div style="margin-bottom: 2rem;">
                 <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">Selecciona la playlist a destacar:</label>
-                <select id="playlistParaDestacar" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: white;">
-                    <option value="">-- Selecciona una playlist --</option>
-                    <option value="reggaeton2026">🔥 Reggaeton 2026 (25,430 seguidores)</option>
-                    <option value="trapelite">💎 Trap Elite (18,720 seguidores)</option>
+                <select id="playlistParaDestacar" style="width: 100%; padding: 0.75rem; background: #ffffff; border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: #000000; font-weight: 500;">
+                    <option value="" style="color: #000;">-- Selecciona una playlist --</option>
+                    <!-- Se cargarán dinámicamente -->
                 </select>
             </div>
             
@@ -5144,7 +5138,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             <div style="background: linear-gradient(135deg, #7c3aed, #ec4899); border-radius: 1rem; padding: 2rem; text-align: center; margin-bottom: 2rem;">
                 <div style="font-size: 3rem; margin-bottom: 1rem;">📬</div>
                 <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">Email de Soporte</h3>
-                <a href="mailto:soportealgoritmoenmovimiento@gmail.com" style="color: white; font-weight: 700; font-size: 1.2rem; text-decoration: none; word-break: break-all;">soportealgoritmoenmovimiento@gmail.com</a>
+                <a href="/cdn-cgi/l/email-protection#0774687768757362666b6068756e736a6862696a68716e6a6e6269736847606a666e6b2964686a" style="color: white; font-weight: 700; font-size: 1.2rem; text-decoration: none; word-break: break-all;"><span class="__cf_email__" data-cfemail="11627e617e636574707d767e6378657c7e747f7c7e67787c78747f657e51767c70787d3f727e7c">[email&#160;protected]</span></a>
                 <p style="color: rgba(255,255,255,0.9); margin-top: 1rem; font-size: 0.95rem;">Respondemos en menos de 24 horas</p>
             </div>
             
@@ -5243,7 +5237,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
 
     
     
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         console.log('🔵🔵🔵 ALGORITMO v6.0 SUPABASE - Script INICIADO 🔵🔵🔵');
         console.log('🔍 Verificando que el script se carga...');
         
@@ -8270,17 +8264,27 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 let playlistsMap = {};
                 if (envios && envios.length > 0) {
                     const playlistIds = [...new Set(envios.map(e => e.playlist_id).filter(id => id))];
+                    console.log('📋 Playlist IDs encontrados:', playlistIds);
+                    
                     if (playlistIds.length > 0) {
-                        const { data: playlists } = await supabaseClient
+                        const { data: playlists, error: playlistError } = await supabaseClient
                             .from('playlists')
                             .select('id, nombre')
                             .in('id', playlistIds);
                         
-                        playlists?.forEach(p => {
-                            playlistsMap[p.id] = p.nombre;
-                        });
+                        console.log('📋 Playlists obtenidas:', playlists);
+                        
+                        if (playlists && !playlistError) {
+                            playlists.forEach(p => {
+                                // Guardar tanto como string como número por si acaso
+                                playlistsMap[p.id] = p.nombre;
+                                playlistsMap[String(p.id)] = p.nombre;
+                            });
+                        }
                     }
                 }
+                
+                console.log('📋 PlaylistsMap:', playlistsMap);
                 
                 // Calcular ganancias
                 let totalDisponible = 0;
@@ -8288,7 +8292,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 let gananciasPorPlaylist = {};
                 
                 envios?.forEach(envio => {
-                    const playlistNombre = playlistsMap[envio.playlist_id] || envio.playlist_nombre || 'Playlist';
+                    // Intentar obtener el nombre de la playlist de varias formas
+                    const playlistNombre = playlistsMap[envio.playlist_id] || 
+                                          playlistsMap[String(envio.playlist_id)] || 
+                                          envio.playlist_nombre || 
+                                          'Playlist desconocida';
+                    
+                    console.log('📊 Envio playlist_id:', envio.playlist_id, '-> Nombre:', playlistNombre);
                     
                     // Calcular ganancia según tipo - FREE NO genera dinero
                     let ganancia = 0;
@@ -8377,38 +8387,128 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             document.getElementById('modalGanancias').classList.remove('active');
         }
         
-        function openPremiumCuradorModal(){
+        async function openPremiumCuradorModal(){
             document.getElementById('modalPremiumCurador').classList.add('active');
+            
+            // Cargar playlists del curador en el dropdown
+            const userId = localStorage.getItem('userId');
+            if (!userId) return;
+            
+            try {
+                const { data: playlists, error } = await supabaseClient
+                    .from('playlists')
+                    .select('id, nombre, followers, destacada')
+                    .eq('curador_id', userId)
+                    .eq('estado', 'aprobada');
+                
+                const select = document.getElementById('playlistParaDestacar');
+                select.innerHTML = '<option value="" style="color: #000;">-- Selecciona una playlist --</option>';
+                
+                if (playlists && playlists.length > 0) {
+                    playlists.forEach(p => {
+                        // No mostrar si ya está destacada
+                        if (p.destacada) return;
+                        
+                        const option = document.createElement('option');
+                        option.value = p.id;
+                        option.style.color = '#000';
+                        option.textContent = `🎵 ${p.nombre} (${(p.followers || 0).toLocaleString()} seguidores)`;
+                        select.appendChild(option);
+                    });
+                    
+                    // Si todas están destacadas
+                    if (select.options.length === 1) {
+                        const option = document.createElement('option');
+                        option.disabled = true;
+                        option.style.color = '#666';
+                        option.textContent = '⚠️ Ya tienes una playlist destacada';
+                        select.appendChild(option);
+                    }
+                } else {
+                    const option = document.createElement('option');
+                    option.disabled = true;
+                    option.style.color = '#666';
+                    option.textContent = '⚠️ No tienes playlists aprobadas';
+                    select.appendChild(option);
+                }
+            } catch (err) {
+                console.error('Error cargando playlists:', err);
+            }
         }
         
         function closePremiumCuradorModal(){
             document.getElementById('modalPremiumCurador').classList.remove('active');
         }
         
-        function activarPremiumPlaylist(){
-            const playlist = document.getElementById('playlistParaDestacar').value;
+        async function activarPremiumPlaylist(){
+            const playlistId = document.getElementById('playlistParaDestacar').value;
+            const userId = localStorage.getItem('userId');
+            const userName = localStorage.getItem('userName');
+            const userEmail = localStorage.getItem('userEmail');
             
-            if(!playlist){
+            if(!playlistId){
                 alert('⚠️ SELECCIONA UNA PLAYLIST\n\nPor favor selecciona la playlist que quieres destacar.');
                 return;
             }
             
-            if(confirm('⭐ CONFIRMAR ACTIVACIÓN PREMIUM\n\n' +
+            if(!confirm('⭐ CONFIRMAR SOLICITUD PREMIUM\n\n' +
                       'Precio: 14.99€/mes\n' +
                       'Beneficios:\n' +
                       '• Aparece en sección TOP\n' +
                       '• Badge PREMIUM\n' +
                       '• 10x más envíos\n' +
                       '• Analytics avanzados\n\n' +
-                      'El cargo se realizará mensualmente.\n\n' +
-                      '¿Confirmar activación?')){
-                alert('🎉 ¡PLAYLIST DESTACADA!\n\n' +
-                      'Tu playlist ahora aparece en la sección TOP.\n\n' +
-                      '✨ Badge PREMIUM activado\n' +
-                      '📈 Comenzarás a recibir más envíos\n' +
-                      '💳 Primer cargo: 14.99€\n\n' +
-                      'Puedes cancelar en cualquier momento desde tu panel.');
+                      'Se enviará tu solicitud al administrador.\n\n' +
+                      '¿Confirmar solicitud?')){
+                return;
+            }
+            
+            try {
+                // Obtener nombre de la playlist
+                const { data: playlist } = await supabaseClient
+                    .from('playlists')
+                    .select('nombre')
+                    .eq('id', playlistId)
+                    .single();
+                
+                // Guardar solicitud en Supabase
+                const { error } = await supabaseClient
+                    .from('solicitudes_destacar')
+                    .insert({
+                        curador_id: userId,
+                        curador_nombre: userName,
+                        curador_email: userEmail,
+                        playlist_id: playlistId,
+                        playlist_nombre: playlist?.nombre || 'Playlist',
+                        precio: 14.99,
+                        estado: 'pendiente'
+                    });
+                
+                if (error) {
+                    console.error('Error guardando solicitud:', error);
+                    
+                    // Si la tabla no existe, mostrar mensaje alternativo
+                    if (error.code === '42P01') {
+                        alert('⚠️ FUNCIÓN EN DESARROLLO\n\n' +
+                              'Esta funcionalidad estará disponible próximamente.\n\n' +
+                              'Contacta al administrador si deseas destacar tu playlist.');
+                    } else {
+                        alert('❌ Error al enviar solicitud. Intenta de nuevo.');
+                    }
+                    return;
+                }
+                
+                alert('🎉 ¡SOLICITUD ENVIADA!\n\n' +
+                      'Tu solicitud para destacar la playlist ha sido enviada.\n\n' +
+                      '📧 Recibirás un email con los detalles de pago.\n' +
+                      '⏳ Tiempo de activación: 24-48 horas\n\n' +
+                      'Gracias por confiar en nosotros.');
+                      
                 closePremiumCuradorModal();
+                
+            } catch (err) {
+                console.error('Error:', err);
+                alert('❌ Error al procesar solicitud');
             }
         }
         
@@ -10524,14 +10624,4 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         current = stat.target;
                         clearInterval(timer);
                     }
-                    if (stat.suffix === 'M+') {
-                        stat.element.textContent = Math.floor(current) + stat.suffix;
-                    } else {
-                        stat.element.textContent = Math.floor(current).toLocaleString() + stat.suffix;
-                    }
-                }, 30);
-            });
-        }
-    </script>
-</body>
-</html>
+                    if (st
