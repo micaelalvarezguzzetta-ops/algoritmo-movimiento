@@ -6776,17 +6776,21 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             const grid = document.getElementById('playlistsTOPGrid');
             
             try {
-                // Cargar playlists destacadas (destacada = true) y aprobadas
+                // Cargar playlists destacadas con datos del curador
                 const { data: playlists, error } = await supabaseClient
                     .from('playlists')
-                    .select('*')
+                    .select(`
+                        *,
+                        usuarios:curador_id (
+                            nombre
+                        )
+                    `)
                     .eq('estado', 'aprobada')
                     .eq('destacada', true)
                     .order('seguidores', { ascending: false });
                 
                 if (error) {
                     console.error('Error cargando playlists TOP:', error);
-                    // Si el error es por la columna destacada, intentar sin filtro
                     grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
                         <div style="font-size: 4rem; margin-bottom: 1rem;">🏆</div>
                         <div style="font-size: 1.2rem;">Próximamente playlists destacadas</div>
@@ -6802,7 +6806,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     return;
                 }
                 
-                // Colores para los gradientes
+                // Colores para los gradientes (fallback si no hay imagen)
                 const gradientes = [
                     'linear-gradient(135deg, #ec4899, #8b5cf6)',
                     'linear-gradient(135deg, #8b5cf6, #6366f1)',
@@ -6812,24 +6816,26 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     'linear-gradient(135deg, #ec4899, #ef4444)'
                 ];
                 
-                const emojis = ['🔥', '💎', '⭐', '🎧', '🎸', '🌴', '🎵', '🎤'];
-                
                 grid.innerHTML = playlists.map((p, index) => {
-                    const curadorNombre = p.curador_nombre || 'Curador';
+                    // Obtener nombre del curador del join
+                    const curadorNombre = p.usuarios?.nombre || p.curador_nombre || 'Curador';
                     const seguidores = p.seguidores || p.followers || 0;
                     const seguidoresDisplay = seguidores >= 1000 ? `${(seguidores/1000).toFixed(0)}K` : seguidores;
                     const gradiente = gradientes[index % gradientes.length];
-                    const emoji = emojis[index % emojis.length];
                     const genero = p.genero || 'Música';
+                    
+                    // Mostrar imagen si existe, sino gradiente con emoji
+                    const imagenPlaylist = p.imagen_url || p.cover_url || p.image_url || null;
+                    const imagenHTML = imagenPlaylist 
+                        ? `<img src="${imagenPlaylist}" alt="${p.nombre}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 0.75rem; margin-bottom: 1rem;">`
+                        : `<div style="width: 100%; height: 180px; background: ${gradiente}; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">🎵</div>`;
                     
                     return `
                         <div class="top-playlist-card" style="position: relative; background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; transition: transform 0.3s;">
-                            <div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; color: #1e293b;">
+                            <div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; color: #1e293b; z-index: 1;">
                                 ⭐ PREMIUM
                             </div>
-                            <div style="width: 100%; height: 180px; background: ${gradiente}; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">
-                                ${emoji}
-                            </div>
+                            ${imagenHTML}
                             <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">${p.nombre}</h3>
                             <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por ${curadorNombre}</p>
                             <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
@@ -6844,6 +6850,14 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         </div>
                     `;
                 }).join('');
+                
+            } catch (err) {
+                console.error('Error:', err);
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                    ❌ Error al cargar playlists
+                </div>`;
+            }
+        }
                 
             } catch (err) {
                 console.error('Error:', err);
