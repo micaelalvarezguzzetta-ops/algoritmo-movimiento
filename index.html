@@ -8471,32 +8471,27 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     .eq('id', playlistId)
                     .single();
                 
-                // Llamar a la API de Stripe
-                const response = await fetch('https://algoritmo-admin.vercel.app/api/create-checkout-destacar', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
+                // Guardar solicitud en Supabase antes de redirigir
+                await supabaseClient
+                    .from('solicitudes_destacar')
+                    .insert({
                         curador_id: userId,
                         curador_nombre: userName,
                         curador_email: userEmail,
                         playlist_id: playlistId,
-                        playlist_nombre: playlist?.nombre || 'Playlist'
-                    })
-                });
+                        playlist_nombre: playlist?.nombre || 'Playlist',
+                        precio: 14.99,
+                        estado: 'pendiente_pago'
+                    });
                 
-                const data = await response.json();
-                
-                if (data.success && data.url) {
-                    // Redirigir a Stripe Checkout
-                    window.location.href = data.url;
-                } else {
-                    console.error('Error:', data);
-                    alert('❌ Error al crear sesión de pago.\n\n' + (data.error || 'Intenta de nuevo.'));
-                }
+                // Redirigir al Payment Link de Stripe
+                window.location.href = 'https://buy.stripe.com/28EfZi7HV45R0oN6JH0x20c';
                 
             } catch (err) {
                 console.error('Error:', err);
-                alert('❌ Error al procesar. Intenta de nuevo.');
+                // Aunque falle guardar, redirigir igual
+                window.location.href = 'https://buy.stripe.com/28EfZi7HV45R0oN6JH0x20c';
+            }
             }
         }
         
