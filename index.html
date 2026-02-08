@@ -4197,11 +4197,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             
             <!-- Info adicional -->
             <div style="background: rgba(251, 191, 36, 0.1); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                <p style="font-size: 1rem; margin-bottom: 0.5rem;">
+                <p style="font-size: 1rem;">
                     <strong>⭐ Playlists PREMIUM</strong> tienen mayor alcance y visibilidad destacada
-                </p>
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">
-                    ¿Eres curador? <a href="#" onclick="openCuradorPanel()" style="color: #fbbf24; text-decoration: underline;">Destaca tu playlist aquí</a>
                 </p>
             </div>
         </div>
@@ -6782,27 +6779,17 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 // Cargar playlists destacadas (destacada = true) y aprobadas
                 const { data: playlists, error } = await supabaseClient
                     .from('playlists')
-                    .select(`
-                        id,
-                        nombre,
-                        genero,
-                        seguidores,
-                        url_spotify,
-                        imagen_url,
-                        destacada,
-                        tipo,
-                        usuarios!playlists_curador_id_fkey (
-                            nombre
-                        )
-                    `)
+                    .select('*')
                     .eq('estado', 'aprobada')
                     .eq('destacada', true)
                     .order('seguidores', { ascending: false });
                 
                 if (error) {
                     console.error('Error cargando playlists TOP:', error);
+                    // Si el error es por la columna destacada, intentar sin filtro
                     grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
-                        ❌ Error al cargar playlists destacadas
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🏆</div>
+                        <div style="font-size: 1.2rem;">Próximamente playlists destacadas</div>
                     </div>`;
                     return;
                 }
@@ -6810,8 +6797,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 if (!playlists || playlists.length === 0) {
                     grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
                         <div style="font-size: 4rem; margin-bottom: 1rem;">🏆</div>
-                        <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">Aún no hay playlists destacadas</div>
-                        <div style="font-size: 0.9rem;">¿Eres curador? ¡Destaca tu playlist y aparece aquí!</div>
+                        <div style="font-size: 1.2rem;">Próximamente playlists destacadas</div>
                     </div>`;
                     return;
                 }
@@ -6829,8 +6815,8 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 const emojis = ['🔥', '💎', '⭐', '🎧', '🎸', '🌴', '🎵', '🎤'];
                 
                 grid.innerHTML = playlists.map((p, index) => {
-                    const curadorNombre = p.usuarios?.nombre || 'Curador Anónimo';
-                    const seguidores = p.seguidores || 0;
+                    const curadorNombre = p.curador_nombre || 'Curador';
+                    const seguidores = p.seguidores || p.followers || 0;
                     const seguidoresDisplay = seguidores >= 1000 ? `${(seguidores/1000).toFixed(0)}K` : seguidores;
                     const gradiente = gradientes[index % gradientes.length];
                     const emoji = emojis[index % emojis.length];
