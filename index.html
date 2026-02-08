@@ -4186,150 +4186,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         <div class="modal-content" style="max-width: 1000px;">
             <button class="modal-close" onclick="closePlaylistsTOPModal()">×</button>
             <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">🏆 Playlists TOP</h2>
-            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">Las playlists más populares y con mayor alcance de la plataforma</p>
+            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">Las playlists destacadas con mayor alcance de la plataforma</p>
             
-            <!-- Filtros -->
-            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; justify-content: center;">
-                <button class="filter-btn active" onclick="filterTOPPlaylists('all')">Todas</button>
-                <button class="filter-btn" onclick="filterTOPPlaylists('reggaeton')">Reggaeton</button>
-                <button class="filter-btn" onclick="filterTOPPlaylists('trap')">Trap</button>
-                <button class="filter-btn" onclick="filterTOPPlaylists('pop')">Pop</button>
-                <button class="filter-btn" onclick="filterTOPPlaylists('rock')">Rock</button>
-                <button class="filter-btn" onclick="filterTOPPlaylists('electronica')">Electrónica</button>
-            </div>
-            
-            <!-- Grid de playlists TOP -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-                
-                <!-- Playlist 1 - PREMIUM -->
-                <div class="top-playlist-card" data-genre="reggaeton">
-                    <div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; color: #1e293b;">
-                        ⭐ PREMIUM
-                    </div>
-                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #ec4899, #8b5cf6); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">
-                        🔥
-                    </div>
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Reggaeton Global 2026</h3>
-                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por Latin Vibes Music</p>
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                        <span>👥 <strong>250K</strong> seguidores</span>
-                        <span>🎵 <strong>180</strong> canciones</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                        <span style="background: rgba(236, 72, 153, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #ec4899;">#Reggaeton</span>
-                        <span style="background: rgba(236, 72, 153, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #ec4899;">#LatinUrban</span>
-                    </div>
-                    <button onclick="enviarAPlaylist('Reggaeton Global 2026')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #ec4899, #8b5cf6); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                        Enviar Música
-                    </button>
+            <!-- Grid de playlists TOP - SE CARGA DINÁMICAMENTE -->
+            <div id="playlistsTOPGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                    ⏳ Cargando playlists destacadas...
                 </div>
-                
-                <!-- Playlist 2 - PREMIUM -->
-                <div class="top-playlist-card" data-genre="trap">
-                    <div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; color: #1e293b;">
-                        ⭐ PREMIUM
-                    </div>
-                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">
-                        💎
-                    </div>
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Trap Elite España</h3>
-                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por Urban Kings</p>
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                        <span>👥 <strong>180K</strong> seguidores</span>
-                        <span>🎵 <strong>150</strong> canciones</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                        <span style="background: rgba(139, 92, 246, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #8b5cf6;">#Trap</span>
-                        <span style="background: rgba(139, 92, 246, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #8b5cf6;">#UrbanSpain</span>
-                    </div>
-                    <button onclick="enviarAPlaylist('Trap Elite España')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                        Enviar Música
-                    </button>
-                </div>
-                
-                <!-- Playlist 3 -->
-                <div class="top-playlist-card" data-genre="pop">
-                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #06b6d4, #3b82f6); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">
-                        ⭐
-                    </div>
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Pop Internacional</h3>
-                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por Global Sounds</p>
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                        <span>👥 <strong>120K</strong> seguidores</span>
-                        <span>🎵 <strong>200</strong> canciones</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                        <span style="background: rgba(59, 130, 246, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #3b82f6;">#Pop</span>
-                        <span style="background: rgba(59, 130, 246, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #3b82f6;">#International</span>
-                    </div>
-                    <button onclick="enviarAPlaylist('Pop Internacional')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #06b6d4, #3b82f6); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                        Enviar Música
-                    </button>
-                </div>
-                
-                <!-- Playlist 4 -->
-                <div class="top-playlist-card" data-genre="electronica">
-                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #10b981, #06b6d4); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">
-                        🎧
-                    </div>
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Electronic Vibes</h3>
-                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por DJ Master</p>
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                        <span>👥 <strong>95K</strong> seguidores</span>
-                        <span>🎵 <strong>220</strong> canciones</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                        <span style="background: rgba(16, 185, 129, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #10b981;">#House</span>
-                        <span style="background: rgba(16, 185, 129, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #10b981;">#Techno</span>
-                    </div>
-                    <button onclick="enviarAPlaylist('Electronic Vibes')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #10b981, #06b6d4); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                        Enviar Música
-                    </button>
-                </div>
-                
-                <!-- Playlist 5 -->
-                <div class="top-playlist-card" data-genre="rock">
-                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #f59e0b, #ef4444); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">
-                        🎸
-                    </div>
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Rock Alternativo</h3>
-                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por Rock Forever</p>
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                        <span>👥 <strong>85K</strong> seguidores</span>
-                        <span>🎵 <strong>175</strong> canciones</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                        <span style="background: rgba(239, 68, 68, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #ef4444;">#Rock</span>
-                        <span style="background: rgba(239, 68, 68, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #ef4444;">#Alternative</span>
-                    </div>
-                    <button onclick="enviarAPlaylist('Rock Alternativo')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #f59e0b, #ef4444); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                        Enviar Música
-                    </button>
-                </div>
-                
-                <!-- Playlist 6 - PREMIUM -->
-                <div class="top-playlist-card" data-genre="reggaeton">
-                    <div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; color: #1e293b;">
-                        ⭐ PREMIUM
-                    </div>
-                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #ec4899, #ef4444); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">
-                        🌴
-                    </div>
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Urbano Latino 2026</h3>
-                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por Música Latina</p>
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                        <span>👥 <strong>200K</strong> seguidores</span>
-                        <span>🎵 <strong>160</strong> canciones</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                        <span style="background: rgba(236, 72, 153, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #ec4899;">#Urbano</span>
-                        <span style="background: rgba(236, 72, 153, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #ec4899;">#Latin</span>
-                    </div>
-                    <button onclick="enviarAPlaylist('Urbano Latino 2026')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #ec4899, #ef4444); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                        Enviar Música
-                    </button>
-                </div>
-                
             </div>
             
             <!-- Info adicional -->
@@ -4338,8 +4201,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     <strong>⭐ Playlists PREMIUM</strong> tienen mayor alcance y visibilidad destacada
                 </p>
                 <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">
-                    Estas playlists cuentan con curadores verificados y mayor engagement de oyentes
+                    ¿Eres curador? <a href="#" onclick="openCuradorPanel()" style="color: #fbbf24; text-decoration: underline;">Destaca tu playlist aquí</a>
                 </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL GUÍA PITCH SPOTIFY -->
             </div>
         </div>
     </div>
@@ -6898,32 +6766,105 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             document.getElementById('modalEstadisticas').classList.remove('active');
         }
         
-        function openPlaylistsTOPModal(){
+        async function openPlaylistsTOPModal(){
             document.getElementById('modalPlaylistsTOP').classList.add('active');
+            await cargarPlaylistsTOP();
         }
         
         function closePlaylistsTOPModal(){
             document.getElementById('modalPlaylistsTOP').classList.remove('active');
         }
         
-        function filterTOPPlaylists(genre){
-            // Quitar active de todos los botones
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            // Agregar active al botón clickeado
-            event.target.classList.add('active');
+        async function cargarPlaylistsTOP() {
+            const grid = document.getElementById('playlistsTOPGrid');
             
-            // Mostrar/ocultar playlists según género
-            document.querySelectorAll('.top-playlist-card').forEach(card => {
-                if(genre === 'all'){
-                    card.style.display = 'block';
-                } else {
-                    if(card.getAttribute('data-genre') === genre){
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
+            try {
+                // Cargar playlists destacadas (destacada = true) y aprobadas
+                const { data: playlists, error } = await supabaseClient
+                    .from('playlists')
+                    .select(`
+                        id,
+                        nombre,
+                        genero,
+                        seguidores,
+                        url_spotify,
+                        imagen_url,
+                        destacada,
+                        tipo,
+                        usuarios!playlists_curador_id_fkey (
+                            nombre
+                        )
+                    `)
+                    .eq('estado', 'aprobada')
+                    .eq('destacada', true)
+                    .order('seguidores', { ascending: false });
+                
+                if (error) {
+                    console.error('Error cargando playlists TOP:', error);
+                    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                        ❌ Error al cargar playlists destacadas
+                    </div>`;
+                    return;
                 }
-            });
+                
+                if (!playlists || playlists.length === 0) {
+                    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🏆</div>
+                        <div style="font-size: 1.2rem; margin-bottom: 0.5rem;">Aún no hay playlists destacadas</div>
+                        <div style="font-size: 0.9rem;">¿Eres curador? ¡Destaca tu playlist y aparece aquí!</div>
+                    </div>`;
+                    return;
+                }
+                
+                // Colores para los gradientes
+                const gradientes = [
+                    'linear-gradient(135deg, #ec4899, #8b5cf6)',
+                    'linear-gradient(135deg, #8b5cf6, #6366f1)',
+                    'linear-gradient(135deg, #06b6d4, #3b82f6)',
+                    'linear-gradient(135deg, #10b981, #06b6d4)',
+                    'linear-gradient(135deg, #f59e0b, #ef4444)',
+                    'linear-gradient(135deg, #ec4899, #ef4444)'
+                ];
+                
+                const emojis = ['🔥', '💎', '⭐', '🎧', '🎸', '🌴', '🎵', '🎤'];
+                
+                grid.innerHTML = playlists.map((p, index) => {
+                    const curadorNombre = p.usuarios?.nombre || 'Curador Anónimo';
+                    const seguidores = p.seguidores || 0;
+                    const seguidoresDisplay = seguidores >= 1000 ? `${(seguidores/1000).toFixed(0)}K` : seguidores;
+                    const gradiente = gradientes[index % gradientes.length];
+                    const emoji = emojis[index % emojis.length];
+                    const genero = p.genero || 'Música';
+                    
+                    return `
+                        <div class="top-playlist-card" style="position: relative; background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; transition: transform 0.3s;">
+                            <div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; color: #1e293b;">
+                                ⭐ PREMIUM
+                            </div>
+                            <div style="width: 100%; height: 180px; background: ${gradiente}; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">
+                                ${emoji}
+                            </div>
+                            <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">${p.nombre}</h3>
+                            <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por ${curadorNombre}</p>
+                            <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
+                                <span>👥 <strong>${seguidoresDisplay}</strong> seguidores</span>
+                            </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+                                <span style="background: rgba(139, 92, 246, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #8b5cf6;">#${genero}</span>
+                            </div>
+                            <a href="${p.url_spotify || '#'}" target="_blank" style="display: block; width: 100%; padding: 0.75rem; background: ${gradiente}; border: none; border-radius: 0.5rem; color: white; font-weight: 700; text-decoration: none; text-align: center; cursor: pointer;">
+                                🎵 Ver en Spotify
+                            </a>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (err) {
+                console.error('Error:', err);
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                    ❌ Error al cargar playlists
+                </div>`;
+            }
         }
         
         function enviarAPlaylist(playlistName){
@@ -7227,6 +7168,66 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 'portadas_ia': 'Creador de Portadas IA'
             };
             
+            // Pedir datos adicionales según el servicio
+            let datosExtra = {};
+            
+            if (servicio === 'promo_tiktok') {
+                const linkVideo = prompt('📱 PROMO TIKTOK\n\nPega el link del video de TikTok que quieres promocionar:');
+                if (!linkVideo || !linkVideo.trim()) {
+                    alert('⚠️ Debes proporcionar el link del video');
+                    return;
+                }
+                datosExtra.link_video = linkVideo.trim();
+                datosExtra.instrucciones = prompt('¿Alguna instrucción especial para la promoción? (opcional)') || '';
+            }
+            
+            if (servicio === 'mastering_ia') {
+                const linkCancion = prompt('🎛️ MASTERING IA\n\nPega el link de tu canción (Google Drive, Dropbox, WeTransfer, etc):');
+                if (!linkCancion || !linkCancion.trim()) {
+                    alert('⚠️ Debes proporcionar el link de la canción');
+                    return;
+                }
+                datosExtra.link_cancion = linkCancion.trim();
+                datosExtra.nombre_cancion = prompt('¿Nombre de la canción?') || 'Sin nombre';
+            }
+            
+            if (servicio === 'portadas_ia') {
+                const descripcion = prompt('🎨 PORTADAS IA\n\nDescribe cómo quieres tu portada (estilo, colores, elementos, etc):');
+                if (!descripcion || !descripcion.trim()) {
+                    alert('⚠️ Debes describir cómo quieres la portada');
+                    return;
+                }
+                datosExtra.descripcion = descripcion.trim();
+                datosExtra.nombre_artista = prompt('¿Nombre del artista para la portada?') || userName;
+                datosExtra.nombre_cancion = prompt('¿Nombre de la canción/álbum?') || '';
+            }
+            
+            if (servicio === 'playlist_top') {
+                // Obtener playlists del curador para que elija
+                const { data: playlists } = await supabaseClient
+                    .from('playlists')
+                    .select('id, nombre, seguidores')
+                    .eq('curador_id', userId)
+                    .eq('estado', 'aprobada');
+                
+                if (!playlists || playlists.length === 0) {
+                    alert('⚠️ No tienes playlists aprobadas para destacar');
+                    return;
+                }
+                
+                const opcionesPlaylists = playlists.map((p, i) => `${i+1}. ${p.nombre} (${p.seguidores} seguidores)`).join('\n');
+                const seleccion = prompt(`🏆 PLAYLIST TOP\n\nElige qué playlist quieres destacar:\n\n${opcionesPlaylists}\n\nEscribe el número:`);
+                
+                const indice = parseInt(seleccion) - 1;
+                if (isNaN(indice) || indice < 0 || indice >= playlists.length) {
+                    alert('⚠️ Selección inválida');
+                    return;
+                }
+                
+                datosExtra.playlist_id = playlists[indice].id;
+                datosExtra.playlist_nombre = playlists[indice].nombre;
+            }
+            
             if (!confirm(`🎁 CANJEAR SERVICIO\n\nServicio: ${serviciosNombres[servicio]}\nCosto: ${puntos} puntos\nPuntos actuales: ${puntosActuales}\n\n¿Confirmar canje?`)) {
                 return;
             }
@@ -7249,10 +7250,11 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                         curador_email: userEmail,
                         tipo: servicio,
                         puntos: puntos,
-                        estado: 'pendiente'
+                        estado: 'pendiente',
+                        datos_extra: datosExtra
                     });
                 
-                alert(`✅ ¡CANJE EXITOSO!\n\nServicio: ${serviciosNombres[servicio]}\nPuntos usados: ${puntos}\nPuntos restantes: ${puntosActuales - puntos}\n\n📧 Recibirás un email cuando esté listo tu servicio.`);
+                alert(`✅ ¡CANJE EXITOSO!\n\nServicio: ${serviciosNombres[servicio]}\nPuntos usados: ${puntos}\nPuntos restantes: ${puntosActuales - puntos}\n\n⏳ Tu solicitud está siendo procesada.\nTe notificaremos cuando esté lista.`);
                 
                 // Actualizar displays
                 await cargarPuntosCurador();
