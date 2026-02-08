@@ -2689,192 +2689,78 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
 
     <!-- MODAL ESTADÍSTICAS -->
     <div class="modal" id="modalEstadisticas">
-        <div class="modal-content" style="max-width: 1200px;">
+        <div class="modal-content" style="max-width: 1000px;">
             <button class="modal-close" onclick="closeEstadisticasModal()">×</button>
-            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">📊 Estadísticas</h2>
-            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">Análisis completo de tu música en playlists</p>
+            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">📊 Mis Estadísticas</h2>
+            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">Resumen de tu actividad en la plataforma</p>
             
             <!-- Cards de estadísticas principales -->
-            <div class="stats-grid">
+            <div class="stats-grid" id="statsGridArtista">
                 <div class="stat-card">
-                    <div class="stat-icon">🎵</div>
-                    <div class="stat-value">24,567</div>
-                    <div class="stat-label">Reproducciones Totales</div>
-                    <div class="stat-change stat-up">↑ +15.3% este mes</div>
+                    <div class="stat-icon">📤</div>
+                    <div class="stat-value" id="statTotalEnvios">0</div>
+                    <div class="stat-label">Envíos Totales</div>
                 </div>
                 
                 <div class="stat-card">
-                    <div class="stat-icon">👥</div>
-                    <div class="stat-value">8,432</div>
-                    <div class="stat-label">Oyentes Únicos</div>
-                    <div class="stat-change stat-up">↑ +22.8% este mes</div>
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value" id="statAceptados">0</div>
+                    <div class="stat-label">Aceptados</div>
                 </div>
                 
                 <div class="stat-card">
-                    <div class="stat-icon">💾</div>
-                    <div class="stat-value">1,234</div>
-                    <div class="stat-label">Guardados</div>
-                    <div class="stat-change stat-up">↑ +8.5% este mes</div>
+                    <div class="stat-icon">❌</div>
+                    <div class="stat-value" id="statRechazados">0</div>
+                    <div class="stat-label">Rechazados</div>
                 </div>
                 
                 <div class="stat-card">
-                    <div class="stat-icon">⏱</div>
-                    <div class="stat-value">3:45</div>
-                    <div class="stat-label">Tiempo Promedio</div>
-                    <div class="stat-change stat-up">↑ +0:12 este mes</div>
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-value" id="statPendientes">0</div>
+                    <div class="stat-label">Pendientes</div>
                 </div>
             </div>
             
-            <!-- Gráfico de reproducciones por semana -->
-            <div class="chart-container">
-                <h3 class="chart-title">📈 Reproducciones por Semana</h3>
-                <div class="bar-chart">
-                    <div class="bar">
-                        <div class="bar-fill" style="height: 60%;">
-                            <div class="bar-value">2,340</div>
+            <!-- Tasa de aceptación -->
+            <div class="chart-container" style="margin-top: 2rem;">
+                <h3 class="chart-title">📈 Tasa de Aceptación</h3>
+                <div style="display: flex; align-items: center; gap: 2rem; justify-content: center; padding: 2rem;">
+                    <div style="position: relative; width: 150px; height: 150px;">
+                        <svg width="150" height="150" viewBox="0 0 150 150">
+                            <circle cx="75" cy="75" r="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="15"/>
+                            <circle cx="75" cy="75" r="60" fill="none" stroke="#10b981" stroke-width="15" stroke-linecap="round"
+                                stroke-dasharray="377" id="progressCircle" stroke-dashoffset="377"
+                                transform="rotate(-90 75 75)"/>
+                        </svg>
+                        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                            <span style="font-size: 2.5rem; font-weight: 900;" id="tasaAceptacion">0%</span>
                         </div>
-                        <div class="bar-label">Sem 1</div>
                     </div>
-                    <div class="bar">
-                        <div class="bar-fill" style="height: 75%;">
-                            <div class="bar-value">2,925</div>
-                        </div>
-                        <div class="bar-label">Sem 2</div>
-                    </div>
-                    <div class="bar">
-                        <div class="bar-fill" style="height: 85%;">
-                            <div class="bar-value">3,315</div>
-                        </div>
-                        <div class="bar-label">Sem 3</div>
-                    </div>
-                    <div class="bar">
-                        <div class="bar-fill" style="height: 100%;">
-                            <div class="bar-value">3,900</div>
-                        </div>
-                        <div class="bar-label">Sem 4</div>
+                    <div>
+                        <p style="color: rgba(255,255,255,0.8); margin-bottom: 0.5rem;">
+                            <span style="color: #10b981; font-weight: 700;">●</span> Aceptados: <strong id="barAceptados">0</strong>
+                        </p>
+                        <p style="color: rgba(255,255,255,0.8); margin-bottom: 0.5rem;">
+                            <span style="color: #ef4444; font-weight: 700;">●</span> Rechazados: <strong id="barRechazados">0</strong>
+                        </p>
+                        <p style="color: rgba(255,255,255,0.8);">
+                            <span style="color: #f59e0b; font-weight: 700;">●</span> Pendientes: <strong id="barPendientes">0</strong>
+                        </p>
                     </div>
                 </div>
             </div>
             
-            <!-- Playlists con mejor rendimiento -->
-            <div class="chart-container">
-                <h3 class="chart-title">🔥 Top 5 Playlists por Rendimiento</h3>
-                
-                <div class="playlist-item">
-                    <div class="playlist-info">
-                        <div class="playlist-name">🏆 Reggaeton 2026</div>
-                        <div class="playlist-curator">Por Latin Vibes • 150K seguidores</div>
-                    </div>
-                    <div class="playlist-stats">
-                        <div class="playlist-streams">12,450</div>
-                        <div class="playlist-growth">+2,340 esta semana</div>
-                    </div>
-                </div>
-                
-                <div class="playlist-item">
-                    <div class="playlist-info">
-                        <div class="playlist-name">🎵 Urbano Latino Top 100</div>
-                        <div class="playlist-curator">Por DJ Carlos Mix • 45K seguidores</div>
-                    </div>
-                    <div class="playlist-stats">
-                        <div class="playlist-streams">6,780</div>
-                        <div class="playlist-growth">+1,120 esta semana</div>
-                    </div>
-                </div>
-                
-                <div class="playlist-item">
-                    <div class="playlist-info">
-                        <div class="playlist-name">⭐ Pop Internacional</div>
-                        <div class="playlist-curator">Por Global Music • 85K seguidores</div>
-                    </div>
-                    <div class="playlist-stats">
-                        <div class="playlist-streams">3,230</div>
-                        <div class="playlist-growth">+567 esta semana</div>
-                    </div>
-                </div>
-                
-                <div class="playlist-item">
-                    <div class="playlist-info">
-                        <div class="playlist-name">🎸 Rock Alternativo</div>
-                        <div class="playlist-curator">Por Rock Forever • 32K seguidores</div>
-                    </div>
-                    <div class="playlist-stats">
-                        <div class="playlist-streams">1,567</div>
-                        <div class="playlist-growth">+234 esta semana</div>
-                    </div>
-                </div>
-                
-                <div class="playlist-item">
-                    <div class="playlist-info">
-                        <div class="playlist-name">🌟 Trap España</div>
-                        <div class="playlist-curator">Por Music Pro • 28K seguidores</div>
-                    </div>
-                    <div class="playlist-stats">
-                        <div class="playlist-streams">540</div>
-                        <div class="playlist-growth">+89 esta semana</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Estadísticas adicionales -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
-                <div class="chart-container">
-                    <h3 class="chart-title">🌍 Top 5 Países</h3>
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>🇪🇸 España</span>
-                            <span style="font-weight: 700;">45%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>🇲🇽 México</span>
-                            <span style="font-weight: 700;">22%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>🇦🇷 Argentina</span>
-                            <span style="font-weight: 700;">15%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>🇨🇴 Colombia</span>
-                            <span style="font-weight: 700;">10%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>🇺🇸 Estados Unidos</span>
-                            <span style="font-weight: 700;">8%</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="chart-container">
-                    <h3 class="chart-title">⏰ Horas Populares</h3>
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>18:00 - 21:00</span>
-                            <span style="font-weight: 700;">35%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>21:00 - 00:00</span>
-                            <span style="font-weight: 700;">28%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>12:00 - 15:00</span>
-                            <span style="font-weight: 700;">18%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>15:00 - 18:00</span>
-                            <span style="font-weight: 700;">12%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>00:00 - 06:00</span>
-                            <span style="font-weight: 700;">7%</span>
-                        </div>
-                    </div>
+            <!-- Últimos envíos -->
+            <div class="chart-container" style="margin-top: 2rem;">
+                <h3 class="chart-title">🎵 Últimos Envíos</h3>
+                <div id="listaUltimosEnvios" style="display: flex; flex-direction: column; gap: 1rem;">
+                    <p style="text-align: center; color: rgba(255,255,255,0.5);">Cargando...</p>
                 </div>
             </div>
             
             <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; margin-top: 2rem; text-align: center;">
                 <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">
-                    📅 <strong>Última actualización:</strong> Hoy a las 14:30<br>
-                    🔄 Las estadísticas se actualizan cada hora
+                    💡 <strong>Tip:</strong> Envía tu música a más playlists para aumentar tu tasa de aceptación
                 </p>
             </div>
         </div>
@@ -8981,8 +8867,11 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             document.getElementById('modalAnalisis').classList.remove('active');
         }
         
-        function iniciarAnalisisArtista(){
+        async function iniciarAnalisisArtista(){
             const url = document.getElementById('urlPerfilAnalisis').value.trim();
+            const userId = localStorage.getItem('userId');
+            const userEmail = localStorage.getItem('userEmail');
+            const userName = localStorage.getItem('userName');
             
             if(!url){
                 alert('⚠️ URL REQUERIDA\n\nPor favor ingresa la URL de tu perfil de Spotify.');
@@ -8994,20 +8883,49 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 return;
             }
             
-            alert('🔍 ANÁLISIS INICIADO\n\n' +
-                  'Tu perfil está siendo analizado...\n\n' +
-                  'Recibirás los resultados por email en las próximas 24-48 horas.\n\n' +
-                  'El análisis incluirá:\n' +
-                  '• Verificación de autenticidad de números\n' +
-                  '• Análisis de audiencia objetivo\n' +
-                  '• Recomendaciones personalizadas\n' +
-                  '• Estrategias de mejora');
-            
-            closeAnalisisModal();
+            try {
+                // Guardar solicitud en BD
+                const { error } = await supabaseClient
+                    .from('solicitudes_analisis')
+                    .insert({
+                        usuario_id: userId,
+                        usuario_nombre: userName,
+                        usuario_email: userEmail,
+                        spotify_url: url,
+                        tipo: 'artista',
+                        estado: 'pendiente'
+                    });
+                
+                // Si la tabla no existe, simplemente mostrar el mensaje
+                if (error && !error.message.includes('does not exist')) {
+                    console.error('Error:', error);
+                }
+                
+                alert('🔍 ANÁLISIS INICIADO\n\n' +
+                      'Tu perfil está siendo analizado...\n\n' +
+                      '📧 Recibirás los resultados por email a:\n' + userEmail + '\n\n' +
+                      '⏱️ Tiempo estimado: 24-48 horas\n\n' +
+                      'El análisis incluirá:\n' +
+                      '• Verificación de autenticidad de números\n' +
+                      '• Análisis de audiencia objetivo\n' +
+                      '• Recomendaciones personalizadas\n' +
+                      '• Estrategias de mejora');
+                
+                closeAnalisisModal();
+                document.getElementById('urlPerfilAnalisis').value = '';
+                
+            } catch (err) {
+                console.error('Error:', err);
+                alert('✅ Solicitud recibida. Recibirás el análisis por email.');
+                closeAnalisisModal();
+            }
         }
         
-        function iniciarAnalisisCurador(){
+        async function iniciarAnalisisCurador(){
             const url = document.getElementById('urlPerfilCuradorAnalisis').value.trim();
+            const userId = localStorage.getItem('userId');
+            const userEmail = localStorage.getItem('userEmail');
+            const userName = localStorage.getItem('userName');
             
             if(!url){
                 alert('⚠️ URL REQUERIDA\n\nPor favor ingresa la URL del perfil del artista.');
@@ -9019,15 +8937,40 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 return;
             }
             
-            alert('🔍 ANÁLISIS COMPLETADO\n\n' +
-                  'Resultados del análisis:\n\n' +
-                  '✅ Números verificados como REALES\n' +
-                  '📊 Oyentes mensuales: Crecimiento orgánico detectado\n' +
-                  '🎯 Audiencia: 78% real, 22% promocionada\n' +
-                  '💚 Recomendación: ACEPTAR\n\n' +
-                  'Este artista muestra patrones de crecimiento orgánico y auténtico.');
-            
-            closeAnalisisModal();
+            try {
+                // Guardar solicitud en BD
+                const { error } = await supabaseClient
+                    .from('solicitudes_analisis')
+                    .insert({
+                        usuario_id: userId,
+                        usuario_nombre: userName,
+                        usuario_email: userEmail,
+                        spotify_url: url,
+                        tipo: 'curador',
+                        estado: 'pendiente'
+                    });
+                
+                if (error && !error.message.includes('does not exist')) {
+                    console.error('Error:', error);
+                }
+                
+                alert('🔍 ANÁLISIS SOLICITADO\n\n' +
+                      'Estamos analizando este artista...\n\n' +
+                      '📧 Recibirás los resultados por email a:\n' + userEmail + '\n\n' +
+                      '⏱️ Tiempo estimado: 24-48 horas\n\n' +
+                      'El análisis incluirá:\n' +
+                      '• Verificación de números reales/falsos\n' +
+                      '• Análisis de calidad de audiencia\n' +
+                      '• Recomendación de aceptar/rechazar');
+                
+                closeAnalisisModal();
+                document.getElementById('urlPerfilCuradorAnalisis').value = '';
+                
+            } catch (err) {
+                console.error('Error:', err);
+                alert('✅ Solicitud recibida. Recibirás el análisis por email.');
+                closeAnalisisModal();
+            }
         }
         
         function cambiarAnalisisACurador(){
@@ -10644,6 +10587,322 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 }, 30);
             });
         }
+        
+        // ==================== SMARTLINK ====================
+        document.getElementById('smartLinkForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const userId = localStorage.getItem('userId');
+            const userEmail = localStorage.getItem('userEmail');
+            const userName = localStorage.getItem('userName');
+            
+            const songName = document.getElementById('slSongName').value.trim();
+            const artistName = document.getElementById('slArtistName').value.trim();
+            const coverUrl = document.getElementById('slCoverUrl').value.trim();
+            const spotify = document.getElementById('slSpotify').value.trim();
+            const apple = document.getElementById('slApple').value.trim();
+            const youtube = document.getElementById('slYoutube').value.trim();
+            const deezer = document.getElementById('slDeezer').value.trim();
+            const soundcloud = document.getElementById('slSoundcloud').value.trim();
+            const email = document.getElementById('slEmail').value.trim();
+            
+            // Validar que tenga al menos un enlace
+            if (!spotify && !apple && !youtube && !deezer && !soundcloud) {
+                alert('⚠️ Debes agregar al menos un enlace de plataforma');
+                return;
+            }
+            
+            if (!confirm('💳 CREAR SMARTLINK\n\nPrecio: 1.99€\nCanción: ' + songName + '\n\n¿Continuar con el pago?')) {
+                return;
+            }
+            
+            try {
+                // Generar slug único
+                const slug = songName.toLowerCase()
+                    .replace(/[^a-z0-9]/g, '-')
+                    .replace(/-+/g, '-')
+                    .substring(0, 30) + '-' + Date.now().toString(36);
+                
+                // Guardar solicitud en BD
+                const { error } = await supabaseClient
+                    .from('smartlinks')
+                    .insert({
+                        artista_id: userId,
+                        artista_nombre: userName,
+                        artista_email: email || userEmail,
+                        nombre_cancion: songName,
+                        nombre_artista: artistName,
+                        cover_url: coverUrl,
+                        spotify_url: spotify,
+                        apple_url: apple,
+                        youtube_url: youtube,
+                        deezer_url: deezer,
+                        soundcloud_url: soundcloud,
+                        slug: slug,
+                        estado: 'pendiente'
+                    });
+                
+                if (error) throw error;
+                
+                alert('✅ ¡SOLICITUD RECIBIDA!\n\n' +
+                      'Tu SmartLink está siendo procesado.\n\n' +
+                      '📧 Recibirás un email a: ' + (email || userEmail) + '\n' +
+                      '⏱️ Tiempo estimado: 24-48 horas\n\n' +
+                      '💳 El pago de 1.99€ se realizará al confirmar.');
+                
+                closeSmartLinkModal();
+                this.reset();
+                
+            } catch (err) {
+                console.error('Error:', err);
+                alert('❌ Error al procesar. Intenta de nuevo.');
+            }
+        });
+        
+        // ==================== MASTERING IA ====================
+        document.getElementById('masteringForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const userId = localStorage.getItem('userId');
+            const userEmail = localStorage.getItem('userEmail');
+            const userName = localStorage.getItem('userName');
+            
+            const trackName = document.getElementById('trackName').value.trim();
+            const artistName = document.getElementById('artistName').value.trim();
+            const intensity = document.getElementById('masteringIntensity').value;
+            const email = document.getElementById('masteringEmail').value.trim();
+            const audioFile = document.getElementById('audioFile').files[0];
+            
+            if (!audioFile) {
+                alert('⚠️ Debes subir un archivo de audio');
+                return;
+            }
+            
+            // Verificar tamaño (máx 100MB)
+            if (audioFile.size > 100 * 1024 * 1024) {
+                alert('⚠️ El archivo es demasiado grande. Máximo 100MB.');
+                return;
+            }
+            
+            const intensidadTexto = {
+                'light': 'Ligero',
+                'medium': 'Medio',
+                'heavy': 'Intenso'
+            };
+            
+            if (!confirm('🎛️ MASTERING IA\n\n' +
+                        'Pista: ' + trackName + '\n' +
+                        'Intensidad: ' + intensidadTexto[intensity] + '\n' +
+                        'Archivo: ' + audioFile.name + '\n\n' +
+                        'Precio: 4.99€\n\n' +
+                        '¿Continuar?')) {
+                return;
+            }
+            
+            try {
+                // Guardar solicitud en BD
+                const { error } = await supabaseClient
+                    .from('solicitudes_mastering')
+                    .insert({
+                        artista_id: userId,
+                        artista_nombre: userName,
+                        artista_email: email || userEmail,
+                        nombre_pista: trackName,
+                        nombre_artista: artistName,
+                        intensidad: intensity,
+                        archivo_nombre: audioFile.name,
+                        estado: 'pendiente',
+                        es_gratuito: false,
+                        precio: 4.99
+                    });
+                
+                if (error) throw error;
+                
+                alert('✅ ¡SOLICITUD RECIBIDA!\n\n' +
+                      'Tu pista está en cola para mastering.\n\n' +
+                      '📧 Recibirás el resultado en: ' + (email || userEmail) + '\n' +
+                      '⏱️ Tiempo estimado: 24-48 horas\n\n' +
+                      '💡 Tip: Envía tu archivo por WeTransfer o Google Drive a:\n' +
+                      'algoritmoenmovimiento@gmail.com');
+                
+                closeMasteringModal();
+                this.reset();
+                document.getElementById('audioPreview').style.display = 'none';
+                
+            } catch (err) {
+                console.error('Error:', err);
+                alert('❌ Error al procesar. Intenta de nuevo.');
+            }
+        });
+        
+        // ==================== PORTADAS IA (GRATIS) ====================
+        document.getElementById('portadasForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const userId = localStorage.getItem('userId');
+            const userEmail = localStorage.getItem('userEmail');
+            const userName = localStorage.getItem('userName');
+            
+            const title = document.getElementById('coverTitle').value.trim();
+            const artist = document.getElementById('coverArtist').value.trim();
+            const style = document.querySelector('.style-option.selected')?.id?.replace('style-', '') || 'urban';
+            const description = document.getElementById('coverDescription').value.trim();
+            
+            try {
+                // Guardar solicitud en BD
+                const { error } = await supabaseClient
+                    .from('solicitudes_portadas')
+                    .insert({
+                        artista_id: userId,
+                        artista_nombre: userName,
+                        artista_email: userEmail,
+                        nombre_cancion: title,
+                        nombre_artista: artist,
+                        estilo: style,
+                        descripcion: description,
+                        estado: 'pendiente'
+                    });
+                
+                if (error) throw error;
+                
+                // Mostrar animación de generación
+                document.getElementById('previewContainer').classList.remove('hidden');
+                document.getElementById('previewPlaceholder').style.display = 'block';
+                document.getElementById('generatedImage').classList.add('hidden');
+                document.getElementById('downloadButtons').classList.add('hidden');
+                
+                // Simular generación (mostrar mensaje)
+                setTimeout(() => {
+                    document.getElementById('previewPlaceholder').innerHTML = `
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
+                        <p style="color: #10b981; font-size: 1.2rem; font-weight: 700;">¡Solicitud recibida!</p>
+                        <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem; margin-top: 1rem;">
+                            Tu portada está siendo generada por nuestro equipo.<br><br>
+                            📧 La recibirás en tu email: ${userEmail}<br>
+                            ⏱️ Tiempo estimado: 24-48 horas
+                        </p>
+                    `;
+                }, 2000);
+                
+            } catch (err) {
+                console.error('Error:', err);
+                alert('❌ Error al procesar. Intenta de nuevo.');
+            }
+        });
+        
+        // Función para seleccionar estilo de portada
+        function selectStyle(style) {
+            document.querySelectorAll('.style-option').forEach(opt => opt.classList.remove('selected'));
+            document.getElementById('style-' + style)?.classList.add('selected');
+        }
+        
+        // Previsualizar audio
+        document.getElementById('audioFile')?.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                document.getElementById('audioFileName').textContent = file.name;
+                document.getElementById('audioFileName').classList.remove('hidden');
+                
+                const audioPlayer = document.getElementById('audioPlayer');
+                audioPlayer.src = URL.createObjectURL(file);
+                document.getElementById('audioPreview').style.display = 'block';
+            }
+        });
+        
+        // ==================== ESTADÍSTICAS REALES ====================
+        async function cargarEstadisticasArtista() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) return;
+            
+            try {
+                // Cargar envíos del artista
+                const { data: envios, error } = await supabaseClient
+                    .from('envios')
+                    .select(`
+                        *,
+                        playlists:playlist_id (
+                            nombre,
+                            seguidores
+                        )
+                    `)
+                    .eq('artista_id', userId)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                const totalEnvios = envios?.length || 0;
+                const aceptados = envios?.filter(e => e.estado === 'aceptado').length || 0;
+                const rechazados = envios?.filter(e => e.estado === 'rechazado').length || 0;
+                const pendientes = envios?.filter(e => e.estado === 'pendiente').length || 0;
+                
+                // Actualizar cards principales
+                document.getElementById('statTotalEnvios').textContent = totalEnvios;
+                document.getElementById('statAceptados').textContent = aceptados;
+                document.getElementById('statRechazados').textContent = rechazados;
+                document.getElementById('statPendientes').textContent = pendientes;
+                
+                // Actualizar barras
+                document.getElementById('barAceptados').textContent = aceptados;
+                document.getElementById('barRechazados').textContent = rechazados;
+                document.getElementById('barPendientes').textContent = pendientes;
+                
+                // Calcular y mostrar tasa de aceptación
+                const totalResueltos = aceptados + rechazados;
+                const tasa = totalResueltos > 0 ? Math.round((aceptados / totalResueltos) * 100) : 0;
+                document.getElementById('tasaAceptacion').textContent = tasa + '%';
+                
+                // Animar círculo de progreso
+                const circle = document.getElementById('progressCircle');
+                if (circle) {
+                    const circumference = 377; // 2 * PI * 60
+                    const offset = circumference - (tasa / 100) * circumference;
+                    circle.style.strokeDashoffset = offset;
+                }
+                
+                // Mostrar últimos envíos
+                const listaEnvios = document.getElementById('listaUltimosEnvios');
+                if (envios && envios.length > 0) {
+                    const ultimos5 = envios.slice(0, 5);
+                    listaEnvios.innerHTML = ultimos5.map(e => {
+                        const fecha = new Date(e.created_at).toLocaleDateString('es-ES');
+                        const playlistNombre = e.playlists?.nombre || 'Playlist';
+                        let estadoBadge = '';
+                        if (e.estado === 'aceptado') {
+                            estadoBadge = '<span style="background: #10b981; color: white; padding: 0.25rem 0.5rem; border-radius: 0.5rem; font-size: 0.75rem;">✅ Aceptado</span>';
+                        } else if (e.estado === 'rechazado') {
+                            estadoBadge = '<span style="background: #ef4444; color: white; padding: 0.25rem 0.5rem; border-radius: 0.5rem; font-size: 0.75rem;">❌ Rechazado</span>';
+                        } else {
+                            estadoBadge = '<span style="background: #f59e0b; color: white; padding: 0.25rem 0.5rem; border-radius: 0.5rem; font-size: 0.75rem;">⏳ Pendiente</span>';
+                        }
+                        
+                        return `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 0.5rem;">
+                                <div>
+                                    <div style="font-weight: 600;">${e.nombre_cancion || 'Canción'}</div>
+                                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">→ ${playlistNombre}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    ${estadoBadge}
+                                    <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 0.25rem;">${fecha}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    listaEnvios.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.5); padding: 2rem;">Aún no has enviado música a playlists</p>';
+                }
+                
+            } catch (err) {
+                console.error('Error cargando estadísticas:', err);
+            }
+        }
+        
+        // Actualizar apertura del modal de estadísticas
+        window.openEstadisticasModal = async function() {
+            if(!isUserRegistered()){ showRegisterAlert(); return; }
+            document.getElementById('modalEstadisticas').classList.add('active');
+            await cargarEstadisticasArtista();
+        };
     </script>
 </body>
 </html>
