@@ -7192,6 +7192,9 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         
         async function canjearServicioCurador(servicio, puntos){
             const userId = localStorage.getItem('userId');
+            const userName = localStorage.getItem('userName');
+            const userEmail = localStorage.getItem('userEmail');
+            
             if (!userId) {
                 alert('⚠️ Debes iniciar sesión');
                 return;
@@ -7224,7 +7227,7 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 'portadas_ia': 'Creador de Portadas IA'
             };
             
-            if (!confirm(`🎁 CANJEAR SERVICIO\n\nServicio: ${serviciosNombres[servicio]}\nCosto: ${puntos} puntos\n\n¿Confirmar canje?`)) {
+            if (!confirm(`🎁 CANJEAR SERVICIO\n\nServicio: ${serviciosNombres[servicio]}\nCosto: ${puntos} puntos\nPuntos actuales: ${puntosActuales}\n\n¿Confirmar canje?`)) {
                 return;
             }
             
@@ -7237,20 +7240,23 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 
                 if (updateError) throw updateError;
                 
-                // Registrar canje
+                // Registrar canje en tabla canjes_servicios
                 await supabaseClient
-                    .from('canjes')
+                    .from('canjes_servicios')
                     .insert({
                         curador_id: userId,
+                        curador_nombre: userName,
+                        curador_email: userEmail,
                         tipo: servicio,
                         puntos: puntos,
                         estado: 'pendiente'
                     });
                 
-                alert(`✅ ¡CANJE EXITOSO!\n\nServicio: ${serviciosNombres[servicio]}\nPuntos usados: ${puntos}\nPuntos restantes: ${puntosActuales - puntos}\n\n📧 Te contactaremos para completar el servicio.`);
+                alert(`✅ ¡CANJE EXITOSO!\n\nServicio: ${serviciosNombres[servicio]}\nPuntos usados: ${puntos}\nPuntos restantes: ${puntosActuales - puntos}\n\n📧 Recibirás un email cuando esté listo tu servicio.`);
                 
                 // Actualizar displays
                 await cargarPuntosCurador();
+                closeServiciosCuradorModal();
                 
             } catch(err) {
                 console.error('Error en canje:', err);
