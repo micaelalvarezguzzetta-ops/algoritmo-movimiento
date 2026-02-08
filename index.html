@@ -6858,14 +6858,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 </div>`;
             }
         }
-                
-            } catch (err) {
-                console.error('Error:', err);
-                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
-                    ❌ Error al cargar playlists
-                </div>`;
-            }
-        }
         
         function enviarAPlaylist(playlistName){
             if(!isUserRegistered()){ 
