@@ -1664,12 +1664,7 @@
             <div class="panel-card" onclick="openMasteringModal()">
                 <div class="panel-card-icon">🎚️</div>
                 <h3 class="panel-card-title">Mastering IA</h3>
-                <p class="panel-card-desc">1 gratis/mes - 4.99€</p>
-            </div>
-            <div class="panel-card" onclick="openPortadasModal()">
-                <div class="panel-card-icon">🎨</div>
-                <h3 class="panel-card-title">Portadas IA</h3>
-                <p class="panel-card-desc">100% Gratis</p>
+                <p class="panel-card-desc">4.99€</p>
             </div>
             <div class="panel-card" onclick="openSmartLinkModal()">
                 <div class="panel-card-icon">🔗</div>
@@ -1810,11 +1805,6 @@
                 <div class="step-icon">🎚️</div>
                 <h3 class="step-title">Mastering IA</h3>
                 <p class="step-desc">Mejora el sonido con inteligencia artificial</p>
-            </div>
-            <div class="step-card" onclick="openPortadasModal()" style="cursor: pointer;">
-                <div class="step-icon">🎨</div>
-                <h3 class="step-title">Portadas IA</h3>
-                <p class="step-desc">Genera portadas profesionales gratis</p>
             </div>
             <div class="step-card" onclick="openAnalisisModal()" style="cursor: pointer;">
                 <div class="step-icon">🔍</div>
@@ -2576,117 +2566,6 @@
         </div>
     </div>
 
-    <!-- MODAL PORTADAS IA -->
-    <div class="modal" id="modalPortadas">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closePortadasModal()">×</button>
-            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">🎨 Generador de Portadas IA</h2>
-            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Crea portadas profesionales para tu música con Inteligencia Artificial</p>
-            
-            <div class="price-box" style="background: linear-gradient(135deg, #10b981, #06b6d4);">
-                <div class="price-amount">100% GRATIS</div>
-                <div class="price-label">Genera tantas portadas como quieras</div>
-            </div>
-            
-            <div class="info-box">
-                <h3>¿Cómo funciona?</h3>
-                <ul>
-                    <li>Describe tu música y el estilo que buscas</li>
-                    <li>Nuestra IA genera una portada única en segundos</li>
-                    <li>Descarga en alta resolución (3000x3000px)</li>
-                    <li>Formato listo para plataformas (Spotify, Apple Music, etc.)</li>
-                    <li>Completamente gratis, sin límites</li>
-                </ul>
-            </div>
-            
-            <form id="portadasForm" class="auth-form">
-                <div class="form-group">
-                    <label>🎵 Nombre de la Canción/Álbum</label>
-                    <input type="text" id="coverTitle" placeholder="Título que aparecerá en la portada" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>👤 Nombre del Artista</label>
-                    <input type="text" id="coverArtist" placeholder="Tu nombre artístico" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>🎨 Estilo Visual</label>
-                    <div class="style-grid">
-                        <div class="style-option" onclick="selectStyle('abstract')" id="style-abstract">
-                            <div class="style-icon">🌈</div>
-                            <div class="style-name">Abstracto</div>
-                        </div>
-                        <div class="style-option selected" onclick="selectStyle('urban')" id="style-urban">
-                            <div class="style-icon">🏙</div>
-                            <div class="style-name">Urbano</div>
-                        </div>
-                        <div class="style-option" onclick="selectStyle('nature')" id="style-nature">
-                            <div class="style-icon">🌿</div>
-                            <div class="style-name">Naturaleza</div>
-                        </div>
-                        <div class="style-option" onclick="selectStyle('neon')" id="style-neon">
-                            <div class="style-icon">💫</div>
-                            <div class="style-name">Neón</div>
-                        </div>
-                        <div class="style-option" onclick="selectStyle('minimal')" id="style-minimal">
-                            <div class="style-icon">⚪</div>
-                            <div class="style-name">Minimalista</div>
-                        </div>
-                        <div class="style-option" onclick="selectStyle('vintage')" id="style-vintage">
-                            <div class="style-icon">📻</div>
-                            <div class="style-name">Vintage</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>✍️ Descripción Adicional (Opcional)</label>
-                    <textarea id="coverDescription" placeholder="Describe el ambiente, colores, elementos que quieres en tu portada...
-Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" rows="4"></textarea>
-                </div>
-                
-                <button type="submit" class="btn-submit" style="margin-top: 1.5rem;">
-                    ✨ Generar Portada con IA
-                </button>
-            </form>
-            
-            <!-- Preview de la portada generada -->
-            <div class="preview-container hidden" id="previewContainer">
-                <div id="previewPlaceholder">
-                    <div class="preview-placeholder generating">🎨</div>
-                    <p style="color: rgba(255,255,255,0.7); font-size: 1.1rem;">Generando tu portada...</p>
-                    <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-top: 0.5rem;">Esto puede tardar 10-30 segundos</p>
-                </div>
-                <img id="generatedImage" class="preview-image hidden" alt="Portada generada">
-                <div id="downloadButtons" class="hidden" style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                    <button onclick="downloadGeneratedCover()" style="padding: 1rem 2rem; border-radius: 0.75rem; border: none; background: linear-gradient(135deg, #10b981, #06b6d4); color: white; font-weight: 700; cursor: pointer; font-size: 1rem;">
-                        💾 Descargar Portada (3000x3000)
-                    </button>
-                    <button onclick="generateAnother()" style="padding: 1rem 2rem; border-radius: 0.75rem; border: none; background: linear-gradient(135deg, #7c3aed, #ec4899); color: white; font-weight: 700; cursor: pointer; font-size: 1rem;">
-                        🔄 Generar Otra
-                    </button>
-                </div>
-            </div>
-            
-            <div class="processing-info">
-                <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.75rem; color: #a78bfa;">💡 Consejos para mejores resultados</h4>
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 0.5rem;">
-                    • Sé específico con los colores y elementos que quieres
-                </p>
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 0.5rem;">
-                    • Menciona el estilo artístico (realista, cartoon, ilustración, foto, etc.)
-                </p>
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 0.5rem;">
-                    • Prueba diferentes combinaciones para encontrar la perfecta
-                </p>
-                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 1rem;">
-                    🎨 La portada se genera en formato cuadrado 1:1 optimizado para todas las plataformas de streaming
-                </p>
-            </div>
-        </div>
-    </div>
-
     <!-- MODAL ESTADÍSTICAS -->
     <div class="modal" id="modalEstadisticas">
         <div class="modal-content" style="max-width: 1000px;">
@@ -2905,108 +2784,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             <button onclick="confirmPaymentIntent()" class="btn-submit" style="margin-top: 2rem; width: 100%;">
                 ✓ He realizado el pago
             </button>
-        </div>
-    </div>
-
-    <!-- MODAL PORTADAS IA -->
-    <div class="modal" id="modalPortadas">
-        <div class="modal-content" style="max-width: 1000px;">
-            <button class="modal-close" onclick="closePortadasModal()">×</button>
-            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">🎨 Generador de Portadas IA</h2>
-            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Crea portadas profesionales para tu música con inteligencia artificial</p>
-            
-            <div class="price-box" style="background: linear-gradient(135deg, #10b981, #06b6d4);">
-                <div class="price-amount">100% GRATIS</div>
-                <div class="price-label">Genera portadas ilimitadas sin costo</div>
-            </div>
-            
-            <div class="info-box">
-                <h3>¿Cómo funciona?</h3>
-                <ul>
-                    <li><strong>Ingresa los datos</strong> - Nombre del artista y título de la canción</li>
-                    <li><strong>Elige un estilo</strong> - Selecciona entre 8 estilos artísticos diferentes</li>
-                    <li><strong>Genera múltiples opciones</strong> - Crea 4 portadas únicas al instante</li>
-                    <li><strong>Descarga en alta calidad</strong> - Resolución 3000x3000px perfecta para plataformas</li>
-                    <li><strong>Sin límites</strong> - Genera tantas portadas como necesites</li>
-                </ul>
-            </div>
-            
-            <form id="portadasForm" class="auth-form">
-                <div class="form-group">
-                    <label>👤 Nombre del Artista</label>
-                    <input type="text" id="portadaArtist" placeholder="Tu nombre artístico" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>🎵 Título de la Canción</label>
-                    <input type="text" id="portadaSong" placeholder="Nombre de tu canción" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>🎨 Estilo Artístico</label>
-                    <div class="style-grid" id="styleGrid">
-                        <div class="style-card" onclick="selectStyle('abstract')">
-                            <div class="style-icon">🌀</div>
-                            <div class="style-name">Abstracto</div>
-                        </div>
-                        <div class="style-card" onclick="selectStyle('urban')">
-                            <div class="style-icon">🏙</div>
-                            <div class="style-name">Urbano</div>
-                        </div>
-                        <div class="style-card" onclick="selectStyle('neon')">
-                            <div class="style-icon">💡</div>
-                            <div class="style-name">Neón</div>
-                        </div>
-                        <div class="style-card selected" onclick="selectStyle('gradient')">
-                            <div class="style-icon">🌈</div>
-                            <div class="style-name">Gradiente</div>
-                        </div>
-                        <div class="style-card" onclick="selectStyle('vintage')">
-                            <div class="style-icon">📼</div>
-                            <div class="style-name">Vintage</div>
-                        </div>
-                        <div class="style-card" onclick="selectStyle('minimal')">
-                            <div class="style-icon">◼️</div>
-                            <div class="style-name">Minimalista</div>
-                        </div>
-                        <div class="style-card" onclick="selectStyle('cosmic')">
-                            <div class="style-icon">🌌</div>
-                            <div class="style-name">Cósmico</div>
-                        </div>
-                        <div class="style-card" onclick="selectStyle('grunge')">
-                            <div class="style-icon">🎸</div>
-                            <div class="style-name">Grunge</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn-submit" style="margin-top: 1rem;">
-                    ✨ Generar 4 Portadas
-                </button>
-            </form>
-            
-            <div id="generatingMessage" class="hidden" style="text-align: center; padding: 2rem; background: rgba(124, 58, 237, 0.1); border-radius: 1rem; margin-top: 2rem;">
-                <div class="generating" style="font-size: 3rem; margin-bottom: 1rem;">🎨</div>
-                <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem;">Generando tus portadas...</h3>
-                <p style="color: rgba(255,255,255,0.7);">La IA está creando 4 diseños únicos para ti</p>
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-top: 1rem;">⏱ Tiempo estimado: 10-15 segundos</p>
-            </div>
-            
-            <div id="previewContainer" class="hidden">
-                <h3 style="font-size: 1.5rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; text-align: center;">📸 Tus Portadas Generadas</h3>
-                <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">Click en cualquier portada para descargarla en alta calidad (3000x3000px)</p>
-                <div class="preview-grid" id="previewGrid"></div>
-            </div>
-            
-            <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; margin-top: 2rem;">
-                <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.75rem; color: #a78bfa;">💡 Consejos para mejores resultados</h4>
-                <ul style="font-size: 0.9rem; color: rgba(255,255,255,0.8); margin: 0; padding-left: 1.5rem;">
-                    <li style="margin-bottom: 0.5rem;">Usa nombres de artistas y canciones claros y concisos</li>
-                    <li style="margin-bottom: 0.5rem;">Experimenta con diferentes estilos para encontrar el perfecto</li>
-                    <li style="margin-bottom: 0.5rem;">Si no te gusta el resultado, genera nuevas opciones sin límite</li>
-                    <li>Las portadas son perfectas para Spotify, Apple Music, YouTube y más</li>
-                </ul>
-            </div>
         </div>
     </div>
 
@@ -4038,17 +3815,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                     <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 1rem;">Masteriza una canción con IA</p>
                     <div style="font-size: 1.5rem; font-weight: 900; color: #3b82f6; margin-bottom: 1rem;">50 puntos</div>
                     <button onclick="canjearServicioCurador('mastering_ia', 50)" style="width: 100%; padding: 0.75rem; background: #3b82f6; color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer;">
-                        Canjear
-                    </button>
-                </div>
-                
-                <!-- Creador de Portadas IA -->
-                <div style="background: rgba(249, 115, 22, 0.1); border: 2px solid rgba(249, 115, 22, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎨</div>
-                    <h3 style="font-weight: 800; margin-bottom: 0.5rem;">Portadas IA</h3>
-                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 1rem;">Crea portadas con inteligencia artificial</p>
-                    <div style="font-size: 1.5rem; font-weight: 900; color: #f97316; margin-bottom: 1rem;">40 puntos</div>
-                    <button onclick="canjearServicioCurador('portadas_ia', 40)" style="width: 100%; padding: 0.75rem; background: #f97316; color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer;">
                         Canjear
                     </button>
                 </div>
@@ -7043,7 +6809,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 'promo_tiktok': 'Promo TikTok',
                 'playlist_top': 'Destacar en Playlist TOP',
                 'mastering_ia': 'Mastering IA',
-                'portadas_ia': 'Creador de Portadas IA'
             };
             
             // Pedir datos adicionales según el servicio
@@ -7067,17 +6832,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 }
                 datosExtra.link_cancion = linkCancion.trim();
                 datosExtra.nombre_cancion = prompt('¿Nombre de la canción?') || 'Sin nombre';
-            }
-            
-            if (servicio === 'portadas_ia') {
-                const descripcion = prompt('🎨 PORTADAS IA\n\nDescribe cómo quieres tu portada (estilo, colores, elementos, etc):');
-                if (!descripcion || !descripcion.trim()) {
-                    alert('⚠️ Debes describir cómo quieres la portada');
-                    return;
-                }
-                datosExtra.descripcion = descripcion.trim();
-                datosExtra.nombre_artista = prompt('¿Nombre del artista para la portada?') || userName;
-                datosExtra.nombre_cancion = prompt('¿Nombre de la canción/álbum?') || '';
             }
             
             if (servicio === 'playlist_top') {
@@ -8667,15 +8421,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         }
 
         
-        function openPortadasModal(){
-            if(!isUserRegistered()){ showRegisterAlert(); return; }
-            document.getElementById('modalPortadas').classList.add('active');
-        }
-        
-        function closePortadasModal(){
-            document.getElementById('modalPortadas').classList.remove('active');
-        }
-        
         function handlePricingClick(type){
             if(!isUserRegistered()){ showRegisterAlert(); return; }
             
@@ -10242,6 +9987,85 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
             }
             
             // ========================================
+            // DETECTAR PAGO EXITOSO DE SMARTLINK
+            // ========================================
+            // Verificar si hay SmartLink pendiente en localStorage (vuelve de Stripe)
+            const pendingSmartlink = localStorage.getItem('pendingSmartlink');
+            if (pendingSmartlink) {
+                const smartlinkData = JSON.parse(pendingSmartlink);
+                // Si los datos son recientes (menos de 1 hora), preguntar si completó el pago
+                const timeDiff = Date.now() - smartlinkData.timestamp;
+                if (timeDiff < 3600000) { // 1 hora
+                    const completoPago = confirm('🔗 SMARTLINK\n\n¿Completaste el pago de 1.99€?\n\nSi es así, tu pedido será procesado.');
+                    
+                    if (completoPago) {
+                        try {
+                            const slug = smartlinkData.nombre_cancion.toLowerCase()
+                                .replace(/[^a-z0-9]/g, '-')
+                                .replace(/-+/g, '-')
+                                .substring(0, 30) + '-' + Date.now().toString(36);
+                            
+                            const { error } = await supabaseClient
+                                .from('smartlinks')
+                                .insert({
+                                    ...smartlinkData,
+                                    slug: slug,
+                                    estado: 'pendiente'
+                                });
+                            
+                            if (!error) {
+                                alert('✅ ¡PAGO CONFIRMADO!\n\n' +
+                                      '📧 Recibirás tu SmartLink en:\n' + smartlinkData.artista_email + '\n\n' +
+                                      '⏱️ Tiempo estimado: 24-48 horas\n\n' +
+                                      '¡Gracias por tu compra!');
+                            }
+                        } catch (err) {
+                            console.error('Error guardando SmartLink:', err);
+                        }
+                    }
+                }
+                localStorage.removeItem('pendingSmartlink');
+            }
+            
+            // ========================================
+            // DETECTAR PAGO EXITOSO DE MASTERING
+            // ========================================
+            const pendingMastering = localStorage.getItem('pendingMastering');
+            if (pendingMastering) {
+                const masteringData = JSON.parse(pendingMastering);
+                const timeDiff = Date.now() - masteringData.timestamp;
+                if (timeDiff < 3600000) { // 1 hora
+                    const completoPago = confirm('🎛️ MASTERING IA\n\n¿Completaste el pago de 4.99€?\n\nSi es así, tu pedido será procesado.');
+                    
+                    if (completoPago) {
+                        try {
+                            const { error } = await supabaseClient
+                                .from('solicitudes_mastering')
+                                .insert({
+                                    ...masteringData,
+                                    estado: 'pendiente',
+                                    es_gratuito: false,
+                                    precio: 4.99
+                                });
+                            
+                            if (!error) {
+                                alert('✅ ¡PAGO CONFIRMADO!\n\n' +
+                                      '📤 PASO IMPORTANTE:\n' +
+                                      'Envía tu archivo de audio a:\n' +
+                                      'algoritmoenmovimiento@gmail.com\n\n' +
+                                      'Asunto: Mastering - ' + masteringData.nombre_pista + '\n\n' +
+                                      '📧 Recibirás el resultado en:\n' + masteringData.artista_email + '\n\n' +
+                                      '⏱️ Tiempo estimado: 24-48 horas');
+                            }
+                        } catch (err) {
+                            console.error('Error guardando Mastering:', err);
+                        }
+                    }
+                }
+                localStorage.removeItem('pendingMastering');
+            }
+            
+            // ========================================
             // DETECTAR LINK DE REFERIDO (?ref=CODIGO)
             // ========================================
             const refCode = urlParams.get('ref');
@@ -10589,6 +10413,13 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         }
         
         // ==================== SMARTLINK ====================
+        // ==================== CONFIGURACIÓN STRIPE PAYMENT LINKS ====================
+        const STRIPE_LINKS = {
+            smartlink: 'https://buy.stripe.com/bJefZi2nB1XJefD6JH0x20d',
+            mastering: 'https://buy.stripe.com/dRm6oId2f45R2wV3xv0x20e'
+        };
+        
+        // ==================== SMARTLINK ====================
         document.getElementById('smartLinkForm')?.addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -10612,51 +10443,26 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 return;
             }
             
-            if (!confirm('💳 CREAR SMARTLINK\n\nPrecio: 1.99€\nCanción: ' + songName + '\n\n¿Continuar con el pago?')) {
-                return;
-            }
+            // Guardar datos en localStorage antes de redirigir a Stripe
+            const smartlinkData = {
+                artista_id: userId,
+                artista_nombre: userName,
+                artista_email: email || userEmail,
+                nombre_cancion: songName,
+                nombre_artista: artistName,
+                cover_url: coverUrl,
+                spotify_url: spotify,
+                apple_url: apple,
+                youtube_url: youtube,
+                deezer_url: deezer,
+                soundcloud_url: soundcloud,
+                timestamp: Date.now()
+            };
             
-            try {
-                // Generar slug único
-                const slug = songName.toLowerCase()
-                    .replace(/[^a-z0-9]/g, '-')
-                    .replace(/-+/g, '-')
-                    .substring(0, 30) + '-' + Date.now().toString(36);
-                
-                // Guardar solicitud en BD
-                const { error } = await supabaseClient
-                    .from('smartlinks')
-                    .insert({
-                        artista_id: userId,
-                        artista_nombre: userName,
-                        artista_email: email || userEmail,
-                        nombre_cancion: songName,
-                        nombre_artista: artistName,
-                        cover_url: coverUrl,
-                        spotify_url: spotify,
-                        apple_url: apple,
-                        youtube_url: youtube,
-                        deezer_url: deezer,
-                        soundcloud_url: soundcloud,
-                        slug: slug,
-                        estado: 'pendiente'
-                    });
-                
-                if (error) throw error;
-                
-                alert('✅ ¡SOLICITUD RECIBIDA!\n\n' +
-                      'Tu SmartLink está siendo procesado.\n\n' +
-                      '📧 Recibirás un email a: ' + (email || userEmail) + '\n' +
-                      '⏱️ Tiempo estimado: 24-48 horas\n\n' +
-                      '💳 El pago de 1.99€ se realizará al confirmar.');
-                
-                closeSmartLinkModal();
-                this.reset();
-                
-            } catch (err) {
-                console.error('Error:', err);
-                alert('❌ Error al procesar. Intenta de nuevo.');
-            }
+            localStorage.setItem('pendingSmartlink', JSON.stringify(smartlinkData));
+            
+            // Redirigir a Stripe Payment Link
+            window.location.href = STRIPE_LINKS.smartlink + '?prefilled_email=' + encodeURIComponent(email || userEmail);
         });
         
         // ==================== MASTERING IA ====================
@@ -10684,117 +10490,23 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
                 return;
             }
             
-            const intensidadTexto = {
-                'light': 'Ligero',
-                'medium': 'Medio',
-                'heavy': 'Intenso'
+            // Guardar datos en localStorage antes de redirigir a Stripe
+            const masteringData = {
+                artista_id: userId,
+                artista_nombre: userName,
+                artista_email: email || userEmail,
+                nombre_pista: trackName,
+                nombre_artista: artistName,
+                intensidad: intensity,
+                archivo_nombre: audioFile.name,
+                timestamp: Date.now()
             };
             
-            if (!confirm('🎛️ MASTERING IA\n\n' +
-                        'Pista: ' + trackName + '\n' +
-                        'Intensidad: ' + intensidadTexto[intensity] + '\n' +
-                        'Archivo: ' + audioFile.name + '\n\n' +
-                        'Precio: 4.99€\n\n' +
-                        '¿Continuar?')) {
-                return;
-            }
+            localStorage.setItem('pendingMastering', JSON.stringify(masteringData));
             
-            try {
-                // Guardar solicitud en BD
-                const { error } = await supabaseClient
-                    .from('solicitudes_mastering')
-                    .insert({
-                        artista_id: userId,
-                        artista_nombre: userName,
-                        artista_email: email || userEmail,
-                        nombre_pista: trackName,
-                        nombre_artista: artistName,
-                        intensidad: intensity,
-                        archivo_nombre: audioFile.name,
-                        estado: 'pendiente',
-                        es_gratuito: false,
-                        precio: 4.99
-                    });
-                
-                if (error) throw error;
-                
-                alert('✅ ¡SOLICITUD RECIBIDA!\n\n' +
-                      'Tu pista está en cola para mastering.\n\n' +
-                      '📧 Recibirás el resultado en: ' + (email || userEmail) + '\n' +
-                      '⏱️ Tiempo estimado: 24-48 horas\n\n' +
-                      '💡 Tip: Envía tu archivo por WeTransfer o Google Drive a:\n' +
-                      'algoritmoenmovimiento@gmail.com');
-                
-                closeMasteringModal();
-                this.reset();
-                document.getElementById('audioPreview').style.display = 'none';
-                
-            } catch (err) {
-                console.error('Error:', err);
-                alert('❌ Error al procesar. Intenta de nuevo.');
-            }
+            // Redirigir a Stripe Payment Link
+            window.location.href = STRIPE_LINKS.mastering + '?prefilled_email=' + encodeURIComponent(email || userEmail);
         });
-        
-        // ==================== PORTADAS IA (GRATIS) ====================
-        document.getElementById('portadasForm')?.addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const userId = localStorage.getItem('userId');
-            const userEmail = localStorage.getItem('userEmail');
-            const userName = localStorage.getItem('userName');
-            
-            const title = document.getElementById('coverTitle').value.trim();
-            const artist = document.getElementById('coverArtist').value.trim();
-            const style = document.querySelector('.style-option.selected')?.id?.replace('style-', '') || 'urban';
-            const description = document.getElementById('coverDescription').value.trim();
-            
-            try {
-                // Guardar solicitud en BD
-                const { error } = await supabaseClient
-                    .from('solicitudes_portadas')
-                    .insert({
-                        artista_id: userId,
-                        artista_nombre: userName,
-                        artista_email: userEmail,
-                        nombre_cancion: title,
-                        nombre_artista: artist,
-                        estilo: style,
-                        descripcion: description,
-                        estado: 'pendiente'
-                    });
-                
-                if (error) throw error;
-                
-                // Mostrar animación de generación
-                document.getElementById('previewContainer').classList.remove('hidden');
-                document.getElementById('previewPlaceholder').style.display = 'block';
-                document.getElementById('generatedImage').classList.add('hidden');
-                document.getElementById('downloadButtons').classList.add('hidden');
-                
-                // Simular generación (mostrar mensaje)
-                setTimeout(() => {
-                    document.getElementById('previewPlaceholder').innerHTML = `
-                        <div style="font-size: 4rem; margin-bottom: 1rem;">✅</div>
-                        <p style="color: #10b981; font-size: 1.2rem; font-weight: 700;">¡Solicitud recibida!</p>
-                        <p style="color: rgba(255,255,255,0.7); font-size: 0.95rem; margin-top: 1rem;">
-                            Tu portada está siendo generada por nuestro equipo.<br><br>
-                            📧 La recibirás en tu email: ${userEmail}<br>
-                            ⏱️ Tiempo estimado: 24-48 horas
-                        </p>
-                    `;
-                }, 2000);
-                
-            } catch (err) {
-                console.error('Error:', err);
-                alert('❌ Error al procesar. Intenta de nuevo.');
-            }
-        });
-        
-        // Función para seleccionar estilo de portada
-        function selectStyle(style) {
-            document.querySelectorAll('.style-option').forEach(opt => opt.classList.remove('selected'));
-            document.getElementById('style-' + style)?.classList.add('selected');
-        }
         
         // Previsualizar audio
         document.getElementById('audioFile')?.addEventListener('change', function(e) {
