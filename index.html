@@ -2525,18 +2525,20 @@
                     </select>
                 </div>
                 
-                <div class="upload-area" onclick="document.getElementById('audioFile').click()">
-                    <input type="file" id="audioFile" class="file-input" accept=".mp3,.wav,.flac,audio/mpeg,audio/wav,audio/flac">
-                    <div class="upload-icon">🎵</div>
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Sube tu Audio</h3>
-                    <p style="color: rgba(255,255,255,0.7);">MP3, WAV o FLAC - Máximo 100MB</p>
-                    <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-top: 1rem;">Click para seleccionar archivo</p>
-                    <div class="file-name hidden" id="audioFileName"></div>
-                </div>
-                
-                <div class="audio-preview" id="audioPreview">
-                    <p style="font-size: 0.9rem; margin-bottom: 0.5rem; color: rgba(255,255,255,0.8);">Vista previa del audio original:</p>
-                    <audio id="audioPlayer" controls></audio>
+                <!-- INSTRUCCIONES ENVÍO ARCHIVO -->
+                <div style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(236, 72, 153, 0.2)); border: 2px dashed rgba(124, 58, 237, 0.5); border-radius: 1rem; padding: 1.5rem; text-align: center; margin: 1rem 0;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📧</div>
+                    <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.75rem; color: white;">Envía tu archivo por email</h3>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem; margin-bottom: 0.5rem;">
+                        Después de completar el pedido, envía tu audio a:
+                    </p>
+                    <p style="background: rgba(0,0,0,0.3); padding: 0.75rem 1rem; border-radius: 0.5rem; font-weight: 700; color: #a78bfa; font-size: 1rem; margin: 0.75rem 0;">
+                        soportealgoritmoenmovimiento@gmail.com
+                    </p>
+                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">
+                        Formatos: MP3, WAV o FLAC (máx 100MB)<br>
+                        Asunto: "Mastering - [Nombre de tu canción]"
+                    </p>
                 </div>
                 
                 <div class="form-group">
@@ -10052,7 +10054,7 @@
                                 alert('✅ ¡PAGO CONFIRMADO!\n\n' +
                                       '📤 PASO IMPORTANTE:\n' +
                                       'Envía tu archivo de audio a:\n' +
-                                      'algoritmoenmovimiento@gmail.com\n\n' +
+                                      'soportealgoritmoenmovimiento@gmail.com\n\n' +
                                       'Asunto: Mastering - ' + masteringData.nombre_pista + '\n\n' +
                                       '📧 Recibirás el resultado en:\n' + masteringData.artista_email + '\n\n' +
                                       '⏱️ Tiempo estimado: 24-48 horas');
@@ -10477,18 +10479,6 @@
             const artistName = document.getElementById('artistName').value.trim();
             const intensity = document.getElementById('masteringIntensity').value;
             const email = document.getElementById('masteringEmail').value.trim();
-            const audioFile = document.getElementById('audioFile').files[0];
-            
-            if (!audioFile) {
-                alert('⚠️ Debes subir un archivo de audio');
-                return;
-            }
-            
-            // Verificar tamaño (máx 100MB)
-            if (audioFile.size > 100 * 1024 * 1024) {
-                alert('⚠️ El archivo es demasiado grande. Máximo 100MB.');
-                return;
-            }
             
             // Guardar datos en localStorage antes de redirigir a Stripe
             const masteringData = {
@@ -10498,7 +10488,6 @@
                 nombre_pista: trackName,
                 nombre_artista: artistName,
                 intensidad: intensity,
-                archivo_nombre: audioFile.name,
                 timestamp: Date.now()
             };
             
@@ -10506,19 +10495,6 @@
             
             // Redirigir a Stripe Payment Link
             window.location.href = STRIPE_LINKS.mastering + '?prefilled_email=' + encodeURIComponent(email || userEmail);
-        });
-        
-        // Previsualizar audio
-        document.getElementById('audioFile')?.addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                document.getElementById('audioFileName').textContent = file.name;
-                document.getElementById('audioFileName').classList.remove('hidden');
-                
-                const audioPlayer = document.getElementById('audioPlayer');
-                audioPlayer.src = URL.createObjectURL(file);
-                document.getElementById('audioPreview').style.display = 'block';
-            }
         });
         
         // ==================== ESTADÍSTICAS REALES ====================
