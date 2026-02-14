@@ -4720,6 +4720,41 @@
         console.log('🔍 Verificando que el script se carga...');
         
         // ========================================
+        // FUNCIONES DE LOGIN (DEFINIR PRIMERO)
+        // ========================================
+        window.openLoginModal = function() {
+            console.log('🔓 Abriendo modal de login...');
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                modal.classList.add('active');
+                console.log('✅ Modal de login abierto');
+            } else {
+                console.error('❌ Modal de login no encontrado');
+            }
+        };
+        
+        window.closeLoginModal = function() {
+            const modal = document.getElementById('loginModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        };
+        
+        window.openRegisterModal = function() {
+            const modal = document.getElementById('registerModal');
+            if (modal) {
+                modal.classList.add('active');
+            }
+        };
+        
+        window.closeRegisterModal = function() {
+            const modal = document.getElementById('registerModal');
+            if (modal) {
+                modal.classList.remove('active');
+            }
+        };
+        
+        // ========================================
         // CONFIGURACIÓN SUPABASE
         // ========================================
         const SUPABASE_URL = 'https://wesmqqaijlmqhctrtaje.supabase.co';
