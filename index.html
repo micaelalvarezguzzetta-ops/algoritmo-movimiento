@@ -146,6 +146,56 @@
                 console.log('❌ No hay sesión activa');
             }
         });
+        
+        // FUNCIONES CRÍTICAS
+        function isUserRegistered() {
+            return localStorage.getItem('userRegistered') === 'true';
+        }
+        
+        function showRegisterAlert() {
+            alert('⚠️ Debes registrarte primero');
+            openRegisterModal();
+        }
+        
+        function cerrarSesion() {
+            if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
+                localStorage.clear();
+                location.reload();
+            }
+        }
+        
+        function openSmartLinkModal() {
+            if (!isUserRegistered()) { showRegisterAlert(); return; }
+            var modal = document.getElementById('modalSmartLink');
+            if (modal) modal.classList.add('active');
+        }
+        
+        function closeSmartLinkModal() {
+            var modal = document.getElementById('modalSmartLink');
+            if (modal) modal.classList.remove('active');
+        }
+        
+        function openMasteringModal() {
+            if (!isUserRegistered()) { showRegisterAlert(); return; }
+            var modal = document.getElementById('modalMastering');
+            if (modal) modal.classList.add('active');
+        }
+        
+        function closeMasteringModal() {
+            var modal = document.getElementById('modalMastering');
+            if (modal) modal.classList.remove('active');
+        }
+        
+        function openEstadisticasModal() {
+            if (!isUserRegistered()) { showRegisterAlert(); return; }
+            var modal = document.getElementById('modalEstadisticas');
+            if (modal) modal.classList.add('active');
+        }
+        
+        function closeEstadisticasModal() {
+            var modal = document.getElementById('modalEstadisticas');
+            if (modal) modal.classList.remove('active');
+        }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
