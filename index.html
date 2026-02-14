@@ -110,6 +110,42 @@
             
             return false;
         }
+        
+        // VERIFICAR SESIÓN AL CARGAR
+        window.addEventListener('load', function() {
+            console.log('🔄 Verificando sesión...');
+            var userRegistered = localStorage.getItem('userRegistered');
+            var userType = localStorage.getItem('userType');
+            var userId = localStorage.getItem('userId');
+            var userName = localStorage.getItem('userName');
+            
+            if (userRegistered === 'true' && userId) {
+                console.log('✅ Sesión activa - Tipo:', userType);
+                
+                // Ocultar auth panel
+                var authPanel = document.getElementById('authPanel');
+                if (authPanel) authPanel.classList.add('hidden');
+                
+                // Mostrar logout
+                var logoutBtn = document.getElementById('logoutBtn');
+                if (logoutBtn) logoutBtn.classList.remove('hidden');
+                
+                // Mostrar panel según tipo
+                if (userType === 'artista') {
+                    var artistaPanel = document.getElementById('artistaPanel');
+                    if (artistaPanel) artistaPanel.classList.add('active');
+                    var artistaName = document.getElementById('artistaName');
+                    if (artistaName) artistaName.textContent = userName || 'Artista';
+                } else if (userType === 'curador') {
+                    var curadorPanel = document.getElementById('curadorPanel');
+                    if (curadorPanel) curadorPanel.classList.add('active');
+                    var curadorName = document.getElementById('curadorName');
+                    if (curadorName) curadorName.textContent = userName || 'Curador';
+                }
+            } else {
+                console.log('❌ No hay sesión activa');
+            }
+        });
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
