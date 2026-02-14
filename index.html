@@ -6,6 +6,36 @@
     <title>Algoritmo en Movimiento - Promoción Musical Profesional</title>
     <meta name="description" content="Conecta tu música con las mejores playlists de Spotify. Promoción musical profesional para artistas independientes.">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    <script>
+        // FUNCIONES GLOBALES - CARGAN ANTES QUE EL HTML
+        function openLoginModal() {
+            console.log('🔓 Abriendo login...');
+            var modal = document.getElementById('loginModal');
+            if (modal) modal.classList.add('active');
+        }
+        function closeLoginModal() {
+            var modal = document.getElementById('loginModal');
+            if (modal) modal.classList.remove('active');
+        }
+        function openRegisterModal() {
+            var modal = document.getElementById('registerModal');
+            if (modal) modal.classList.add('active');
+        }
+        function closeRegisterModal() {
+            var modal = document.getElementById('registerModal');
+            if (modal) modal.classList.remove('active');
+        }
+        function selectUserType(type) {
+            console.log('👤 Tipo seleccionado:', type);
+            document.querySelectorAll('.user-type-card').forEach(function(card) {
+                card.classList.remove('selected');
+            });
+            event.currentTarget.classList.add('selected');
+            window.selectedUserType = type;
+            var continueBtn = document.getElementById('continueToRegister');
+            if (continueBtn) continueBtn.disabled = false;
+        }
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
