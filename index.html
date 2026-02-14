@@ -3,10 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-     <title>Algoritmo en Movimiento - Promoción Musical Profesional</title>
+    <title>Algoritmo en Movimiento - Promoción Musical Profesional</title>
     <meta name="description" content="Conecta tu música con las mejores playlists de Spotify. Promoción musical profesional para artistas independientes.">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
     <script>
+        // SUPABASE - INICIALIZAR PRIMERO
+        var SUPABASE_URL = 'https://wesmqqaijlmqhctrtaje.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Indlc21xcWFpamxtcWhjdHJ0YWplIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDcyMzU0ODEsImV4cCI6MjA2MjgxMTQ4MX0.3c0oPFrAPKfjuzLkOSVZl_IONK01SsjmPVeJy-B0mcI';
+        var supabaseClient = null;
+        
+        // Inicializar cuando Supabase esté listo
+        if (typeof supabase !== 'undefined') {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('✅ Supabase inicializado en HEAD');
+        }
+        
         // FUNCIONES GLOBALES - CARGAN ANTES QUE EL HTML
         function openLoginModal() {
             console.log('🔓 Abriendo login...');
@@ -34,6 +45,70 @@
             window.selectedUserType = type;
             var continueBtn = document.getElementById('continueToRegister');
             if (continueBtn) continueBtn.disabled = false;
+        }
+        
+        // FUNCIÓN LOGIN
+        async function handleLogin(event) {
+            event.preventDefault();
+            console.log('🔐 handleLogin ejecutándose...');
+            
+            var email = document.getElementById('loginEmail').value.trim();
+            var password = document.getElementById('loginPassword').value.trim();
+            
+            if (!email || !password) {
+                alert('⚠️ Por favor completa todos los campos');
+                return false;
+            }
+            
+            if (!supabaseClient) {
+                alert('⚠️ Error de conexión. Recarga la página.');
+                return false;
+            }
+            
+            try {
+                var passwordHash = btoa(password);
+                
+                var result = await supabaseClient
+                    .from('usuarios')
+                    .select('*')
+                    .eq('email', email)
+                    .eq('password_hash', passwordHash)
+                    .single();
+                
+                if (result.error || !result.data) {
+                    console.error('❌ Error login:', result.error);
+                    alert('⚠️ Email o contraseña incorrectos');
+                    return false;
+                }
+                
+                var data = result.data;
+                console.log('✅ Login exitoso:', data);
+                
+                localStorage.setItem('userRegistered', 'true');
+                localStorage.setItem('userName', data.nombre);
+                localStorage.setItem('userEmail', data.email);
+                localStorage.setItem('userType', data.tipo);
+                localStorage.setItem('userId', data.id);
+                localStorage.setItem('userCreditos', data.creditos);
+                
+                if (data.codigo_afiliado_usado) {
+                    localStorage.setItem('codigoAfiliadoDelUsuario', data.codigo_afiliado_usado);
+                }
+                
+                if (data.descuento_primera_compra && !data.primera_compra_realizada) {
+                    localStorage.setItem('descuentoPrimeraCompra', 'true');
+                }
+                
+                closeLoginModal();
+                alert('✅ Bienvenido de nuevo, ' + data.nombre + '!');
+                location.reload();
+                
+            } catch (err) {
+                console.error('❌ Error:', err);
+                alert('⚠️ Error al iniciar sesión');
+            }
+            
+            return false;
         }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -5302,19 +5377,10 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
         }
         
         // ========================================
-        // CONFIGURACIÓN SUPABASE
+        // CONFIGURACIÓN SUPABASE - YA INICIALIZADO EN HEAD
         // ========================================
-        const SUPABASE_URL = 'https://wesmqqaijlmqhctrtaje.supabase.co';
-        const SUPABASE_ANON_KEY = 'sb_publishable_LgSAsCVW7tlDfDvkD8enyA_pQp42IZF';
-        
-        // Esperar a que Supabase esté disponible
-        let supabaseClient;
-        if (typeof supabase !== 'undefined') {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('✅ Supabase inicializado', supabaseClient);
-        } else {
-            console.error('❌ Supabase no está disponible');
-        }
+        // supabaseClient ya está definido globalmente en el <head>
+        console.log('✅ Usando Supabase del HEAD:', supabaseClient);
         
         // ========================================
         // CONFIGURACIÓN SPOTIFY API
