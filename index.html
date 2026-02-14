@@ -10389,43 +10389,30 @@
             const userEmail = localStorage.getItem('userEmail');
             const userName = localStorage.getItem('userName');
             
-            const songName = document.getElementById('slSongName').value.trim();
-            const artistName = document.getElementById('slArtistName').value.trim();
-            const coverUrl = document.getElementById('slCoverUrl').value.trim();
             const spotify = document.getElementById('slSpotify').value.trim();
-            const apple = document.getElementById('slApple').value.trim();
-            const youtube = document.getElementById('slYoutube').value.trim();
-            const deezer = document.getElementById('slDeezer').value.trim();
-            const soundcloud = document.getElementById('slSoundcloud').value.trim();
             const email = document.getElementById('slEmail').value.trim();
             
-            // Validar que tenga al menos un enlace
-            if (!spotify && !apple && !youtube && !deezer && !soundcloud) {
-                alert('⚠️ Debes agregar al menos un enlace de plataforma');
+            if (!spotify) {
+                alert('⚠️ Debes agregar el enlace de Spotify');
                 return;
             }
             
-            // Guardar datos en localStorage antes de redirigir a Stripe
+            if (!spotify.includes('spotify.com')) {
+                alert('⚠️ El enlace debe ser de Spotify');
+                return;
+            }
+            
             const smartlinkData = {
                 artista_id: userId,
                 artista_nombre: userName,
                 artista_email: email || userEmail,
-                nombre_cancion: songName,
-                nombre_artista: artistName,
-                cover_url: coverUrl,
                 spotify_url: spotify,
-                apple_url: apple,
-                youtube_url: youtube,
-                deezer_url: deezer,
-                soundcloud_url: soundcloud,
                 timestamp: Date.now()
             };
             
             localStorage.setItem('pendingSmartlink', JSON.stringify(smartlinkData));
             
-            // Redirigir a Stripe Payment Link
-            window.location.href = STRIPE_LINKS.smartlink + '?prefilled_email=' + encodeURIComponent(email || userEmail);
-        });
+            window.location.href = STRIPE_LINKS.smartlink
         
         // ==================== MASTERING IA ====================
         document.getElementById('masteringForm')?.addEventListener('submit', async function(e) {
