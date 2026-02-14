@@ -10389,7 +10389,7 @@
             const userEmail = localStorage.getItem('userEmail');
             const userName = localStorage.getItem('userName');
             
-            const spotify = document.getElementById('slSpotify').value.trim();
+           const spotify = document.getElementById('slSpotify').value.trim();
             const email = document.getElementById('slEmail').value.trim();
             
             if (!spotify) {
@@ -10412,8 +10412,12 @@
             
             localStorage.setItem('pendingSmartlink', JSON.stringify(smartlinkData));
             
-            window.location.href = STRIPE_LINKS.smartlink
+            window.location.href = STRIPE_LINKS.smartlink + '?prefilled_email=' + encodeURIComponent(email || userEmail);
+        });
         
+        // ==================== MASTERING IA ====================
+        document.getElementById('masteringForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
         // ==================== MASTERING IA ====================
         document.getElementById('masteringForm')?.addEventListener('submit', async function(e) {
             e.preventDefault();
