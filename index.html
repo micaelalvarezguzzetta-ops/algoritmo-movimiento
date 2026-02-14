@@ -2398,60 +2398,20 @@
             </div>
             
             <form id="smartLinkForm" class="auth-form">
-                <div class="form-group">
-                    <label>🎵 Nombre de la Canción</label>
-                    <input type="text" id="slSongName" placeholder="Título de tu canción" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>👤 Nombre del Artista</label>
-                    <input type="text" id="slArtistName" placeholder="Tu nombre artístico" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>🎨 URL de la Portada (opcional)</label>
-                    <input type="url" id="slCoverUrl" placeholder="https://ejemplo.com/portada.jpg">
-                    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Si no tienes, generaremos una portada genérica</p>
-                </div>
-                
-                <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem;">
-                    <h4 style="font-weight: 800; margin-bottom: 1rem; font-size: 1.1rem;">🌐 Enlaces a Plataformas</h4>
-                    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Agrega los enlaces de tu canción en cada plataforma (mínimo 1)</p>
-                    
-                    <div class="form-group">
-                        <label>🟢 Spotify URL</label>
-                        <input type="url" id="slSpotify" placeholder="https://open.spotify.com/track/...">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>🎵 Apple Music URL</label>
-                        <input type="url" id="slApple" placeholder="https://music.apple.com/...">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>▶️ YouTube URL</label>
-                        <input type="url" id="slYoutube" placeholder="https://youtube.com/watch?v=...">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>🎶 Deezer URL</label>
-                        <input type="url" id="slDeezer" placeholder="https://www.deezer.com/track/...">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>🎧 SoundCloud URL</label>
-                        <input type="url" id="slSoundcloud" placeholder="https://soundcloud.com/...">
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>📧 Email de Contacto</label>
-                    <input type="email" id="slEmail" placeholder="tu@email.com" required>
-                    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Te enviaremos el SmartLink y las estadísticas aquí</p>
-                </div>
-                
-                <button type="submit" class="btn-submit" style="margin-top: 2rem;">💳 Pagar 1.99€ y Crear SmartLink</button>
-            </form>
+    <div class="form-group">
+        <label>🟢 Link de Spotify</label>
+        <input type="url" id="slSpotify" placeholder="https://open.spotify.com/track/..." required>
+        <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Pega el enlace de tu canción en Spotify</p>
+    </div>
+    
+    <div class="form-group">
+        <label>📧 Email de Contacto</label>
+        <input type="email" id="slEmail" placeholder="tu@email.com" required>
+        <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Te enviaremos tu SmartLink aquí</p>
+    </div>
+    
+    <button type="submit" class="btn-submit" style="margin-top: 2rem;">💳 Pagar 1.99€ y Crear SmartLink</button>
+</form>
             
             <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; margin-top: 2rem;">
                 <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.75rem; color: #a78bfa;">✨ Ejemplo de SmartLink</h4>
