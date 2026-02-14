@@ -118,6 +118,8 @@
             var userType = localStorage.getItem('userType');
             var userId = localStorage.getItem('userId');
             var userName = localStorage.getItem('userName');
+            var userEmail = localStorage.getItem('userEmail');
+            var userCreditos = localStorage.getItem('userCreditos') || '0';
             
             if (userRegistered === 'true' && userId) {
                 console.log('✅ Sesión activa - Tipo:', userType);
@@ -126,9 +128,38 @@
                 var authPanel = document.getElementById('authPanel');
                 if (authPanel) authPanel.classList.add('hidden');
                 
+                // Ocultar Comenzar Ahora
+                var heroCta = document.getElementById('heroCta');
+                if (heroCta) heroCta.style.display = 'none';
+                
                 // Mostrar logout
                 var logoutBtn = document.getElementById('logoutBtn');
                 if (logoutBtn) logoutBtn.classList.remove('hidden');
+                
+                // Mostrar avatar de usuario con inicial
+                var userAvatar = document.getElementById('userAvatar');
+                var userInitial = document.getElementById('userInitial');
+                if (userAvatar) {
+                    userAvatar.style.display = 'flex';
+                    if (userInitial && userName) {
+                        userInitial.textContent = userName.charAt(0).toUpperCase();
+                    }
+                }
+                
+                // Actualizar créditos en navbar
+                var creditosStandard = document.getElementById('creditosStandard');
+                if (creditosStandard) creditosStandard.textContent = userCreditos;
+                
+                // Actualizar datos del perfil
+                var profileName = document.getElementById('profileName');
+                var profileEmail = document.getElementById('profileEmail');
+                var profileAvatarLarge = document.getElementById('profileAvatarLarge');
+                var profileCreditosStandard = document.getElementById('profileCreditosStandard');
+                
+                if (profileName) profileName.textContent = userName || 'Usuario';
+                if (profileEmail) profileEmail.textContent = userEmail || '';
+                if (profileAvatarLarge && userName) profileAvatarLarge.textContent = userName.charAt(0).toUpperCase();
+                if (profileCreditosStandard) profileCreditosStandard.textContent = userCreditos + ' 💰';
                 
                 // Mostrar panel según tipo
                 if (userType === 'artista') {
@@ -399,6 +430,15 @@
         function closePremiumCuradorModal() {
             var modal = document.getElementById('modalPremiumCurador');
             if (modal) modal.classList.remove('active');
+        }
+        
+        // Funciones adicionales
+        function editarPerfil() {
+            alert('Función de editar perfil próximamente disponible');
+        }
+        
+        function comprarCreditos() {
+            openCreditosModal();
         }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2059,12 +2099,7 @@
             <div class="panel-card" onclick="openMasteringModal()">
                 <div class="panel-card-icon">🎚️</div>
                 <h3 class="panel-card-title">Mastering IA</h3>
-                <p class="panel-card-desc">1 gratis/mes - 4.99€</p>
-            </div>
-            <div class="panel-card" onclick="openPortadasModal()">
-                <div class="panel-card-icon">🎨</div>
-                <h3 class="panel-card-title">Portadas IA</h3>
-                <p class="panel-card-desc">100% Gratis</p>
+                <p class="panel-card-desc">4.99€ por pista</p>
             </div>
             <div class="panel-card" onclick="openSmartLinkModal()">
                 <div class="panel-card-icon">🔗</div>
@@ -2210,11 +2245,6 @@
                 <div class="step-icon">🎚️</div>
                 <h3 class="step-title">Mastering IA</h3>
                 <p class="step-desc">Mejora el sonido con inteligencia artificial</p>
-            </div>
-            <div class="step-card" onclick="openPortadasModal()" style="cursor: pointer;">
-                <div class="step-icon">🎨</div>
-                <h3 class="step-title">Portadas IA</h3>
-                <p class="step-desc">Genera portadas profesionales gratis</p>
             </div>
             <div class="step-card" onclick="openAnalisisModal()" style="cursor: pointer;">
                 <div class="step-icon">🔍</div>
@@ -2840,15 +2870,9 @@
             <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">🎚 Mastering IA</h2>
             <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Mejora profesionalmente la calidad de sonido de tu pista</p>
             
-            <!-- Contador de uso gratuito -->
-            <div class="usage-counter">
-                <div class="usage-number" id="freeUsageCount">1</div>
-                <div class="usage-label">Mastering gratuito disponible este mes</div>
-            </div>
-            
             <div class="price-box" style="background: linear-gradient(135deg, #ec4899, #f97316);">
                 <div class="price-amount">4.99€</div>
-                <div class="price-label">Por pista adicional</div>
+                <div class="price-label">Por pista</div>
             </div>
             
             <div class="info-box">
@@ -2942,115 +2966,6 @@
     </div>
 
     <!-- MODAL PORTADAS IA -->
-    <div class="modal" id="modalPortadas">
-        <div class="modal-content">
-            <button class="modal-close" onclick="closePortadasModal()">×</button>
-            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">🎨 Generador de Portadas IA</h2>
-            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Crea portadas profesionales para tu música con Inteligencia Artificial</p>
-            
-            <div class="price-box" style="background: linear-gradient(135deg, #10b981, #06b6d4);">
-                <div class="price-amount">100% GRATIS</div>
-                <div class="price-label">Genera tantas portadas como quieras</div>
-            </div>
-            
-            <div class="info-box">
-                <h3>¿Cómo funciona?</h3>
-                <ul>
-                    <li>Describe tu música y el estilo que buscas</li>
-                    <li>Nuestra IA genera una portada única en segundos</li>
-                    <li>Descarga en alta resolución (3000x3000px)</li>
-                    <li>Formato listo para plataformas (Spotify, Apple Music, etc.)</li>
-                    <li>Completamente gratis, sin límites</li>
-                </ul>
-            </div>
-            
-            <form id="portadasForm" class="auth-form">
-                <div class="form-group">
-                    <label>🎵 Nombre de la Canción/Álbum</label>
-                    <input type="text" id="coverTitle" placeholder="Título que aparecerá en la portada" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>👤 Nombre del Artista</label>
-                    <input type="text" id="coverArtist" placeholder="Tu nombre artístico" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>🎨 Estilo Visual</label>
-                    <div class="style-grid">
-                        <div class="style-option" onclick="selectStyle('abstract')" id="style-abstract">
-                            <div class="style-icon">🌈</div>
-                            <div class="style-name">Abstracto</div>
-                        </div>
-                        <div class="style-option selected" onclick="selectStyle('urban')" id="style-urban">
-                            <div class="style-icon">🏙</div>
-                            <div class="style-name">Urbano</div>
-                        </div>
-                        <div class="style-option" onclick="selectStyle('nature')" id="style-nature">
-                            <div class="style-icon">🌿</div>
-                            <div class="style-name">Naturaleza</div>
-                        </div>
-                        <div class="style-option" onclick="selectStyle('neon')" id="style-neon">
-                            <div class="style-icon">💫</div>
-                            <div class="style-name">Neón</div>
-                        </div>
-                        <div class="style-option" onclick="selectStyle('minimal')" id="style-minimal">
-                            <div class="style-icon">⚪</div>
-                            <div class="style-name">Minimalista</div>
-                        </div>
-                        <div class="style-option" onclick="selectStyle('vintage')" id="style-vintage">
-                            <div class="style-icon">📻</div>
-                            <div class="style-name">Vintage</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="form-group">
-                    <label>✍️ Descripción Adicional (Opcional)</label>
-                    <textarea id="coverDescription" placeholder="Describe el ambiente, colores, elementos que quieres en tu portada...
-Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" rows="4"></textarea>
-                </div>
-                
-                <button type="submit" class="btn-submit" style="margin-top: 1.5rem;">
-                    ✨ Generar Portada con IA
-                </button>
-            </form>
-            
-            <!-- Preview de la portada generada -->
-            <div class="preview-container hidden" id="previewContainer">
-                <div id="previewPlaceholder">
-                    <div class="preview-placeholder generating">🎨</div>
-                    <p style="color: rgba(255,255,255,0.7); font-size: 1.1rem;">Generando tu portada...</p>
-                    <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-top: 0.5rem;">Esto puede tardar 10-30 segundos</p>
-                </div>
-                <img id="generatedImage" class="preview-image hidden" alt="Portada generada">
-                <div id="downloadButtons" class="hidden" style="margin-top: 2rem; display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;">
-                    <button onclick="downloadGeneratedCover()" style="padding: 1rem 2rem; border-radius: 0.75rem; border: none; background: linear-gradient(135deg, #10b981, #06b6d4); color: white; font-weight: 700; cursor: pointer; font-size: 1rem;">
-                        💾 Descargar Portada (3000x3000)
-                    </button>
-                    <button onclick="generateAnother()" style="padding: 1rem 2rem; border-radius: 0.75rem; border: none; background: linear-gradient(135deg, #7c3aed, #ec4899); color: white; font-weight: 700; cursor: pointer; font-size: 1rem;">
-                        🔄 Generar Otra
-                    </button>
-                </div>
-            </div>
-            
-            <div class="processing-info">
-                <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.75rem; color: #a78bfa;">💡 Consejos para mejores resultados</h4>
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 0.5rem;">
-                    • Sé específico con los colores y elementos que quieres
-                </p>
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 0.5rem;">
-                    • Menciona el estilo artístico (realista, cartoon, ilustración, foto, etc.)
-                </p>
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8); margin-bottom: 0.5rem;">
-                    • Prueba diferentes combinaciones para encontrar la perfecta
-                </p>
-                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 1rem;">
-                    🎨 La portada se genera en formato cuadrado 1:1 optimizado para todas las plataformas de streaming
-                </p>
-            </div>
-        </div>
-    </div>
 
     <!-- MODAL ESTADÍSTICAS -->
     <div class="modal" id="modalEstadisticas">
@@ -3388,106 +3303,6 @@ Ejemplo: 'Colores vibrantes, ciudad de noche, luces neón, estilo cyberpunk'" ro
     </div>
 
     <!-- MODAL PORTADAS IA -->
-    <div class="modal" id="modalPortadas">
-        <div class="modal-content" style="max-width: 1000px;">
-            <button class="modal-close" onclick="closePortadasModal()">×</button>
-            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">🎨 Generador de Portadas IA</h2>
-            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Crea portadas profesionales para tu música con inteligencia artificial</p>
-            
-            <div class="price-box" style="background: linear-gradient(135deg, #10b981, #06b6d4);">
-                <div class="price-amount">100% GRATIS</div>
-                <div class="price-label">Genera portadas ilimitadas sin costo</div>
-            </div>
-            
-            <div class="info-box">
-                <h3>¿Cómo funciona?</h3>
-                <ul>
-                    <li><strong>Ingresa los datos</strong> - Nombre del artista y título de la canción</li>
-                    <li><strong>Elige un estilo</strong> - Selecciona entre 8 estilos artísticos diferentes</li>
-                    <li><strong>Genera múltiples opciones</strong> - Crea 4 portadas únicas al instante</li>
-                    <li><strong>Descarga en alta calidad</strong> - Resolución 3000x3000px perfecta para plataformas</li>
-                    <li><strong>Sin límites</strong> - Genera tantas portadas como necesites</li>
-                </ul>
-            </div>
-            
-            <form id="portadasForm" class="auth-form">
-                <div class="form-group">
-                    <label>👤 Nombre del Artista</label>
-                    <input type="text" id="portadaArtist" placeholder="Tu nombre artístico" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>🎵 Título de la Canción</label>
-                    <input type="text" id="portadaSong" placeholder="Nombre de tu canción" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>🎨 Estilo Artístico</label>
-                    <div class="style-grid" id="styleGrid">
-                        <div class="style-card" onclick="selectStyle('abstract')">
-                            <div class="style-icon">🌀</div>
-                            <div class="style-name">Abstracto</div>
-                        </div>
-                        <div class="style-card" onclick="selectStyle('urban')">
-                            <div class="style-icon">🏙</div>
-                            <div class="style-name">Urbano</div>
-                        </div>
-                        <div class="style-card" onclick="selectStyle('neon')">
-                            <div class="style-icon">💡</div>
-                            <div class="style-name">Neón</div>
-                        </div>
-                        <div class="style-card selected" onclick="selectStyle('gradient')">
-                            <div class="style-icon">🌈</div>
-                            <div class="style-name">Gradiente</div>
-                        </div>
-                        <div class="style-card" onclick="selectStyle('vintage')">
-                            <div class="style-icon">📼</div>
-                            <div class="style-name">Vintage</div>
-                        </div>
-                        <div class="style-card" onclick="selectStyle('minimal')">
-                            <div class="style-icon">◼️</div>
-                            <div class="style-name">Minimalista</div>
-                        </div>
-                        <div class="style-card" onclick="selectStyle('cosmic')">
-                            <div class="style-icon">🌌</div>
-                            <div class="style-name">Cósmico</div>
-                        </div>
-                        <div class="style-card" onclick="selectStyle('grunge')">
-                            <div class="style-icon">🎸</div>
-                            <div class="style-name">Grunge</div>
-                        </div>
-                    </div>
-                </div>
-                
-                <button type="submit" class="btn-submit" style="margin-top: 1rem;">
-                    ✨ Generar 4 Portadas
-                </button>
-            </form>
-            
-            <div id="generatingMessage" class="hidden" style="text-align: center; padding: 2rem; background: rgba(124, 58, 237, 0.1); border-radius: 1rem; margin-top: 2rem;">
-                <div class="generating" style="font-size: 3rem; margin-bottom: 1rem;">🎨</div>
-                <h3 style="font-size: 1.5rem; font-weight: 800; margin-bottom: 0.5rem;">Generando tus portadas...</h3>
-                <p style="color: rgba(255,255,255,0.7);">La IA está creando 4 diseños únicos para ti</p>
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-top: 1rem;">⏱ Tiempo estimado: 10-15 segundos</p>
-            </div>
-            
-            <div id="previewContainer" class="hidden">
-                <h3 style="font-size: 1.5rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem; text-align: center;">📸 Tus Portadas Generadas</h3>
-                <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 1.5rem;">Click en cualquier portada para descargarla en alta calidad (3000x3000px)</p>
-                <div class="preview-grid" id="previewGrid"></div>
-            </div>
-            
-            <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; margin-top: 2rem;">
-                <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.75rem; color: #a78bfa;">💡 Consejos para mejores resultados</h4>
-                <ul style="font-size: 0.9rem; color: rgba(255,255,255,0.8); margin: 0; padding-left: 1.5rem;">
-                    <li style="margin-bottom: 0.5rem;">Usa nombres de artistas y canciones claros y concisos</li>
-                    <li style="margin-bottom: 0.5rem;">Experimenta con diferentes estilos para encontrar el perfecto</li>
-                    <li style="margin-bottom: 0.5rem;">Si no te gusta el resultado, genera nuevas opciones sin límite</li>
-                    <li>Las portadas son perfectas para Spotify, Apple Music, YouTube y más</li>
-                </ul>
-            </div>
-        </div>
-    </div>
 
     <!-- MODAL CRÉDITOS -->
     <div class="modal" id="modalCreditos">
