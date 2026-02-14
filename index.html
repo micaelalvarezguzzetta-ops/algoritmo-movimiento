@@ -2399,55 +2399,15 @@
             
             <form id="smartLinkForm" class="auth-form">
                 <div class="form-group">
-                    <label>🎵 Nombre de la Canción</label>
-                    <input type="text" id="slSongName" placeholder="Título de tu canción" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>👤 Nombre del Artista</label>
-                    <input type="text" id="slArtistName" placeholder="Tu nombre artístico" required>
-                </div>
-                
-                <div class="form-group">
-                    <label>🎨 URL de la Portada (opcional)</label>
-                    <input type="url" id="slCoverUrl" placeholder="https://ejemplo.com/portada.jpg">
-                    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Si no tienes, generaremos una portada genérica</p>
-                </div>
-                
-                <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem;">
-                    <h4 style="font-weight: 800; margin-bottom: 1rem; font-size: 1.1rem;">🌐 Enlaces a Plataformas</h4>
-                    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Agrega los enlaces de tu canción en cada plataforma (mínimo 1)</p>
-                    
-                    <div class="form-group">
-                        <label>🟢 Spotify URL</label>
-                        <input type="url" id="slSpotify" placeholder="https://open.spotify.com/track/...">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>🎵 Apple Music URL</label>
-                        <input type="url" id="slApple" placeholder="https://music.apple.com/...">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>▶️ YouTube URL</label>
-                        <input type="url" id="slYoutube" placeholder="https://youtube.com/watch?v=...">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>🎶 Deezer URL</label>
-                        <input type="url" id="slDeezer" placeholder="https://www.deezer.com/track/...">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label>🎧 SoundCloud URL</label>
-                        <input type="url" id="slSoundcloud" placeholder="https://soundcloud.com/...">
-                    </div>
+                    <label>🟢 Link de Spotify</label>
+                    <input type="url" id="slSpotify" placeholder="https://open.spotify.com/track/..." required>
+                    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Pega el enlace de tu canción en Spotify</p>
                 </div>
                 
                 <div class="form-group">
                     <label>📧 Email de Contacto</label>
                     <input type="email" id="slEmail" placeholder="tu@email.com" required>
-                    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Te enviaremos el SmartLink y las estadísticas aquí</p>
+                    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Te enviaremos tu SmartLink aquí</p>
                 </div>
                 
                 <button type="submit" class="btn-submit" style="margin-top: 2rem;">💳 Pagar 1.99€ y Crear SmartLink</button>
@@ -2455,10 +2415,10 @@
             
             <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; margin-top: 2rem;">
                 <h4 style="font-size: 1rem; font-weight: 800; margin-bottom: 0.75rem; color: #a78bfa;">✨ Ejemplo de SmartLink</h4>
-                <div style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; font-family: monospace; font-size: 0.9rem;">
-                    algoritmo.link/<strong style="color: #a78bfa;">tu-cancion</strong>
-                </div>
-                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-top: 0.75rem;">Recibirás un enlace corto y memorable como este</p>
+                <a href="https://song.link/s/2NTqjRmiqcg7uda73p0cjS" target="_blank" style="display: block; background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 0.5rem; font-family: monospace; font-size: 0.9rem; color: #a78bfa; text-decoration: none;">
+                    🔗 song.link/s/2NTqjRmiqcg7uda73p0cjS
+                </a>
+                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-top: 0.75rem;">Click para ver cómo queda tu SmartLink</p>
             </div>
         </div>
     </div>
@@ -2528,16 +2488,18 @@
                 <!-- INSTRUCCIONES ENVÍO ARCHIVO -->
                 <div style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(236, 72, 153, 0.2)); border: 2px dashed rgba(124, 58, 237, 0.5); border-radius: 1rem; padding: 1.5rem; text-align: center; margin: 1rem 0;">
                     <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📧</div>
-                    <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.75rem; color: white;">Envía tu archivo por email</h3>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem; margin-bottom: 0.5rem;">
-                        Después de completar el pedido, envía tu audio a:
+                    <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.75rem; color: white;">Después de pagar, envía tu archivo</h3>
+                    <p style="color: rgba(255,255,255,0.7); font-size: 0.9rem; margin-bottom: 1rem;">
+                        Formatos: MP3, WAV o FLAC (máx 100MB)
                     </p>
-                    <p style="background: rgba(0,0,0,0.3); padding: 0.75rem 1rem; border-radius: 0.5rem; font-weight: 700; color: #a78bfa; font-size: 1rem; margin: 0.75rem 0;">
-                        soportealgoritmoenmovimiento@gmail.com
-                    </p>
-                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">
-                        Formatos: MP3, WAV o FLAC (máx 100MB)<br>
-                        Asunto: "Mastering - [Nombre de tu canción]"
+                    <a href="mailto:soportealgoritmoenmovimiento@gmail.com?subject=Mastering%20-%20Mi%20Canción&body=Hola%2C%0A%0AAdjunto%20mi%20archivo%20de%20audio%20para%20masterizar.%0A%0ANombre%20de%20la%20pista%3A%20%0ANombre%20del%20artista%3A%20%0AIntensidad%20deseada%3A%20%0A%0AGracias!" 
+                       style="display: inline-block; background: linear-gradient(135deg, #7c3aed, #ec4899); color: white; padding: 1rem 2rem; border-radius: 1rem; font-weight: 700; font-size: 1rem; text-decoration: none; transition: transform 0.2s, box-shadow 0.2s;"
+                       onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 30px rgba(124,58,237,0.4)';"
+                       onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='none';">
+                        📧 Abrir correo para enviar archivo
+                    </a>
+                    <p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-top: 1rem;">
+                        Se abrirá tu aplicación de correo automáticamente
                     </p>
                 </div>
                 
@@ -4756,7 +4718,7 @@
 
     
     
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         console.log('🔵🔵🔵 ALGORITMO v6.0 SUPABASE - Script INICIADO 🔵🔵🔵');
         console.log('🔍 Verificando que el script se carga...');
         
@@ -10051,13 +10013,24 @@
                                 });
                             
                             if (!error) {
-                                alert('✅ ¡PAGO CONFIRMADO!\n\n' +
+                                const confirmaEnvio = confirm('✅ ¡PAGO CONFIRMADO!\n\n' +
                                       '📤 PASO IMPORTANTE:\n' +
-                                      'Envía tu archivo de audio a:\n' +
-                                      'soportealgoritmoenmovimiento@gmail.com\n\n' +
-                                      'Asunto: Mastering - ' + masteringData.nombre_pista + '\n\n' +
-                                      '📧 Recibirás el resultado en:\n' + masteringData.artista_email + '\n\n' +
-                                      '⏱️ Tiempo estimado: 24-48 horas');
+                                      'Ahora debes enviar tu archivo de audio.\n\n' +
+                                      '¿Quieres abrir tu correo ahora para enviar el archivo?');
+                                
+                                if (confirmaEnvio) {
+                                    const asunto = encodeURIComponent('Mastering - ' + masteringData.nombre_pista);
+                                    const cuerpo = encodeURIComponent(
+                                        'Hola,\n\n' +
+                                        'Adjunto mi archivo de audio para masterizar.\n\n' +
+                                        'Nombre de la pista: ' + masteringData.nombre_pista + '\n' +
+                                        'Nombre del artista: ' + masteringData.nombre_artista + '\n' +
+                                        'Intensidad: ' + masteringData.intensidad + '\n' +
+                                        'Email para recibir resultado: ' + masteringData.artista_email + '\n\n' +
+                                        'Gracias!'
+                                    );
+                                    window.open('mailto:soportealgoritmoenmovimiento@gmail.com?subject=' + asunto + '&body=' + cuerpo, '_blank');
+                                }
                             }
                         } catch (err) {
                             console.error('Error guardando Mastering:', err);
@@ -10429,19 +10402,18 @@
             const userEmail = localStorage.getItem('userEmail');
             const userName = localStorage.getItem('userName');
             
-            const songName = document.getElementById('slSongName').value.trim();
-            const artistName = document.getElementById('slArtistName').value.trim();
-            const coverUrl = document.getElementById('slCoverUrl').value.trim();
             const spotify = document.getElementById('slSpotify').value.trim();
-            const apple = document.getElementById('slApple').value.trim();
-            const youtube = document.getElementById('slYoutube').value.trim();
-            const deezer = document.getElementById('slDeezer').value.trim();
-            const soundcloud = document.getElementById('slSoundcloud').value.trim();
             const email = document.getElementById('slEmail').value.trim();
             
-            // Validar que tenga al menos un enlace
-            if (!spotify && !apple && !youtube && !deezer && !soundcloud) {
-                alert('⚠️ Debes agregar al menos un enlace de plataforma');
+            // Validar que tenga link de Spotify
+            if (!spotify) {
+                alert('⚠️ Debes agregar el enlace de Spotify');
+                return;
+            }
+            
+            // Validar formato de Spotify
+            if (!spotify.includes('spotify.com')) {
+                alert('⚠️ El enlace debe ser de Spotify');
                 return;
             }
             
@@ -10450,14 +10422,7 @@
                 artista_id: userId,
                 artista_nombre: userName,
                 artista_email: email || userEmail,
-                nombre_cancion: songName,
-                nombre_artista: artistName,
-                cover_url: coverUrl,
                 spotify_url: spotify,
-                apple_url: apple,
-                youtube_url: youtube,
-                deezer_url: deezer,
-                soundcloud_url: soundcloud,
                 timestamp: Date.now()
             };
             
@@ -10586,11 +10551,4 @@
         }
         
         // Actualizar apertura del modal de estadísticas
-        window.openEstadisticasModal = async function() {
-            if(!isUserRegistered()){ showRegisterAlert(); return; }
-            document.getElementById('modalEstadisticas').classList.add('active');
-            await cargarEstadisticasArtista();
-        };
-    </script>
-</body>
-</html>
+        window.openEstadisticasModal = async f
