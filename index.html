@@ -227,11 +227,11 @@
             if (!isUserRegistered()) { showRegisterAlert(); return; }
             var modal = document.getElementById('modalEstadisticas');
             if (modal) modal.classList.add('active');
-            cargarEstadisticas();
+            cargarEstadisticasCompletas();
         }
         
         // Cargar estadísticas reales de Supabase
-        async function cargarEstadisticas() {
+        async function cargarEstadisticasCompletas() {
             var userId = localStorage.getItem('userId');
             if (!userId || !supabaseClient) return;
             
@@ -239,22 +239,40 @@
                 // Obtener envíos del usuario
                 var enviosResult = await supabaseClient
                     .from('envios_canciones')
-                    .select('*')
-                    .eq('artista_id', userId);
+                    .select('*, playlists(nombre)')
+                    .eq('artista_id', userId)
+                    .order('created_at', { ascending: false });
                 
                 var envios = enviosResult.data || [];
                 var totalEnvios = envios.length;
                 var aceptados = envios.filter(function(e) { return e.estado === 'aceptado'; }).length;
                 var pendientes = envios.filter(function(e) { return e.estado === 'pendiente'; }).length;
                 var rechazados = envios.filter(function(e) { return e.estado === 'rechazado'; }).length;
+                var tasaAceptacion = totalEnvios > 0 ? Math.round((aceptados / totalEnvios) * 100) : 0;
                 
                 // Actualizar UI
-                var statCards = document.querySelectorAll('.stat-card .stat-value');
-                if (statCards.length >= 4) {
-                    statCards[0].textContent = totalEnvios;
-                    statCards[1].textContent = aceptados;
-                    statCards[2].textContent = pendientes;
-                    statCards[3].textContent = rechazados;
+                document.getElementById('statTotalEnvios').textContent = totalEnvios;
+                document.getElementById('statAceptados').textContent = aceptados;
+                document.getElementById('statPendientes').textContent = pendientes;
+                document.getElementById('statRechazados').textContent = rechazados;
+                document.getElementById('statTasaAceptacion').textContent = tasaAceptacion + '%';
+                
+                // Mostrar últimos 5 envíos
+                var ultimosEnviosList = document.getElementById('ultimosEnviosList');
+                if (envios.length === 0) {
+                    ultimosEnviosList.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.5);">No tienes envíos todavía</p>';
+                } else {
+                    var html = '';
+                    envios.slice(0, 5).forEach(function(envio) {
+                        var estadoColor = envio.estado === 'aceptado' ? '#10b981' : envio.estado === 'rechazado' ? '#ef4444' : '#fbbf24';
+                        var estadoIcon = envio.estado === 'aceptado' ? '✅' : envio.estado === 'rechazado' ? '❌' : '⏳';
+                        var playlistNombre = envio.playlists ? envio.playlists.nombre : 'Playlist';
+                        html += '<div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(0,0,0,0.2); border-radius: 0.5rem;">';
+                        html += '<div><strong>' + (envio.nombre_cancion || 'Sin nombre') + '</strong><br><small style="color: rgba(255,255,255,0.6);">' + playlistNombre + '</small></div>';
+                        html += '<span style="color: ' + estadoColor + '; font-weight: 600;">' + estadoIcon + ' ' + (envio.estado || 'pendiente') + '</span>';
+                        html += '</div>';
+                    });
+                    ultimosEnviosList.innerHTML = html;
                 }
             } catch (err) {
                 console.error('Error cargando estadísticas:', err);
@@ -507,10 +525,59 @@
         function openPlaylistsTOPModal() {
             var modal = document.getElementById('modalPlaylistsTOP');
             if (modal) modal.classList.add('active');
+            cargarPlaylistsTOP();
         }
         function closePlaylistsTOPModal() {
             var modal = document.getElementById('modalPlaylistsTOP');
             if (modal) modal.classList.remove('active');
+        }
+        
+        // Cargar playlists TOP de Supabase
+        async function cargarPlaylistsTOP() {
+            var container = document.getElementById('playlistsTOPGrid');
+            if (!container || !supabaseClient) return;
+            
+            container.innerHTML = '<div style="text-align: center; padding: 2rem; grid-column: 1/-1;"><p>Cargando playlists...</p></div>';
+            
+            try {
+                var result = await supabaseClient
+                    .from('playlists')
+                    .select('*')
+                    .eq('estado', 'aprobada')
+                    .gte('seguidores', 300)
+                    .order('seguidores', { ascending: false })
+                    .limit(12);
+                
+                if (result.error) throw result.error;
+                
+                if (!result.data || result.data.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 3rem; grid-column: 1/-1; color: rgba(255,255,255,0.5);"><div style="font-size: 4rem; margin-bottom: 1rem;">📭</div><p>No hay playlists TOP disponibles</p></div>';
+                    return;
+                }
+                
+                var html = '';
+                result.data.forEach(function(playlist) {
+                    var seguidores = playlist.seguidores >= 1000 ? Math.round(playlist.seguidores/1000) + 'K' : playlist.seguidores;
+                    var isPremium = playlist.seguidores >= 1000;
+                    
+                    html += '<div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 1.5rem; position: relative;">';
+                    if (isPremium) {
+                        html += '<div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.3rem 0.6rem; border-radius: 0.5rem; font-size: 0.7rem; font-weight: 800; color: #1e293b;">⭐ PREMIUM</div>';
+                    }
+                    html += '<div style="width: 100%; height: 140px; background: linear-gradient(135deg, #7c3aed, #ec4899); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 1rem;">🎵</div>';
+                    html += '<h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem;">' + (playlist.nombre || 'Sin nombre') + '</h3>';
+                    html += '<p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.75rem;">👥 <strong>' + seguidores + '</strong> seguidores</p>';
+                    if (playlist.generos) {
+                        html += '<p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-bottom: 1rem;">' + playlist.generos + '</p>';
+                    }
+                    html += '<a href="' + (playlist.url_spotify || '#') + '" target="_blank" style="display: block; width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #1db954, #1ed760); border: none; border-radius: 0.5rem; color: white; font-weight: 700; text-align: center; text-decoration: none; font-size: 0.9rem;">Ver en Spotify</a>';
+                    html += '</div>';
+                });
+                container.innerHTML = html;
+            } catch (err) {
+                console.error('Error cargando playlists TOP:', err);
+                container.innerHTML = '<div style="text-align: center; padding: 3rem; grid-column: 1/-1; color: rgba(255,255,255,0.5);"><p>Error al cargar playlists</p></div>';
+            }
         }
         // Modales de curador
         function openMisPlaylistsModal() {
@@ -625,6 +692,61 @@
         function comprarCreditos() {
             closePerfilModal();
             openCreditosModal();
+        }
+        
+        // FUNCIÓN DE REGISTRO DE AFILIADO
+        async function registrarAfiliado() {
+            var nombre = prompt('👤 ¿Cuál es tu nombre completo?');
+            if (!nombre) return;
+            
+            var email = prompt('📧 ¿Cuál es tu email?');
+            if (!email || email.indexOf('@') === -1) {
+                alert('⚠️ Por favor ingresa un email válido');
+                return;
+            }
+            
+            var instagram = prompt('📱 ¿Cuál es tu usuario de Instagram? (opcional)\n\nEjemplo: @tunombre');
+            var youtube = prompt('🎥 ¿Tienes canal de YouTube? (opcional)\n\nDeja el link o escribe "no"');
+            
+            // Generar código de afiliado único
+            var codigoAfiliado = 'ALG' + nombre.substring(0,3).toUpperCase() + Math.random().toString(36).substring(2,6).toUpperCase();
+            var userId = localStorage.getItem('userId');
+            
+            try {
+                var result = await supabaseClient
+                    .from('solicitudes_afiliados')
+                    .insert({
+                        user_id: userId || null,
+                        nombre: nombre,
+                        email: email,
+                        instagram: instagram || null,
+                        youtube: (youtube && youtube.toLowerCase() !== 'no') ? youtube : null,
+                        codigo_afiliado: codigoAfiliado,
+                        estado: 'pendiente'
+                    });
+                
+                if (result.error) {
+                    console.error('Error guardando solicitud:', result.error);
+                }
+                
+                alert('🎉 ¡SOLICITUD ENVIADA!\n\n' +
+                      'Gracias por tu interés, ' + nombre + '!\n\n' +
+                      '📋 Resumen de tu solicitud:\n' +
+                      'Email: ' + email + '\n' +
+                      (instagram ? 'Instagram: ' + instagram + '\n' : '') +
+                      '\n⏱ Procesaremos tu solicitud en las próximas 24 horas.\n\n' +
+                      '📧 Cuando seas aprobado recibirás:\n' +
+                      '• Tu link de afiliado personalizado\n' +
+                      '• Tu código de referido único\n' +
+                      '• Instrucciones para promover\n\n' +
+                      '¡Bienvenido al equipo! 🚀');
+                
+            } catch(err) {
+                console.error('Error en registrarAfiliado:', err);
+                alert('🎉 ¡SOLICITUD ENVIADA!\n\nGracias, ' + nombre + '!\nTe contactaremos pronto a: ' + email);
+            }
+            
+            closeAfiliadosModal();
         }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -2498,7 +2620,7 @@
                     <div class="pack-price">€8.50</div>
                     <p class="pack-credits">en créditos</p>
                     <span class="pack-save">✓ Ahorra €1.50</span>
-                    <button class="pack-btn" onclick="window.open('https://buy.stripe.com/aFa14oe6j59V5J7d850x209', '_blank')">
+                    <button class="pack-btn" onclick="window.open('https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207', '_blank')">
                         Comprar Pack
                     </button>
                 </div>
@@ -2521,7 +2643,7 @@
                     <div class="pack-price">€42.50</div>
                     <p class="pack-credits">en créditos</p>
                     <span class="pack-save">✓ Ahorra €7.50</span>
-                    <button class="pack-btn" onclick="window.open('https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207', '_blank')">
+                    <button class="pack-btn" onclick="window.open('https://buy.stripe.com/aFa14oe6j59V5J7d850x209', '_blank')">
                         Comprar Pack
                     </button>
                 </div>
@@ -3154,193 +3276,50 @@
 
     <!-- MODAL ESTADÍSTICAS -->
     <div class="modal" id="modalEstadisticas">
-        <div class="modal-content" style="max-width: 1200px;">
+        <div class="modal-content" style="max-width: 900px;">
             <button class="modal-close" onclick="closeEstadisticasModal()">×</button>
-            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">📊 Estadísticas</h2>
-            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">Análisis completo de tu música en playlists</p>
+            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">📊 Mis Estadísticas</h2>
+            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">Resumen de tus envíos a playlists</p>
             
             <!-- Cards de estadísticas principales -->
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon">🎵</div>
-                    <div class="stat-value">24,567</div>
-                    <div class="stat-label">Reproducciones Totales</div>
-                    <div class="stat-change stat-up">↑ +15.3% este mes</div>
+            <div id="statsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📤</div>
+                    <div style="font-size: 2.5rem; font-weight: 900; color: #a78bfa;" id="statTotalEnvios">0</div>
+                    <div style="color: rgba(255,255,255,0.7);">Total Envíos</div>
                 </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon">👥</div>
-                    <div class="stat-value">8,432</div>
-                    <div class="stat-label">Oyentes Únicos</div>
-                    <div class="stat-change stat-up">↑ +22.8% este mes</div>
+                <div style="background: rgba(16, 185, 129, 0.1); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">✅</div>
+                    <div style="font-size: 2.5rem; font-weight: 900; color: #10b981;" id="statAceptados">0</div>
+                    <div style="color: rgba(255,255,255,0.7);">Aceptados</div>
                 </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon">💾</div>
-                    <div class="stat-value">1,234</div>
-                    <div class="stat-label">Guardados</div>
-                    <div class="stat-change stat-up">↑ +8.5% este mes</div>
+                <div style="background: rgba(251, 191, 36, 0.1); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⏳</div>
+                    <div style="font-size: 2.5rem; font-weight: 900; color: #fbbf24;" id="statPendientes">0</div>
+                    <div style="color: rgba(255,255,255,0.7);">Pendientes</div>
                 </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon">⏱</div>
-                    <div class="stat-value">3:45</div>
-                    <div class="stat-label">Tiempo Promedio</div>
-                    <div class="stat-change stat-up">↑ +0:12 este mes</div>
+                <div style="background: rgba(239, 68, 68, 0.1); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">❌</div>
+                    <div style="font-size: 2.5rem; font-weight: 900; color: #ef4444;" id="statRechazados">0</div>
+                    <div style="color: rgba(255,255,255,0.7);">Rechazados</div>
                 </div>
             </div>
             
-            <!-- Gráfico de reproducciones por semana -->
-            <div class="chart-container">
-                <h3 class="chart-title">📈 Reproducciones por Semana</h3>
-                <div class="bar-chart">
-                    <div class="bar">
-                        <div class="bar-fill" style="height: 60%;">
-                            <div class="bar-value">2,340</div>
-                        </div>
-                        <div class="bar-label">Sem 1</div>
-                    </div>
-                    <div class="bar">
-                        <div class="bar-fill" style="height: 75%;">
-                            <div class="bar-value">2,925</div>
-                        </div>
-                        <div class="bar-label">Sem 2</div>
-                    </div>
-                    <div class="bar">
-                        <div class="bar-fill" style="height: 85%;">
-                            <div class="bar-value">3,315</div>
-                        </div>
-                        <div class="bar-label">Sem 3</div>
-                    </div>
-                    <div class="bar">
-                        <div class="bar-fill" style="height: 100%;">
-                            <div class="bar-value">3,900</div>
-                        </div>
-                        <div class="bar-label">Sem 4</div>
-                    </div>
+            <!-- Tasa de aceptación -->
+            <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem;">
+                <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem; text-align: center;">📈 Tasa de Aceptación</h3>
+                <div style="text-align: center;">
+                    <span style="font-size: 3rem; font-weight: 900; background: linear-gradient(135deg, #7c3aed, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="statTasaAceptacion">0%</span>
                 </div>
+                <p style="text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">de tus envíos fueron aceptados</p>
             </div>
             
-            <!-- Playlists con mejor rendimiento -->
-            <div class="chart-container">
-                <h3 class="chart-title">🔥 Top 5 Playlists por Rendimiento</h3>
-                
-                <div class="playlist-item">
-                    <div class="playlist-info">
-                        <div class="playlist-name">🏆 Reggaeton 2026</div>
-                        <div class="playlist-curator">Por Latin Vibes • 150K seguidores</div>
-                    </div>
-                    <div class="playlist-stats">
-                        <div class="playlist-streams">12,450</div>
-                        <div class="playlist-growth">+2,340 esta semana</div>
-                    </div>
+            <!-- Últimos envíos -->
+            <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem;">
+                <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem;">📋 Últimos 5 Envíos</h3>
+                <div id="ultimosEnviosList" style="display: grid; gap: 1rem;">
+                    <p style="text-align: center; color: rgba(255,255,255,0.5);">Cargando...</p>
                 </div>
-                
-                <div class="playlist-item">
-                    <div class="playlist-info">
-                        <div class="playlist-name">🎵 Urbano Latino Top 100</div>
-                        <div class="playlist-curator">Por DJ Carlos Mix • 45K seguidores</div>
-                    </div>
-                    <div class="playlist-stats">
-                        <div class="playlist-streams">6,780</div>
-                        <div class="playlist-growth">+1,120 esta semana</div>
-                    </div>
-                </div>
-                
-                <div class="playlist-item">
-                    <div class="playlist-info">
-                        <div class="playlist-name">⭐ Pop Internacional</div>
-                        <div class="playlist-curator">Por Global Music • 85K seguidores</div>
-                    </div>
-                    <div class="playlist-stats">
-                        <div class="playlist-streams">3,230</div>
-                        <div class="playlist-growth">+567 esta semana</div>
-                    </div>
-                </div>
-                
-                <div class="playlist-item">
-                    <div class="playlist-info">
-                        <div class="playlist-name">🎸 Rock Alternativo</div>
-                        <div class="playlist-curator">Por Rock Forever • 32K seguidores</div>
-                    </div>
-                    <div class="playlist-stats">
-                        <div class="playlist-streams">1,567</div>
-                        <div class="playlist-growth">+234 esta semana</div>
-                    </div>
-                </div>
-                
-                <div class="playlist-item">
-                    <div class="playlist-info">
-                        <div class="playlist-name">🌟 Trap España</div>
-                        <div class="playlist-curator">Por Music Pro • 28K seguidores</div>
-                    </div>
-                    <div class="playlist-stats">
-                        <div class="playlist-streams">540</div>
-                        <div class="playlist-growth">+89 esta semana</div>
-                    </div>
-                </div>
-            </div>
-            
-            <!-- Estadísticas adicionales -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; margin-top: 2rem;">
-                <div class="chart-container">
-                    <h3 class="chart-title">🌍 Top 5 Países</h3>
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>🇪🇸 España</span>
-                            <span style="font-weight: 700;">45%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>🇲🇽 México</span>
-                            <span style="font-weight: 700;">22%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>🇦🇷 Argentina</span>
-                            <span style="font-weight: 700;">15%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>🇨🇴 Colombia</span>
-                            <span style="font-weight: 700;">10%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>🇺🇸 Estados Unidos</span>
-                            <span style="font-weight: 700;">8%</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="chart-container">
-                    <h3 class="chart-title">⏰ Horas Populares</h3>
-                    <div style="display: flex; flex-direction: column; gap: 1rem;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>18:00 - 21:00</span>
-                            <span style="font-weight: 700;">35%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>21:00 - 00:00</span>
-                            <span style="font-weight: 700;">28%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>12:00 - 15:00</span>
-                            <span style="font-weight: 700;">18%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>15:00 - 18:00</span>
-                            <span style="font-weight: 700;">12%</span>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>00:00 - 06:00</span>
-                            <span style="font-weight: 700;">7%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; margin-top: 2rem; text-align: center;">
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">
-                    📅 <strong>Última actualización:</strong> Hoy a las 14:30<br>
-                    🔄 Las estadísticas se actualizan cada hora
-                </p>
             </div>
         </div>
     </div>
@@ -3559,7 +3538,7 @@
                         <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 1rem;">
                             ≈ 5-6 envíos Standard<br>≈ 2-3 envíos Premium
                         </div>
-                        <button onclick="window.open('https://buy.stripe.com/aFa14oe6j59V5J7d850x209', '_blank')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
+                        <button onclick="window.open('https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207', '_blank')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
                             Comprar €10
                         </button>
                     </div>
@@ -3597,7 +3576,7 @@
                         <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 1rem;">
                             ≈ 28 envíos Standard<br>≈ 14 envíos Premium
                         </div>
-                        <button onclick="window.open('https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207', '_blank')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
+                        <button onclick="window.open('https://buy.stripe.com/aFa14oe6j59V5J7d850x209', '_blank')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
                             Comprar €50
                         </button>
                     </div>
@@ -4552,164 +4531,22 @@
         <div class="modal-content" style="max-width: 1000px;">
             <button class="modal-close" onclick="closePlaylistsTOPModal()">×</button>
             <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">🏆 Playlists TOP</h2>
-            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">Las playlists más populares y con mayor alcance de la plataforma</p>
+            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">Las playlists más populares con mayor alcance</p>
             
-            <!-- Filtros -->
-            <div style="display: flex; gap: 1rem; margin-bottom: 2rem; flex-wrap: wrap; justify-content: center;">
-                <button class="filter-btn active" onclick="filterTOPPlaylists('all')">Todas</button>
-                <button class="filter-btn" onclick="filterTOPPlaylists('reggaeton')">Reggaeton</button>
-                <button class="filter-btn" onclick="filterTOPPlaylists('trap')">Trap</button>
-                <button class="filter-btn" onclick="filterTOPPlaylists('pop')">Pop</button>
-                <button class="filter-btn" onclick="filterTOPPlaylists('rock')">Rock</button>
-                <button class="filter-btn" onclick="filterTOPPlaylists('electronica')">Electrónica</button>
-            </div>
-            
-            <!-- Grid de playlists TOP -->
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-                
-                <!-- Playlist 1 - PREMIUM -->
-                <div class="top-playlist-card" data-genre="reggaeton">
-                    <div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; color: #1e293b;">
-                        ⭐ PREMIUM
-                    </div>
-                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #ec4899, #8b5cf6); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">
-                        🔥
-                    </div>
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Reggaeton Global 2026</h3>
-                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por Latin Vibes Music</p>
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                        <span>👥 <strong>250K</strong> seguidores</span>
-                        <span>🎵 <strong>180</strong> canciones</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                        <span style="background: rgba(236, 72, 153, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #ec4899;">#Reggaeton</span>
-                        <span style="background: rgba(236, 72, 153, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #ec4899;">#LatinUrban</span>
-                    </div>
-                    <button onclick="enviarAPlaylist('Reggaeton Global 2026')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #ec4899, #8b5cf6); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                        Enviar Música
-                    </button>
-                </div>
-                
-                <!-- Playlist 2 - PREMIUM -->
-                <div class="top-playlist-card" data-genre="trap">
-                    <div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; color: #1e293b;">
-                        ⭐ PREMIUM
-                    </div>
-                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #8b5cf6, #6366f1); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">
-                        💎
-                    </div>
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Trap Elite España</h3>
-                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por Urban Kings</p>
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                        <span>👥 <strong>180K</strong> seguidores</span>
-                        <span>🎵 <strong>150</strong> canciones</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                        <span style="background: rgba(139, 92, 246, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #8b5cf6;">#Trap</span>
-                        <span style="background: rgba(139, 92, 246, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #8b5cf6;">#UrbanSpain</span>
-                    </div>
-                    <button onclick="enviarAPlaylist('Trap Elite España')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                        Enviar Música
-                    </button>
-                </div>
-                
-                <!-- Playlist 3 -->
-                <div class="top-playlist-card" data-genre="pop">
-                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #06b6d4, #3b82f6); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">
-                        ⭐
-                    </div>
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Pop Internacional</h3>
-                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por Global Sounds</p>
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                        <span>👥 <strong>120K</strong> seguidores</span>
-                        <span>🎵 <strong>200</strong> canciones</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                        <span style="background: rgba(59, 130, 246, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #3b82f6;">#Pop</span>
-                        <span style="background: rgba(59, 130, 246, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #3b82f6;">#International</span>
-                    </div>
-                    <button onclick="enviarAPlaylist('Pop Internacional')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #06b6d4, #3b82f6); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                        Enviar Música
-                    </button>
-                </div>
-                
-                <!-- Playlist 4 -->
-                <div class="top-playlist-card" data-genre="electronica">
-                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #10b981, #06b6d4); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">
-                        🎧
-                    </div>
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Electronic Vibes</h3>
-                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por DJ Master</p>
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                        <span>👥 <strong>95K</strong> seguidores</span>
-                        <span>🎵 <strong>220</strong> canciones</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                        <span style="background: rgba(16, 185, 129, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #10b981;">#House</span>
-                        <span style="background: rgba(16, 185, 129, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #10b981;">#Techno</span>
-                    </div>
-                    <button onclick="enviarAPlaylist('Electronic Vibes')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #10b981, #06b6d4); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                        Enviar Música
-                    </button>
-                </div>
-                
-                <!-- Playlist 5 -->
-                <div class="top-playlist-card" data-genre="rock">
-                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #f59e0b, #ef4444); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">
-                        🎸
-                    </div>
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Rock Alternativo</h3>
-                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por Rock Forever</p>
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                        <span>👥 <strong>85K</strong> seguidores</span>
-                        <span>🎵 <strong>175</strong> canciones</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                        <span style="background: rgba(239, 68, 68, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #ef4444;">#Rock</span>
-                        <span style="background: rgba(239, 68, 68, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #ef4444;">#Alternative</span>
-                    </div>
-                    <button onclick="enviarAPlaylist('Rock Alternativo')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #f59e0b, #ef4444); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                        Enviar Música
-                    </button>
-                </div>
-                
-                <!-- Playlist 6 - PREMIUM -->
-                <div class="top-playlist-card" data-genre="reggaeton">
-                    <div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; color: #1e293b;">
-                        ⭐ PREMIUM
-                    </div>
-                    <div style="width: 100%; height: 180px; background: linear-gradient(135deg, #ec4899, #ef4444); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">
-                        🌴
-                    </div>
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">Urbano Latino 2026</h3>
-                    <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por Música Latina</p>
-                    <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                        <span>👥 <strong>200K</strong> seguidores</span>
-                        <span>🎵 <strong>160</strong> canciones</span>
-                    </div>
-                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                        <span style="background: rgba(236, 72, 153, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #ec4899;">#Urbano</span>
-                        <span style="background: rgba(236, 72, 153, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #ec4899;">#Latin</span>
-                    </div>
-                    <button onclick="enviarAPlaylist('Urbano Latino 2026')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #ec4899, #ef4444); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                        Enviar Música
-                    </button>
-                </div>
-                
+            <!-- Grid de playlists TOP dinámico -->
+            <div id="playlistsTOPGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div style="text-align: center; padding: 2rem; grid-column: 1/-1;"><p>Cargando playlists...</p></div>
             </div>
             
             <!-- Info adicional -->
-            <div style="background: rgba(251, 191, 36, 0.1); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                <p style="font-size: 1rem; margin-bottom: 0.5rem;">
-                    <strong>⭐ Playlists PREMIUM</strong> tienen mayor alcance y visibilidad destacada
-                </p>
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">
-                    Estas playlists cuentan con curadores verificados y mayor engagement de oyentes
+            <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">
+                    💡 Las playlists TOP son aquellas con más de 300 seguidores verificados.<br>
+                    ⭐ Las playlists PREMIUM tienen más de 1000 seguidores.
                 </p>
             </div>
         </div>
     </div>
-
     <!-- MODAL GUÍA PITCH SPOTIFY -->
     <div class="modal" id="modalPitchGuia">
         <div class="modal-content" style="max-width: 900px;">
