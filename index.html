@@ -167,6 +167,12 @@
                     if (artistaPanel) artistaPanel.classList.add('active');
                     var artistaName = document.getElementById('artistaName');
                     if (artistaName) artistaName.textContent = userName || 'Artista';
+                    
+                    // Mostrar secciones de artista
+                    var serviciosSection = document.getElementById('servicios');
+                    var recursosSection = document.getElementById('recursos');
+                    if (serviciosSection) serviciosSection.style.display = 'block';
+                    if (recursosSection) recursosSection.style.display = 'block';
                 } else if (userType === 'curador') {
                     var curadorPanel = document.getElementById('curadorPanel');
                     if (curadorPanel) curadorPanel.classList.add('active');
@@ -221,6 +227,38 @@
             if (!isUserRegistered()) { showRegisterAlert(); return; }
             var modal = document.getElementById('modalEstadisticas');
             if (modal) modal.classList.add('active');
+            cargarEstadisticas();
+        }
+        
+        // Cargar estadísticas reales de Supabase
+        async function cargarEstadisticas() {
+            var userId = localStorage.getItem('userId');
+            if (!userId || !supabaseClient) return;
+            
+            try {
+                // Obtener envíos del usuario
+                var enviosResult = await supabaseClient
+                    .from('envios_canciones')
+                    .select('*')
+                    .eq('artista_id', userId);
+                
+                var envios = enviosResult.data || [];
+                var totalEnvios = envios.length;
+                var aceptados = envios.filter(function(e) { return e.estado === 'aceptado'; }).length;
+                var pendientes = envios.filter(function(e) { return e.estado === 'pendiente'; }).length;
+                var rechazados = envios.filter(function(e) { return e.estado === 'rechazado'; }).length;
+                
+                // Actualizar UI
+                var statCards = document.querySelectorAll('.stat-card .stat-value');
+                if (statCards.length >= 4) {
+                    statCards[0].textContent = totalEnvios;
+                    statCards[1].textContent = aceptados;
+                    statCards[2].textContent = pendientes;
+                    statCards[3].textContent = rechazados;
+                }
+            } catch (err) {
+                console.error('Error cargando estadísticas:', err);
+            }
         }
         
         function closeEstadisticasModal() {
@@ -240,10 +278,126 @@
         function openNotificacionesModal() {
             var modal = document.getElementById('modalNotificaciones');
             if (modal) modal.classList.add('active');
+            cargarNotificaciones();
         }
         function closeNotificacionesModal() {
             var modal = document.getElementById('modalNotificaciones');
             if (modal) modal.classList.remove('active');
+        }
+        
+        // Cargar notificaciones de Supabase
+        async function cargarNotificaciones() {
+            var userId = localStorage.getItem('userId');
+            var container = document.getElementById('notificacionesList');
+            if (!container || !userId || !supabaseClient) return;
+            
+            container.innerHTML = '<div style="text-align: center; padding: 2rem;"><p>Cargando...</p></div>';
+            
+            try {
+                var result = await supabaseClient
+                    .from('notificaciones')
+                    .select('*')
+                    .eq('usuario_id', userId)
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+                
+                if (result.error) throw result.error;
+                
+                if (!result.data || result.data.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);"><div style="font-size: 4rem; margin-bottom: 1rem;">📭</div><p>No tienes notificaciones</p></div>';
+                    return;
+                }
+                
+                var html = '';
+                result.data.forEach(function(notif) {
+                    var bgColor = notif.leida ? 'rgba(255,255,255,0.03)' : 'rgba(124, 58, 237, 0.1)';
+                    var fecha = new Date(notif.created_at).toLocaleDateString('es-ES');
+                    html += '<div style="background: ' + bgColor + '; border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 1.25rem;">';
+                    html += '<div style="display: flex; justify-content: space-between; align-items: start;">';
+                    html += '<div><h4 style="font-weight: 700; margin-bottom: 0.5rem;">' + (notif.titulo || 'Notificación') + '</h4>';
+                    html += '<p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">' + (notif.mensaje || '') + '</p></div>';
+                    html += '<span style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">' + fecha + '</span>';
+                    html += '</div></div>';
+                });
+                container.innerHTML = html;
+            } catch (err) {
+                console.error('Error cargando notificaciones:', err);
+                container.innerHTML = '<div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);"><p>Error al cargar notificaciones</p></div>';
+            }
+        }
+        
+        function openHistorialModal() {
+            var modal = document.getElementById('modalHistorial');
+            if (modal) modal.classList.add('active');
+            cargarHistorialEnvios();
+        }
+        function closeHistorialModal() {
+            var modal = document.getElementById('modalHistorial');
+            if (modal) modal.classList.remove('active');
+        }
+        
+        // Cargar historial de envíos de Supabase
+        async function cargarHistorialEnvios() {
+            var userId = localStorage.getItem('userId');
+            var container = document.getElementById('historialEnviosList');
+            if (!container || !userId || !supabaseClient) return;
+            
+            container.innerHTML = '<div style="text-align: center; padding: 2rem;"><p>Cargando...</p></div>';
+            
+            try {
+                var result = await supabaseClient
+                    .from('envios_canciones')
+                    .select('*, playlists(nombre, seguidores)')
+                    .eq('artista_id', userId)
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+                
+                if (result.error) throw result.error;
+                
+                if (!result.data || result.data.length === 0) {
+                    container.innerHTML = '<div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);"><div style="font-size: 4rem; margin-bottom: 1rem;">📭</div><p>No has enviado canciones aún</p><p style="font-size: 0.9rem; margin-top: 0.5rem;">¡Envía tu primera canción a una playlist!</p></div>';
+                    return;
+                }
+                
+                var html = '';
+                result.data.forEach(function(envio) {
+                    var estadoColor = envio.estado === 'aceptado' ? '#10b981' : envio.estado === 'rechazado' ? '#ef4444' : '#fbbf24';
+                    var estadoIcon = envio.estado === 'aceptado' ? '✅' : envio.estado === 'rechazado' ? '❌' : '⏳';
+                    var fecha = new Date(envio.created_at).toLocaleDateString('es-ES');
+                    var playlistNombre = envio.playlists ? envio.playlists.nombre : 'Playlist';
+                    
+                    html += '<div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 1.5rem;">';
+                    html += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">';
+                    html += '<h4 style="font-weight: 700;">' + (envio.nombre_cancion || 'Sin nombre') + '</h4>';
+                    html += '<span style="background: ' + estadoColor + '22; color: ' + estadoColor + '; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 600;">' + estadoIcon + ' ' + (envio.estado || 'pendiente') + '</span>';
+                    html += '</div>';
+                    html += '<p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">📋 ' + playlistNombre + '</p>';
+                    html += '<p style="color: rgba(255,255,255,0.5); font-size: 0.85rem; margin-top: 0.5rem;">📅 ' + fecha + '</p>';
+                    html += '</div>';
+                });
+                container.innerHTML = html;
+            } catch (err) {
+                console.error('Error cargando historial:', err);
+                container.innerHTML = '<div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);"><p>Error al cargar historial</p></div>';
+            }
+        }
+        
+        // Marcar notificaciones como leídas
+        async function marcarTodasLeidas() {
+            var userId = localStorage.getItem('userId');
+            if (!userId || !supabaseClient) return;
+            
+            try {
+                await supabaseClient
+                    .from('notificaciones')
+                    .update({ leida: true })
+                    .eq('usuario_id', userId);
+                
+                cargarNotificaciones();
+                alert('✅ Notificaciones marcadas como leídas');
+            } catch (err) {
+                console.error('Error:', err);
+            }
         }
         function openContactoModal() {
             var modal = document.getElementById('modalContacto');
@@ -260,14 +414,6 @@
         }
         function closeAfiliadosModal() {
             var modal = document.getElementById('modalAfiliados');
-            if (modal) modal.classList.remove('active');
-        }
-        function openHistorialModal() {
-            var modal = document.getElementById('modalHistorial');
-            if (modal) modal.classList.add('active');
-        }
-        function closeHistorialModal() {
-            var modal = document.getElementById('modalHistorial');
             if (modal) modal.classList.remove('active');
         }
         function openMisPuntosModal() {
@@ -434,10 +580,50 @@
         
         // Funciones adicionales
         function editarPerfil() {
-            alert('Función de editar perfil próximamente disponible');
+            // Mostrar modal de edición
+            var nombre = prompt('Introduce tu nuevo nombre:', localStorage.getItem('userName') || '');
+            if (nombre && nombre.trim() !== '') {
+                actualizarPerfil(nombre.trim());
+            }
+        }
+        
+        async function actualizarPerfil(nuevoNombre) {
+            var userId = localStorage.getItem('userId');
+            if (!userId || !supabaseClient) {
+                alert('Error: No hay sesión activa');
+                return;
+            }
+            
+            try {
+                var result = await supabaseClient
+                    .from('usuarios')
+                    .update({ nombre: nuevoNombre })
+                    .eq('id', userId);
+                
+                if (result.error) throw result.error;
+                
+                localStorage.setItem('userName', nuevoNombre);
+                
+                // Actualizar UI
+                var profileName = document.getElementById('profileName');
+                var artistaName = document.getElementById('artistaName');
+                var userInitial = document.getElementById('userInitial');
+                var profileAvatarLarge = document.getElementById('profileAvatarLarge');
+                
+                if (profileName) profileName.textContent = nuevoNombre;
+                if (artistaName) artistaName.textContent = nuevoNombre;
+                if (userInitial) userInitial.textContent = nuevoNombre.charAt(0).toUpperCase();
+                if (profileAvatarLarge) profileAvatarLarge.textContent = nuevoNombre.charAt(0).toUpperCase();
+                
+                alert('✅ Perfil actualizado correctamente');
+            } catch (err) {
+                console.error('Error actualizando perfil:', err);
+                alert('❌ Error al actualizar el perfil');
+            }
         }
         
         function comprarCreditos() {
+            closePerfilModal();
             openCreditosModal();
         }
     </script>
@@ -2945,8 +3131,7 @@
                 </div>
                 
                 <button type="submit" class="btn-submit" style="margin-top: 2rem;" id="masteringSubmitBtn">
-                    <span id="submitTextFree">🎁 Usar Mastering Gratuito</span>
-                    <span id="submitTextPaid" class="hidden">💳 Pagar 4.99€ y Masterizar</span>
+                    💳 Pagar 4.99€ y Masterizar
                 </button>
             </form>
             
