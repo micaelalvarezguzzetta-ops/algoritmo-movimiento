@@ -742,6 +742,58 @@
             
             closeAfiliadosModal();
         }
+        
+        // FUNCIÓN HISTORIAL MODAL (disponible globalmente)
+        async function openHistorialModal() {
+            if (!isUserRegistered()) { showRegisterAlert(); return; }
+            var modal = document.getElementById('modalHistorial');
+            if (modal) modal.classList.add('active');
+            // cargarHistorialEnvios se llama después cuando esté disponible
+            if (typeof cargarHistorialEnvios === 'function') {
+                await cargarHistorialEnvios();
+            } else {
+                setTimeout(async function() {
+                    if (typeof cargarHistorialEnvios === 'function') {
+                        await cargarHistorialEnvios();
+                    }
+                }, 100);
+            }
+        }
+        
+        // FUNCIÓN COMPRAR CRÉDITO (disponible globalmente)
+        async function comprarCredito(tipo, precio) {
+            var userId = localStorage.getItem('userId');
+            var codigoAfiliado = localStorage.getItem('codigoAfiliadoDelUsuario');
+            
+            // Registrar comisión para el afiliado
+            if (codigoAfiliado && userId && supabaseClient) {
+                var monto = tipo === 'standard' ? 1.50 : 3.00;
+                var comision = monto * 0.15;
+                
+                try {
+                    await supabaseClient
+                        .from('comisiones_afiliados')
+                        .insert({
+                            codigo_afiliado: codigoAfiliado,
+                            usuario_comprador_id: userId,
+                            monto_compra: monto,
+                            comision: comision,
+                            tipo_compra: 'credito_' + tipo,
+                            estado: 'pendiente'
+                        });
+                    console.log('💰 Comisión de afiliado registrada:', comision.toFixed(2) + '€');
+                } catch(err) {
+                    console.log('Error registrando comisión:', err);
+                }
+            }
+            
+            // Redirigir a Stripe Payment Link
+            if (tipo === 'standard') {
+                window.open('https://buy.stripe.com/eVq28s2nBaufb3r6JH0x20a', '_blank');
+            } else if (tipo === 'premium') {
+                window.open('https://buy.stripe.com/8x2fZi0ft1XJ3AZ3xv0x20b', '_blank');
+            }
+        }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -6822,12 +6874,6 @@
             document.getElementById('modalSocial').classList.remove('active');
         }
         
-        async function openHistorialModal(){
-            if(!isUserRegistered()){ showRegisterAlert(); return; }
-            document.getElementById('modalHistorial').classList.add('active');
-            await cargarHistorialEnvios();
-        }
-        
         async function cargarHistorialEnvios() {
             const userId = localStorage.getItem('userId');
             if (!userId) return;
@@ -8962,41 +9008,6 @@
         
         function closeCreditosModal(){
             document.getElementById('modalCreditos').classList.remove('active');
-        }
-        
-        async function comprarCredito(tipo, precio){
-            const userId = localStorage.getItem('userId');
-            const codigoAfiliado = localStorage.getItem('codigoAfiliadoDelUsuario');
-            
-            // Registrar comisión para el afiliado (15% de CADA compra)
-            if (codigoAfiliado && userId) {
-                const monto = tipo === 'standard' ? 1.50 : 3.00;
-                const comision = monto * 0.15;
-                
-                try {
-                    await supabaseClient
-                        .from('comisiones_afiliados')
-                        .insert({
-                            codigo_afiliado: codigoAfiliado,
-                            usuario_comprador_id: userId,
-                            monto_compra: monto,
-                            comision: comision,
-                            tipo_compra: 'credito_' + tipo,
-                            estado: 'pendiente'
-                        });
-                    
-                    console.log('💰 Comisión de afiliado registrada:', comision.toFixed(2) + '€');
-                } catch(err) {
-                    console.log('Error registrando comisión:', err);
-                }
-            }
-            
-            // Redirigir a Stripe Payment Link (sin descuento en créditos individuales)
-            if(tipo === 'standard'){
-                window.open('https://buy.stripe.com/eVq28s2nBaufb3r6JH0x20a', '_blank');
-            } else if(tipo === 'premium'){
-                window.open('https://buy.stripe.com/8x2fZi0ft1XJ3AZ3xv0x20b', '_blank');
-            }
         }
         
         async function comprarPaquete(monto, creditos){
