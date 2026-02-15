@@ -6,795 +6,6 @@
     <title>Algoritmo en Movimiento - Promoción Musical Profesional</title>
     <meta name="description" content="Conecta tu música con las mejores playlists de Spotify. Promoción musical profesional para artistas independientes.">
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script>
-        // SUPABASE - INICIALIZAR PRIMERO
-        var SUPABASE_URL = 'https://wesmqqaijlmqhctrtaje.supabase.co';
-        var SUPABASE_ANON_KEY = 'sb_publishable_LgSAsCVW7tlDfDvkD8enyA_pQp42IZF';
-        var supabaseClient = null;
-        
-        // Inicializar cuando Supabase esté listo
-        if (typeof supabase !== 'undefined') {
-            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            console.log('✅ Supabase inicializado en HEAD');
-        }
-        
-        // FUNCIONES GLOBALES - CARGAN ANTES QUE EL HTML
-        function openLoginModal() {
-            console.log('🔓 Abriendo login...');
-            var modal = document.getElementById('loginModal');
-            if (modal) modal.classList.add('active');
-        }
-        function closeLoginModal() {
-            var modal = document.getElementById('loginModal');
-            if (modal) modal.classList.remove('active');
-        }
-        function openRegisterModal() {
-            var modal = document.getElementById('registerModal');
-            if (modal) modal.classList.add('active');
-        }
-        function closeRegisterModal() {
-            var modal = document.getElementById('registerModal');
-            if (modal) modal.classList.remove('active');
-        }
-        function selectUserType(type) {
-            console.log('👤 Tipo seleccionado:', type);
-            document.querySelectorAll('.user-type-card').forEach(function(card) {
-                card.classList.remove('selected');
-            });
-            event.currentTarget.classList.add('selected');
-            window.selectedUserType = type;
-            var continueBtn = document.getElementById('continueToRegister');
-            if (continueBtn) continueBtn.disabled = false;
-        }
-        
-        // FUNCIÓN LOGIN
-        async function handleLogin(event) {
-            event.preventDefault();
-            console.log('🔐 handleLogin ejecutándose...');
-            
-            var email = document.getElementById('loginEmail').value.trim();
-            var password = document.getElementById('loginPassword').value.trim();
-            
-            if (!email || !password) {
-                alert('⚠️ Por favor completa todos los campos');
-                return false;
-            }
-            
-            if (!supabaseClient) {
-                alert('⚠️ Error de conexión. Recarga la página.');
-                return false;
-            }
-            
-            try {
-                var passwordHash = btoa(password);
-                
-                var result = await supabaseClient
-                    .from('usuarios')
-                    .select('*')
-                    .eq('email', email)
-                    .eq('password_hash', passwordHash)
-                    .single();
-                
-                if (result.error || !result.data) {
-                    console.error('❌ Error login:', result.error);
-                    alert('⚠️ Email o contraseña incorrectos');
-                    return false;
-                }
-                
-                var data = result.data;
-                console.log('✅ Login exitoso:', data);
-                
-                localStorage.setItem('userRegistered', 'true');
-                localStorage.setItem('userName', data.nombre);
-                localStorage.setItem('userEmail', data.email);
-                localStorage.setItem('userType', data.tipo);
-                localStorage.setItem('userId', data.id);
-                localStorage.setItem('userCreditos', data.creditos);
-                
-                if (data.codigo_afiliado_usado) {
-                    localStorage.setItem('codigoAfiliadoDelUsuario', data.codigo_afiliado_usado);
-                }
-                
-                if (data.descuento_primera_compra && !data.primera_compra_realizada) {
-                    localStorage.setItem('descuentoPrimeraCompra', 'true');
-                }
-                
-                closeLoginModal();
-                alert('✅ Bienvenido de nuevo, ' + data.nombre + '!');
-                location.reload();
-                
-            } catch (err) {
-                console.error('❌ Error:', err);
-                alert('⚠️ Error al iniciar sesión');
-            }
-            
-            return false;
-        }
-        
-        // VERIFICAR SESIÓN AL CARGAR
-        window.addEventListener('load', function() {
-            console.log('🔄 Verificando sesión...');
-            var userRegistered = localStorage.getItem('userRegistered');
-            var userType = localStorage.getItem('userType');
-            var userId = localStorage.getItem('userId');
-            var userName = localStorage.getItem('userName');
-            var userEmail = localStorage.getItem('userEmail');
-            var userCreditos = localStorage.getItem('userCreditos') || '0';
-            
-            if (userRegistered === 'true' && userId) {
-                console.log('✅ Sesión activa - Tipo:', userType);
-                
-                // Ocultar auth panel
-                var authPanel = document.getElementById('authPanel');
-                if (authPanel) authPanel.classList.add('hidden');
-                
-                // Ocultar Comenzar Ahora
-                var heroCta = document.getElementById('heroCta');
-                if (heroCta) heroCta.style.display = 'none';
-                
-                // Mostrar logout
-                var logoutBtn = document.getElementById('logoutBtn');
-                if (logoutBtn) logoutBtn.classList.remove('hidden');
-                
-                // Mostrar avatar de usuario con inicial
-                var userAvatar = document.getElementById('userAvatar');
-                var userInitial = document.getElementById('userInitial');
-                if (userAvatar) {
-                    userAvatar.style.display = 'flex';
-                    if (userInitial && userName) {
-                        userInitial.textContent = userName.charAt(0).toUpperCase();
-                    }
-                }
-                
-                // Actualizar créditos en navbar
-                var creditosStandard = document.getElementById('creditosStandard');
-                if (creditosStandard) creditosStandard.textContent = userCreditos;
-                
-                // Actualizar datos del perfil
-                var profileName = document.getElementById('profileName');
-                var profileEmail = document.getElementById('profileEmail');
-                var profileAvatarLarge = document.getElementById('profileAvatarLarge');
-                var profileCreditosStandard = document.getElementById('profileCreditosStandard');
-                
-                if (profileName) profileName.textContent = userName || 'Usuario';
-                if (profileEmail) profileEmail.textContent = userEmail || '';
-                if (profileAvatarLarge && userName) profileAvatarLarge.textContent = userName.charAt(0).toUpperCase();
-                if (profileCreditosStandard) profileCreditosStandard.textContent = userCreditos + ' 💰';
-                
-                // Mostrar panel según tipo
-                if (userType === 'artista') {
-                    var artistaPanel = document.getElementById('artistaPanel');
-                    if (artistaPanel) artistaPanel.classList.add('active');
-                    var artistaName = document.getElementById('artistaName');
-                    if (artistaName) artistaName.textContent = userName || 'Artista';
-                    
-                    // Mostrar secciones de artista
-                    var serviciosSection = document.getElementById('servicios');
-                    var recursosSection = document.getElementById('recursos');
-                    if (serviciosSection) serviciosSection.style.display = 'block';
-                    if (recursosSection) recursosSection.style.display = 'block';
-                } else if (userType === 'curador') {
-                    var curadorPanel = document.getElementById('curadorPanel');
-                    if (curadorPanel) curadorPanel.classList.add('active');
-                    var curadorName = document.getElementById('curadorName');
-                    if (curadorName) curadorName.textContent = userName || 'Curador';
-                }
-            } else {
-                console.log('❌ No hay sesión activa');
-            }
-        });
-        
-        // FUNCIONES CRÍTICAS
-        function isUserRegistered() {
-            return localStorage.getItem('userRegistered') === 'true';
-        }
-        
-        function showRegisterAlert() {
-            alert('⚠️ Debes registrarte primero');
-            openRegisterModal();
-        }
-        
-        function cerrarSesion() {
-            if (confirm('¿Estás seguro que deseas cerrar sesión?')) {
-                localStorage.clear();
-                location.reload();
-            }
-        }
-        
-        function openSmartLinkModal() {
-            if (!isUserRegistered()) { showRegisterAlert(); return; }
-            var modal = document.getElementById('modalSmartLink');
-            if (modal) modal.classList.add('active');
-        }
-        
-        function closeSmartLinkModal() {
-            var modal = document.getElementById('modalSmartLink');
-            if (modal) modal.classList.remove('active');
-        }
-        
-        function openMasteringModal() {
-            if (!isUserRegistered()) { showRegisterAlert(); return; }
-            var modal = document.getElementById('modalMastering');
-            if (modal) modal.classList.add('active');
-        }
-        
-        function closeMasteringModal() {
-            var modal = document.getElementById('modalMastering');
-            if (modal) modal.classList.remove('active');
-        }
-        
-        function openEstadisticasModal() {
-            if (!isUserRegistered()) { showRegisterAlert(); return; }
-            var modal = document.getElementById('modalEstadisticas');
-            if (modal) modal.classList.add('active');
-            cargarEstadisticasCompletas();
-        }
-        
-        // Cargar estadísticas reales de Supabase
-        async function cargarEstadisticasCompletas() {
-            var userId = localStorage.getItem('userId');
-            console.log('📊 userId desde localStorage:', userId);
-            
-            if (!userId || !supabaseClient) {
-                console.log('❌ No hay userId o supabaseClient');
-                return;
-            }
-            
-            try {
-                // Obtener envíos del usuario
-                var enviosResult = await supabaseClient
-                    .from('envios_canciones')
-                    .select('*')
-                    .eq('artista_id', userId)
-                    .order('created_at', { ascending: false });
-                
-                console.log('📊 Consulta envios_canciones:', enviosResult);
-                console.log('📊 Datos:', enviosResult.data);
-                console.log('📊 Error:', enviosResult.error);
-                
-                if (enviosResult.error) {
-                    console.error('❌ Error en consulta:', enviosResult.error);
-                    return;
-                }
-                
-                var envios = enviosResult.data || [];
-                var totalEnvios = envios.length;
-                var aceptados = envios.filter(function(e) { return e.estado === 'aceptado'; }).length;
-                var pendientes = envios.filter(function(e) { return e.estado === 'pendiente'; }).length;
-                var rechazados = envios.filter(function(e) { return e.estado === 'rechazado'; }).length;
-                var tasaAceptacion = totalEnvios > 0 ? Math.round((aceptados / totalEnvios) * 100) : 0;
-                
-                console.log('📊 Estadísticas calculadas:', { totalEnvios, aceptados, pendientes, rechazados });
-                
-                // Actualizar UI
-                var statTotal = document.getElementById('statTotalEnvios');
-                var statAcept = document.getElementById('statAceptados');
-                var statPend = document.getElementById('statPendientes');
-                var statRech = document.getElementById('statRechazados');
-                var statTasa = document.getElementById('statTasaAceptacion');
-                
-                if (statTotal) statTotal.textContent = totalEnvios;
-                if (statAcept) statAcept.textContent = aceptados;
-                if (statPend) statPend.textContent = pendientes;
-                if (statRech) statRech.textContent = rechazados;
-                if (statTasa) statTasa.textContent = tasaAceptacion + '%';
-                
-                // Mostrar últimos 5 envíos
-                var ultimosEnviosList = document.getElementById('ultimosEnviosList');
-                if (!ultimosEnviosList) return;
-                
-                if (envios.length === 0) {
-                    ultimosEnviosList.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.5);">No tienes envíos todavía</p>';
-                } else {
-                    var html = '';
-                    envios.slice(0, 5).forEach(function(envio) {
-                        var estadoColor = envio.estado === 'aceptado' ? '#10b981' : envio.estado === 'rechazado' ? '#ef4444' : '#fbbf24';
-                        var estadoIcon = envio.estado === 'aceptado' ? '✅' : envio.estado === 'rechazado' ? '❌' : '⏳';
-                        var playlistNombre = envio.playlist_nombre || 'Playlist';
-                        var cancionNombre = envio.cancion_nombre || 'Sin nombre';
-                        html += '<div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(0,0,0,0.2); border-radius: 0.5rem;">';
-                        html += '<div><strong>' + cancionNombre + '</strong><br><small style="color: rgba(255,255,255,0.6);">' + playlistNombre + '</small></div>';
-                        html += '<span style="color: ' + estadoColor + '; font-weight: 600;">' + estadoIcon + ' ' + (envio.estado || 'pendiente') + '</span>';
-                        html += '</div>';
-                    });
-                    ultimosEnviosList.innerHTML = html;
-                }
-            } catch (err) {
-                console.error('❌ Error cargando estadísticas:', err);
-            }
-        }
-        
-        function closeEstadisticasModal() {
-            var modal = document.getElementById('modalEstadisticas');
-            if (modal) modal.classList.remove('active');
-        }
-        
-        // TODOS LOS MODALES - FUNCIONES GENÉRICAS
-        function openCreditosModal() {
-            var modal = document.getElementById('modalCreditos');
-            if (modal) modal.classList.add('active');
-        }
-        function closeCreditosModal() {
-            var modal = document.getElementById('modalCreditos');
-            if (modal) modal.classList.remove('active');
-        }
-        function openNotificacionesModal() {
-            var modal = document.getElementById('modalNotificaciones');
-            if (modal) modal.classList.add('active');
-            cargarNotificaciones();
-        }
-        function closeNotificacionesModal() {
-            var modal = document.getElementById('modalNotificaciones');
-            if (modal) modal.classList.remove('active');
-        }
-        
-        // Cargar notificaciones de Supabase
-        async function cargarNotificaciones() {
-            var userId = localStorage.getItem('userId');
-            var container = document.getElementById('notificacionesList');
-            if (!container || !userId || !supabaseClient) return;
-            
-            container.innerHTML = '<div style="text-align: center; padding: 2rem;"><p>Cargando...</p></div>';
-            
-            try {
-                var result = await supabaseClient
-                    .from('notificaciones')
-                    .select('*')
-                    .eq('usuario_id', userId)
-                    .order('created_at', { ascending: false })
-                    .limit(20);
-                
-                if (result.error) throw result.error;
-                
-                if (!result.data || result.data.length === 0) {
-                    container.innerHTML = '<div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);"><div style="font-size: 4rem; margin-bottom: 1rem;">📭</div><p>No tienes notificaciones</p></div>';
-                    return;
-                }
-                
-                var html = '';
-                result.data.forEach(function(notif) {
-                    var bgColor = notif.leida ? 'rgba(255,255,255,0.03)' : 'rgba(124, 58, 237, 0.1)';
-                    var fecha = new Date(notif.created_at).toLocaleDateString('es-ES');
-                    html += '<div style="background: ' + bgColor + '; border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 1.25rem;">';
-                    html += '<div style="display: flex; justify-content: space-between; align-items: start;">';
-                    html += '<div><h4 style="font-weight: 700; margin-bottom: 0.5rem;">' + (notif.titulo || 'Notificación') + '</h4>';
-                    html += '<p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">' + (notif.mensaje || '') + '</p></div>';
-                    html += '<span style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">' + fecha + '</span>';
-                    html += '</div></div>';
-                });
-                container.innerHTML = html;
-            } catch (err) {
-                console.error('Error cargando notificaciones:', err);
-                container.innerHTML = '<div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);"><p>Error al cargar notificaciones</p></div>';
-            }
-        }
-        
-        function closeHistorialModal() {
-            var modal = document.getElementById('modalHistorial');
-            if (modal) modal.classList.remove('active');
-        }
-        
-        // Marcar notificaciones como leídas
-        async function marcarTodasLeidas() {
-            var userId = localStorage.getItem('userId');
-            if (!userId || !supabaseClient) return;
-            
-            try {
-                await supabaseClient
-                    .from('notificaciones')
-                    .update({ leida: true })
-                    .eq('usuario_id', userId);
-                
-                cargarNotificaciones();
-                alert('✅ Notificaciones marcadas como leídas');
-            } catch (err) {
-                console.error('Error:', err);
-            }
-        }
-        function openContactoModal() {
-            var modal = document.getElementById('modalContacto');
-            if (modal) modal.classList.add('active');
-        }
-        window.openContactoModal = openContactoModal;
-        function closeContactoModal() {
-            var modal = document.getElementById('modalContacto');
-            if (modal) modal.classList.remove('active');
-        }
-        function openAfiliadosModal() {
-            var modal = document.getElementById('modalAfiliados');
-            if (modal) modal.classList.add('active');
-        }
-        function closeAfiliadosModal() {
-            var modal = document.getElementById('modalAfiliados');
-            if (modal) modal.classList.remove('active');
-        }
-        function openMisPuntosModal() {
-            var modal = document.getElementById('modalMisPuntos');
-            if (modal) modal.classList.add('active');
-        }
-        function closeMisPuntosModal() {
-            var modal = document.getElementById('modalMisPuntos');
-            if (modal) modal.classList.remove('active');
-        }
-        function openPerfilModal() {
-            var modal = document.getElementById('modalPerfil');
-            if (modal) modal.classList.add('active');
-        }
-        function closePerfilModal() {
-            var modal = document.getElementById('modalPerfil');
-            if (modal) modal.classList.remove('active');
-        }
-        function openEventosModal() {
-            var modal = document.getElementById('modalEventos');
-            if (modal) modal.classList.add('active');
-        }
-        function closeEventosModal() {
-            var modal = document.getElementById('modalEventos');
-            if (modal) modal.classList.remove('active');
-        }
-        function openEquipoModal() {
-            var modal = document.getElementById('modalEquipo');
-            if (modal) modal.classList.add('active');
-        }
-        function closeEquipoModal() {
-            var modal = document.getElementById('modalEquipo');
-            if (modal) modal.classList.remove('active');
-        }
-        function openNovedadesModal() {
-            var modal = document.getElementById('modalNovedades');
-            if (modal) modal.classList.add('active');
-        }
-        function closeNovedadesModal() {
-            var modal = document.getElementById('modalNovedades');
-            if (modal) modal.classList.remove('active');
-        }
-        function openTerminosModal() {
-            var modal = document.getElementById('modalTerminos');
-            if (modal) modal.classList.add('active');
-        }
-        function closeTerminosModal() {
-            var modal = document.getElementById('modalTerminos');
-            if (modal) modal.classList.remove('active');
-        }
-        function openPrivacidadModal() {
-            var modal = document.getElementById('modalPrivacidad');
-            if (modal) modal.classList.add('active');
-        }
-        function closePrivacidadModal() {
-            var modal = document.getElementById('modalPrivacidad');
-            if (modal) modal.classList.remove('active');
-        }
-        function openPitchGuiaModal() {
-            var modal = document.getElementById('modalPitchGuia');
-            if (modal) modal.classList.add('active');
-        }
-        function closePitchGuiaModal() {
-            var modal = document.getElementById('modalPitchGuia');
-            if (modal) modal.classList.remove('active');
-        }
-        function openSpotifyModal() {
-            var modal = document.getElementById('modalSpotify');
-            if (modal) modal.classList.add('active');
-        }
-        function closeSpotifyModal() {
-            var modal = document.getElementById('modalSpotify');
-            if (modal) modal.classList.remove('active');
-        }
-        function openPortadasModal() {
-            var modal = document.getElementById('modalPortadas');
-            if (modal) modal.classList.add('active');
-        }
-        function closePortadasModal() {
-            var modal = document.getElementById('modalPortadas');
-            if (modal) modal.classList.remove('active');
-        }
-        function openPlaylistsTOPModal() {
-            var modal = document.getElementById('modalPlaylistsTOP');
-            if (modal) modal.classList.add('active');
-            cargarPlaylistsTOP();
-        }
-        function closePlaylistsTOPModal() {
-            var modal = document.getElementById('modalPlaylistsTOP');
-            if (modal) modal.classList.remove('active');
-        }
-        
-        // Cargar playlists TOP de Supabase (desde tabla solicitudes_destacar)
-        async function cargarPlaylistsTOP() {
-            var container = document.getElementById('playlistsTOPGrid');
-            if (!container || !supabaseClient) {
-                console.log('No hay container o supabaseClient');
-                return;
-            }
-            
-            container.innerHTML = '<div style="text-align: center; padding: 2rem; grid-column: 1/-1;"><p>Cargando playlists destacadas...</p></div>';
-            
-            console.log('Cargando playlists destacadas...');
-            
-            try {
-                // Consultar solicitudes_destacar con estado aprobado
-                var result = await supabaseClient
-                    .from('solicitudes_destacar')
-                    .select('*')
-                    .eq('estado', 'aprobado')
-                    .order('created_at', { ascending: false })
-                    .limit(12);
-                
-                console.log('Resultado solicitudes_destacar:', result);
-                
-                if (result.error) {
-                    console.error('Error en consulta:', result.error);
-                }
-                
-                if (!result.data || result.data.length === 0) {
-                    container.innerHTML = '<div style="text-align: center; padding: 3rem; grid-column: 1/-1; color: rgba(255,255,255,0.6);"><div style="font-size: 4rem; margin-bottom: 1rem;">🏆</div><h3 style="margin-bottom: 1rem;">No hay playlists destacadas actualmente</h3><p style="font-size: 0.9rem;">Los curadores pueden pagar para aparecer aquí y recibir más envíos.</p></div>';
-                    return;
-                }
-                
-                // Obtener datos completos de las playlists
-                var playlistIds = result.data.map(function(s) { return s.playlist_id; }).filter(function(id) { return id; });
-                var playlistsMap = {};
-                
-                if (playlistIds.length > 0) {
-                    var playlistsResult = await supabaseClient
-                        .from('playlists')
-                        .select('*')
-                        .in('id', playlistIds);
-                    
-                    if (playlistsResult.data) {
-                        playlistsResult.data.forEach(function(p) {
-                            playlistsMap[p.id] = p;
-                        });
-                    }
-                }
-                
-                var html = '';
-                result.data.forEach(function(item) {
-                    var playlist = playlistsMap[item.playlist_id] || {};
-                    var seguidores = playlist.followers || 0;
-                    var seguidoresText = seguidores >= 1000 ? Math.round(seguidores/1000) + 'K' : seguidores;
-                    var nombre = item.playlist_nombre || playlist.nombre || 'Sin nombre';
-                    
-                    html += '<div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1)); border: 2px solid rgba(139, 92, 246, 0.3); border-radius: 1rem; padding: 1.5rem; position: relative;">';
-                    html += '<div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.3rem 0.6rem; border-radius: 0.5rem; font-size: 0.7rem; font-weight: 800; color: #1e293b;">⭐ DESTACADA</div>';
-                    html += '<div style="width: 100%; height: 140px; background: linear-gradient(135deg, #7c3aed, #ec4899); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 1rem;">🏆</div>';
-                    html += '<h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem;">' + nombre + '</h3>';
-                    html += '<p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.75rem;">👥 <strong>' + seguidoresText + '</strong> seguidores</p>';
-                    if (playlist.genero) {
-                        html += '<p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-bottom: 1rem;">' + playlist.genero + '</p>';
-                    }
-                    if (playlist.url_spotify) {
-                        html += '<a href="' + playlist.url_spotify + '" target="_blank" style="display: block; width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #1db954, #1ed760); border: none; border-radius: 0.5rem; color: white; font-weight: 700; text-align: center; text-decoration: none; font-size: 0.9rem;">Ver en Spotify</a>';
-                    }
-                    html += '</div>';
-                });
-                container.innerHTML = html;
-            } catch (err) {
-                console.error('Error cargando playlists TOP:', err);
-                container.innerHTML = '<div style="text-align: center; padding: 3rem; grid-column: 1/-1; color: rgba(255,255,255,0.5);"><p>Error al cargar playlists destacadas</p></div>';
-            }
-        }
-        // Modales de curador
-        function openMisPlaylistsModal() {
-            var modal = document.getElementById('modalMisPlaylists');
-            if (modal) modal.classList.add('active');
-        }
-        function closeMisPlaylistsModal() {
-            var modal = document.getElementById('modalMisPlaylists');
-            if (modal) modal.classList.remove('active');
-        }
-        function openEnviosRecibidosModal() {
-            var modal = document.getElementById('modalEnviosRecibidos');
-            if (modal) modal.classList.add('active');
-        }
-        function closeEnviosRecibidosModal() {
-            var modal = document.getElementById('modalEnviosRecibidos');
-            if (modal) modal.classList.remove('active');
-        }
-        function openGananciasModal() {
-            var modal = document.getElementById('modalGanancias');
-            if (modal) modal.classList.add('active');
-        }
-        function closeGananciasModal() {
-            var modal = document.getElementById('modalGanancias');
-            if (modal) modal.classList.remove('active');
-        }
-        function openEstadisticasCuradorModal() {
-            var modal = document.getElementById('modalEstadisticasCurador');
-            if (modal) modal.classList.add('active');
-        }
-        function closeEstadisticasCuradorModal() {
-            var modal = document.getElementById('modalEstadisticasCurador');
-            if (modal) modal.classList.remove('active');
-        }
-        function openAgregarPlaylistModal() {
-            var modal = document.getElementById('modalAgregarPlaylist');
-            if (modal) modal.classList.add('active');
-        }
-        function closeAgregarPlaylistModal() {
-            var modal = document.getElementById('modalAgregarPlaylist');
-            if (modal) modal.classList.remove('active');
-        }
-        function openPagosModal() {
-            var modal = document.getElementById('modalPagos');
-            if (modal) modal.classList.add('active');
-        }
-        function closePagosModal() {
-            var modal = document.getElementById('modalPagos');
-            if (modal) modal.classList.remove('active');
-        }
-        function openServiciosCuradorModal() {
-            var modal = document.getElementById('modalServiciosCurador');
-            if (modal) modal.classList.add('active');
-        }
-        function closeServiciosCuradorModal() {
-            var modal = document.getElementById('modalServiciosCurador');
-            if (modal) modal.classList.remove('active');
-        }
-        function openPremiumCuradorModal() {
-            var modal = document.getElementById('modalPremiumCurador');
-            if (modal) modal.classList.add('active');
-        }
-        function closePremiumCuradorModal() {
-            var modal = document.getElementById('modalPremiumCurador');
-            if (modal) modal.classList.remove('active');
-        }
-        
-        // Funciones adicionales
-        function editarPerfil() {
-            // Mostrar modal de edición
-            var nombre = prompt('Introduce tu nuevo nombre:', localStorage.getItem('userName') || '');
-            if (nombre && nombre.trim() !== '') {
-                actualizarPerfil(nombre.trim());
-            }
-        }
-        
-        async function actualizarPerfil(nuevoNombre) {
-            var userId = localStorage.getItem('userId');
-            if (!userId || !supabaseClient) {
-                alert('Error: No hay sesión activa');
-                return;
-            }
-            
-            try {
-                var result = await supabaseClient
-                    .from('usuarios')
-                    .update({ nombre: nuevoNombre })
-                    .eq('id', userId);
-                
-                if (result.error) throw result.error;
-                
-                localStorage.setItem('userName', nuevoNombre);
-                
-                // Actualizar UI
-                var profileName = document.getElementById('profileName');
-                var artistaName = document.getElementById('artistaName');
-                var userInitial = document.getElementById('userInitial');
-                var profileAvatarLarge = document.getElementById('profileAvatarLarge');
-                
-                if (profileName) profileName.textContent = nuevoNombre;
-                if (artistaName) artistaName.textContent = nuevoNombre;
-                if (userInitial) userInitial.textContent = nuevoNombre.charAt(0).toUpperCase();
-                if (profileAvatarLarge) profileAvatarLarge.textContent = nuevoNombre.charAt(0).toUpperCase();
-                
-                alert('✅ Perfil actualizado correctamente');
-            } catch (err) {
-                console.error('Error actualizando perfil:', err);
-                alert('❌ Error al actualizar el perfil');
-            }
-        }
-        
-        function comprarCreditos() {
-            closePerfilModal();
-            openCreditosModal();
-        }
-        
-        // FUNCIÓN DE REGISTRO DE AFILIADO
-        async function registrarAfiliado() {
-            var nombre = prompt('👤 ¿Cuál es tu nombre completo?');
-            if (!nombre) return;
-            
-            var email = prompt('📧 ¿Cuál es tu email?');
-            if (!email || email.indexOf('@') === -1) {
-                alert('⚠️ Por favor ingresa un email válido');
-                return;
-            }
-            
-            var instagram = prompt('📱 ¿Cuál es tu usuario de Instagram? (opcional)\n\nEjemplo: @tunombre');
-            var youtube = prompt('🎥 ¿Tienes canal de YouTube? (opcional)\n\nDeja el link o escribe "no"');
-            
-            // Generar código de afiliado único
-            var codigoAfiliado = 'ALG' + nombre.substring(0,3).toUpperCase() + Math.random().toString(36).substring(2,6).toUpperCase();
-            var userId = localStorage.getItem('userId');
-            
-            try {
-                var result = await supabaseClient
-                    .from('solicitudes_afiliados')
-                    .insert({
-                        user_id: userId || null,
-                        nombre: nombre,
-                        email: email,
-                        instagram: instagram || null,
-                        youtube: (youtube && youtube.toLowerCase() !== 'no') ? youtube : null,
-                        codigo_afiliado: codigoAfiliado,
-                        estado: 'pendiente'
-                    });
-                
-                if (result.error) {
-                    console.error('Error guardando solicitud:', result.error);
-                }
-                
-                alert('🎉 ¡SOLICITUD ENVIADA!\n\n' +
-                      'Gracias por tu interés, ' + nombre + '!\n\n' +
-                      '📋 Resumen de tu solicitud:\n' +
-                      'Email: ' + email + '\n' +
-                      (instagram ? 'Instagram: ' + instagram + '\n' : '') +
-                      '\n⏱ Procesaremos tu solicitud en las próximas 24 horas.\n\n' +
-                      '📧 Cuando seas aprobado recibirás:\n' +
-                      '• Tu link de afiliado personalizado\n' +
-                      '• Tu código de referido único\n' +
-                      '• Instrucciones para promover\n\n' +
-                      '¡Bienvenido al equipo! 🚀');
-                
-            } catch(err) {
-                console.error('Error en registrarAfiliado:', err);
-                alert('🎉 ¡SOLICITUD ENVIADA!\n\nGracias, ' + nombre + '!\nTe contactaremos pronto a: ' + email);
-            }
-            
-            closeAfiliadosModal();
-        }
-        
-        // FUNCIÓN HISTORIAL MODAL (disponible globalmente)
-        async function openHistorialModal() {
-            if (!isUserRegistered()) { showRegisterAlert(); return; }
-            var modal = document.getElementById('modalHistorial');
-            if (modal) modal.classList.add('active');
-            // cargarHistorialEnvios se llama después cuando esté disponible
-            if (typeof cargarHistorialEnvios === 'function') {
-                await cargarHistorialEnvios();
-            } else {
-                setTimeout(async function() {
-                    if (typeof cargarHistorialEnvios === 'function') {
-                        await cargarHistorialEnvios();
-                    }
-                }, 100);
-            }
-        }
-        
-        // FUNCIÓN COMPRAR CRÉDITO (disponible globalmente)
-        async function comprarCredito(tipo, precio) {
-            var userId = localStorage.getItem('userId');
-            var codigoAfiliado = localStorage.getItem('codigoAfiliadoDelUsuario');
-            
-            // Registrar comisión para el afiliado
-            if (codigoAfiliado && userId && supabaseClient) {
-                var monto = tipo === 'standard' ? 1.50 : 3.00;
-                var comision = monto * 0.15;
-                
-                try {
-                    await supabaseClient
-                        .from('comisiones_afiliados')
-                        .insert({
-                            codigo_afiliado: codigoAfiliado,
-                            usuario_comprador_id: userId,
-                            monto_compra: monto,
-                            comision: comision,
-                            tipo_compra: 'credito_' + tipo,
-                            estado: 'pendiente'
-                        });
-                    console.log('💰 Comisión de afiliado registrada:', comision.toFixed(2) + '€');
-                } catch(err) {
-                    console.log('Error registrando comisión:', err);
-                }
-            }
-            
-            // Redirigir a Stripe Payment Link
-            if (tipo === 'standard') {
-                window.open('https://buy.stripe.com/eVq28s2nBaufb3r6JH0x20a', '_blank');
-            } else if (tipo === 'premium') {
-                window.open('https://buy.stripe.com/8x2fZi0ft1XJ3AZ3xv0x20b', '_blank');
-            }
-        }
-    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Sora:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -2453,7 +1664,7 @@
             <div class="panel-card" onclick="openMasteringModal()">
                 <div class="panel-card-icon">🎚️</div>
                 <h3 class="panel-card-title">Mastering IA</h3>
-                <p class="panel-card-desc">4.99€ por pista</p>
+                <p class="panel-card-desc">4.99€</p>
             </div>
             <div class="panel-card" onclick="openSmartLinkModal()">
                 <div class="panel-card-icon">🔗</div>
@@ -2472,11 +1683,6 @@
     <div class="user-panel" id="curadorPanel">
         <div class="panel-header">
             <h2>🎧 Bienvenido, <span id="curadorName">Curador</span></h2>
-            
-            <!-- Estado conexión Spotify -->
-            <div id="spotifyConnectionStatus" style="margin-top: 1rem;">
-                <!-- Se llenará dinámicamente -->
-            </div>
             
             <!-- Display de Puntos -->
             <div style="background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 1.25rem; border-radius: 1rem; margin-top: 1rem; text-align: center;">
@@ -2600,6 +1806,11 @@
                 <h3 class="step-title">Mastering IA</h3>
                 <p class="step-desc">Mejora el sonido con inteligencia artificial</p>
             </div>
+            <div class="step-card" onclick="openAnalisisModal()" style="cursor: pointer;">
+                <div class="step-icon">🔍</div>
+                <h3 class="step-title">Análisis Artista</h3>
+                <p class="step-desc">Analiza tu perfil de Spotify</p>
+            </div>
             <div class="step-card" onclick="openAfiliadosModal()" style="cursor: pointer;">
                 <div class="step-icon">🤝</div>
                 <h3 class="step-title">Afiliados</h3>
@@ -2661,7 +1872,7 @@
                     <div class="pack-price">€8.50</div>
                     <p class="pack-credits">en créditos</p>
                     <span class="pack-save">✓ Ahorra €1.50</span>
-                    <button class="pack-btn" onclick="window.open('https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207', '_blank')">
+                    <button class="pack-btn" onclick="window.open('https://buy.stripe.com/aFa14oe6j59V5J7d850x209', '_blank')">
                         Comprar Pack
                     </button>
                 </div>
@@ -2684,7 +1895,7 @@
                     <div class="pack-price">€42.50</div>
                     <p class="pack-credits">en créditos</p>
                     <span class="pack-save">✓ Ahorra €7.50</span>
-                    <button class="pack-btn" onclick="window.open('https://buy.stripe.com/aFa14oe6j59V5J7d850x209', '_blank')">
+                    <button class="pack-btn" onclick="window.open('https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207', '_blank')">
                         Comprar Pack
                     </button>
                 </div>
@@ -2860,7 +2071,7 @@
                 <a href="https://www.facebook.com/share/1CxxsB4Mkb/" target="_blank" title="Facebook">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                 </a>
-                <a href="javascript:void(0)" onclick="window.location.href='mailto:' + 'soportealgoritmoenmovimiento' + '@' + 'gmail.com'" title="Email">
+                <a href="/cdn-cgi/l/email-protection#9deef2edf2efe9f8fcf1faf2eff4e9f0f2f8f3f0f2ebf4f0f4f8f3e9f2ddfaf0fcf4f1b3fef2f0" title="Email">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
                 </a>
             </div>
@@ -3188,15 +2399,55 @@
             
             <form id="smartLinkForm" class="auth-form">
                 <div class="form-group">
-                    <label>🟢 Link de Spotify</label>
-                    <input type="url" id="slSpotify" placeholder="https://open.spotify.com/track/..." required>
-                    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Pega el enlace de tu canción en Spotify. Ejemplo: <a href="https://song.link/s/2NTqjRmiqcg7uda73p0cjS" target="_blank" style="color: #a78bfa;">https://song.link/s/2NTqjRmiqcg7uda73p0cjS</a></p>
+                    <label>🎵 Nombre de la Canción</label>
+                    <input type="text" id="slSongName" placeholder="Título de tu canción" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>👤 Nombre del Artista</label>
+                    <input type="text" id="slArtistName" placeholder="Tu nombre artístico" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>🎨 URL de la Portada (opcional)</label>
+                    <input type="url" id="slCoverUrl" placeholder="https://ejemplo.com/portada.jpg">
+                    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Si no tienes, generaremos una portada genérica</p>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <h4 style="font-weight: 800; margin-bottom: 1rem; font-size: 1.1rem;">🌐 Enlaces a Plataformas</h4>
+                    <p style="font-size: 0.9rem; color: rgba(255,255,255,0.7); margin-bottom: 1rem;">Agrega los enlaces de tu canción en cada plataforma (mínimo 1)</p>
+                    
+                    <div class="form-group">
+                        <label>🟢 Spotify URL</label>
+                        <input type="url" id="slSpotify" placeholder="https://open.spotify.com/track/...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>🎵 Apple Music URL</label>
+                        <input type="url" id="slApple" placeholder="https://music.apple.com/...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>▶️ YouTube URL</label>
+                        <input type="url" id="slYoutube" placeholder="https://youtube.com/watch?v=...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>🎶 Deezer URL</label>
+                        <input type="url" id="slDeezer" placeholder="https://www.deezer.com/track/...">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label>🎧 SoundCloud URL</label>
+                        <input type="url" id="slSoundcloud" placeholder="https://soundcloud.com/...">
+                    </div>
                 </div>
                 
                 <div class="form-group">
                     <label>📧 Email de Contacto</label>
                     <input type="email" id="slEmail" placeholder="tu@email.com" required>
-                    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Te enviaremos tu SmartLink aquí</p>
+                    <p style="font-size: 0.8rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">Te enviaremos el SmartLink y las estadísticas aquí</p>
                 </div>
                 
                 <button type="submit" class="btn-submit" style="margin-top: 2rem;">💳 Pagar 1.99€ y Crear SmartLink</button>
@@ -3219,9 +2470,15 @@
             <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">🎚 Mastering IA</h2>
             <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;">Mejora profesionalmente la calidad de sonido de tu pista</p>
             
+            <!-- Contador de uso gratuito -->
+            <div class="usage-counter">
+                <div class="usage-number" id="freeUsageCount">1</div>
+                <div class="usage-label">Mastering gratuito disponible este mes</div>
+            </div>
+            
             <div class="price-box" style="background: linear-gradient(135deg, #ec4899, #f97316);">
                 <div class="price-amount">4.99€</div>
-                <div class="price-label">Por pista</div>
+                <div class="price-label">Por pista adicional</div>
             </div>
             
             <div class="info-box">
@@ -3268,7 +2525,7 @@
                     </select>
                 </div>
                 
-                <!-- INSTRUCCIONES ENVÍO ARCHIVO POR EMAIL -->
+                <!-- INSTRUCCIONES ENVÍO ARCHIVO -->
                 <div style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(236, 72, 153, 0.2)); border: 2px dashed rgba(124, 58, 237, 0.5); border-radius: 1rem; padding: 1.5rem; text-align: center; margin: 1rem 0;">
                     <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📧</div>
                     <h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.75rem; color: white;">Envía tu archivo por email</h3>
@@ -3282,9 +2539,6 @@
                         Formatos: MP3, WAV o FLAC (máx 100MB)<br>
                         Asunto: "Mastering - [Nombre de tu canción]"
                     </p>
-                    <button type="button" onclick="abrirCorreoMastering()" style="margin-top: 1rem; padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #8b5cf6, #ec4899); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                        📧 Abrir correo ahora
-                    </button>
                 </div>
                 
                 <div class="form-group">
@@ -3294,7 +2548,8 @@
                 </div>
                 
                 <button type="submit" class="btn-submit" style="margin-top: 2rem;" id="masteringSubmitBtn">
-                    💳 Pagar 4.99€ y Masterizar
+                    <span id="submitTextFree">🎁 Usar Mastering Gratuito</span>
+                    <span id="submitTextPaid" class="hidden">💳 Pagar 4.99€ y Masterizar</span>
                 </button>
             </form>
             
@@ -3313,54 +2568,81 @@
         </div>
     </div>
 
-    <!-- MODAL PORTADAS IA -->
-
     <!-- MODAL ESTADÍSTICAS -->
     <div class="modal" id="modalEstadisticas">
-        <div class="modal-content" style="max-width: 900px;">
+        <div class="modal-content" style="max-width: 1000px;">
             <button class="modal-close" onclick="closeEstadisticasModal()">×</button>
             <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">📊 Mis Estadísticas</h2>
-            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">Resumen de tus envíos a playlists</p>
+            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">Resumen de tu actividad en la plataforma</p>
             
             <!-- Cards de estadísticas principales -->
-            <div id="statsContainer" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-                <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">📤</div>
-                    <div style="font-size: 2.5rem; font-weight: 900; color: #a78bfa;" id="statTotalEnvios">0</div>
-                    <div style="color: rgba(255,255,255,0.7);">Total Envíos</div>
+            <div class="stats-grid" id="statsGridArtista">
+                <div class="stat-card">
+                    <div class="stat-icon">📤</div>
+                    <div class="stat-value" id="statTotalEnvios">0</div>
+                    <div class="stat-label">Envíos Totales</div>
                 </div>
-                <div style="background: rgba(16, 185, 129, 0.1); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">✅</div>
-                    <div style="font-size: 2.5rem; font-weight: 900; color: #10b981;" id="statAceptados">0</div>
-                    <div style="color: rgba(255,255,255,0.7);">Aceptados</div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value" id="statAceptados">0</div>
+                    <div class="stat-label">Aceptados</div>
                 </div>
-                <div style="background: rgba(251, 191, 36, 0.1); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">⏳</div>
-                    <div style="font-size: 2.5rem; font-weight: 900; color: #fbbf24;" id="statPendientes">0</div>
-                    <div style="color: rgba(255,255,255,0.7);">Pendientes</div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">❌</div>
+                    <div class="stat-value" id="statRechazados">0</div>
+                    <div class="stat-label">Rechazados</div>
                 </div>
-                <div style="background: rgba(239, 68, 68, 0.1); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 2.5rem; margin-bottom: 0.5rem;">❌</div>
-                    <div style="font-size: 2.5rem; font-weight: 900; color: #ef4444;" id="statRechazados">0</div>
-                    <div style="color: rgba(255,255,255,0.7);">Rechazados</div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon">⏳</div>
+                    <div class="stat-value" id="statPendientes">0</div>
+                    <div class="stat-label">Pendientes</div>
                 </div>
             </div>
             
             <!-- Tasa de aceptación -->
-            <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem;">
-                <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem; text-align: center;">📈 Tasa de Aceptación</h3>
-                <div style="text-align: center;">
-                    <span style="font-size: 3rem; font-weight: 900; background: linear-gradient(135deg, #7c3aed, #ec4899); -webkit-background-clip: text; -webkit-text-fill-color: transparent;" id="statTasaAceptacion">0%</span>
+            <div class="chart-container" style="margin-top: 2rem;">
+                <h3 class="chart-title">📈 Tasa de Aceptación</h3>
+                <div style="display: flex; align-items: center; gap: 2rem; justify-content: center; padding: 2rem;">
+                    <div style="position: relative; width: 150px; height: 150px;">
+                        <svg width="150" height="150" viewBox="0 0 150 150">
+                            <circle cx="75" cy="75" r="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="15"/>
+                            <circle cx="75" cy="75" r="60" fill="none" stroke="#10b981" stroke-width="15" stroke-linecap="round"
+                                stroke-dasharray="377" id="progressCircle" stroke-dashoffset="377"
+                                transform="rotate(-90 75 75)"/>
+                        </svg>
+                        <div style="position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; flex-direction: column;">
+                            <span style="font-size: 2.5rem; font-weight: 900;" id="tasaAceptacion">0%</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p style="color: rgba(255,255,255,0.8); margin-bottom: 0.5rem;">
+                            <span style="color: #10b981; font-weight: 700;">●</span> Aceptados: <strong id="barAceptados">0</strong>
+                        </p>
+                        <p style="color: rgba(255,255,255,0.8); margin-bottom: 0.5rem;">
+                            <span style="color: #ef4444; font-weight: 700;">●</span> Rechazados: <strong id="barRechazados">0</strong>
+                        </p>
+                        <p style="color: rgba(255,255,255,0.8);">
+                            <span style="color: #f59e0b; font-weight: 700;">●</span> Pendientes: <strong id="barPendientes">0</strong>
+                        </p>
+                    </div>
                 </div>
-                <p style="text-align: center; font-size: 0.9rem; color: rgba(255,255,255,0.6); margin-top: 0.5rem;">de tus envíos fueron aceptados</p>
             </div>
             
             <!-- Últimos envíos -->
-            <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem;">
-                <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 1rem;">📋 Últimos 5 Envíos</h3>
-                <div id="ultimosEnviosList" style="display: grid; gap: 1rem;">
+            <div class="chart-container" style="margin-top: 2rem;">
+                <h3 class="chart-title">🎵 Últimos Envíos</h3>
+                <div id="listaUltimosEnvios" style="display: flex; flex-direction: column; gap: 1rem;">
                     <p style="text-align: center; color: rgba(255,255,255,0.5);">Cargando...</p>
                 </div>
+            </div>
+            
+            <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; margin-top: 2rem; text-align: center;">
+                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">
+                    💡 <strong>Tip:</strong> Envía tu música a más playlists para aumentar tu tasa de aceptación
+                </p>
             </div>
         </div>
     </div>
@@ -3411,14 +2693,14 @@
                     <div class="payment-details">
                         <div class="payment-detail-line">
                             <span class="payment-detail-label">Email:</span>
-                            <span class="payment-detail-value" style="font-size: 0.85rem;">gzapuestaspremium@hotmail.com</span>
+                            <span class="payment-detail-value" style="font-size: 0.85rem;"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="086f7269787d6d7b7c697b787a6d65617d654860677c65696164266b6765">[email&#160;protected]</a></span>
                         </div>
                         <button class="copy-btn" onclick="event.stopPropagation(); copyToClipboard('gzapuestaspremium@hotmail.com', 'PayPal')">📋 Copiar</button>
                     </div>
                     <div class="payment-instructions">
                         <strong>Instrucciones:</strong><br>
                         1. Accede a PayPal<br>
-                        2. Envía dinero a: gzapuestaspremium@hotmail.com<br>
+                        2. Envía dinero a: <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="05627f6475706076716476757760686c7068456d6a7168646c692b666a68">[email&#160;protected]</a><br>
                         3. Importe: <strong class="payment-amount-text">0.00€</strong><br>
                         4. Marca como "Envío a amigos y familiares" para evitar comisiones
                     </div>
@@ -3507,8 +2789,6 @@
         </div>
     </div>
 
-    <!-- MODAL PORTADAS IA -->
-
     <!-- MODAL CRÉDITOS -->
     <div class="modal" id="modalCreditos">
         <div class="modal-content">
@@ -3579,7 +2859,7 @@
                         <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 1rem;">
                             ≈ 5-6 envíos Standard<br>≈ 2-3 envíos Premium
                         </div>
-                        <button onclick="window.open('https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207', '_blank')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
+                        <button onclick="window.open('https://buy.stripe.com/aFa14oe6j59V5J7d850x209', '_blank')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
                             Comprar €10
                         </button>
                     </div>
@@ -3617,7 +2897,7 @@
                         <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 1rem;">
                             ≈ 28 envíos Standard<br>≈ 14 envíos Premium
                         </div>
-                        <button onclick="window.open('https://buy.stripe.com/aFa14oe6j59V5J7d850x209', '_blank')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
+                        <button onclick="window.open('https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207', '_blank')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
                             Comprar €50
                         </button>
                     </div>
@@ -3804,7 +3084,7 @@
                     M
                 </div>
                 <h3 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem;" id="profileName">Micael Alvarez Guzzetta</h3>
-                <p style="color: rgba(255,255,255,0.6); font-size: 1rem;" id="profileEmail">usuario@email.com</p>
+                <p style="color: rgba(255,255,255,0.6); font-size: 1rem;" id="profileEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="04696d6765616844617c65697468612a676b69">[email&#160;protected]</a></p>
                 <p style="color: rgba(255,255,255,0.5); font-size: 0.9rem; margin-top: 0.5rem;" id="profileTipoUsuario">👤 Artista • Miembro desde Enero 2026</p>
             </div>
             
@@ -4217,7 +3497,7 @@
             <div style="background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem;">
                 <div style="text-align: center; margin-bottom: 1rem;">
                     <div style="font-size: 3rem; font-weight: 900; color: #8b5cf6;">14.99€</div>
-                    <div style="color: rgba(255,255,255,0.7);">por mes / por playlist</div>
+                    <div style="color: rgba(255,255,255,0.7);">pago único / 30 días</div>
                 </div>
                 <div style="background: rgba(251, 191, 36, 0.1); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 0.75rem; padding: 1rem; text-align: center;">
                     <div style="color: #fbbf24; font-weight: 700; margin-bottom: 0.25rem;">⚠️ Límite de plazas</div>
@@ -4229,10 +3509,9 @@
             <!-- Seleccionar playlist -->
             <div style="margin-bottom: 2rem;">
                 <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">Selecciona la playlist a destacar:</label>
-                <select id="playlistParaDestacar" style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: white;">
-                    <option value="">-- Selecciona una playlist --</option>
-                    <option value="reggaeton2026">🔥 Reggaeton 2026 (25,430 seguidores)</option>
-                    <option value="trapelite">💎 Trap Elite (18,720 seguidores)</option>
+                <select id="playlistParaDestacar" style="width: 100%; padding: 0.75rem; background: #ffffff; border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: #000000; font-weight: 500;">
+                    <option value="" style="color: #000;">-- Selecciona una playlist --</option>
+                    <!-- Se cargarán dinámicamente -->
                 </select>
             </div>
             
@@ -4242,7 +3521,7 @@
                     Cancelar
                 </button>
                 <button onclick="activarPremiumPlaylist()" style="flex: 1; padding: 1rem; background: linear-gradient(135deg, #8b5cf6, #ec4899); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
-                    ⭐ Activar por 14.99€/mes
+                    ⭐ Pagar 14.99€ y Activar
                 </button>
             </div>
         </div>
@@ -4542,17 +3821,6 @@
                     </button>
                 </div>
                 
-                <!-- Creador de Portadas IA -->
-                <div style="background: rgba(249, 115, 22, 0.1); border: 2px solid rgba(249, 115, 22, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                    <div style="font-size: 3rem; margin-bottom: 0.5rem;">🎨</div>
-                    <h3 style="font-weight: 800; margin-bottom: 0.5rem;">Portadas IA</h3>
-                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 1rem;">Crea portadas con inteligencia artificial</p>
-                    <div style="font-size: 1.5rem; font-weight: 900; color: #f97316; margin-bottom: 1rem;">40 puntos</div>
-                    <button onclick="canjearServicioCurador('portadas_ia', 40)" style="width: 100%; padding: 0.75rem; background: #f97316; color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer;">
-                        Canjear
-                    </button>
-                </div>
-                
             </div>
             
             <!-- Info -->
@@ -4572,22 +3840,29 @@
         <div class="modal-content" style="max-width: 1000px;">
             <button class="modal-close" onclick="closePlaylistsTOPModal()">×</button>
             <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;">🏆 Playlists TOP</h2>
-            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">Las playlists más populares con mayor alcance</p>
+            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 3rem;">Las playlists destacadas con mayor alcance de la plataforma</p>
             
-            <!-- Grid de playlists TOP dinámico -->
-            <div id="playlistsTOPGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
-                <div style="text-align: center; padding: 2rem; grid-column: 1/-1;"><p>Cargando playlists...</p></div>
+            <!-- Grid de playlists TOP - SE CARGA DINÁMICAMENTE -->
+            <div id="playlistsTOPGrid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 2rem;">
+                <div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                    ⏳ Cargando playlists destacadas...
+                </div>
             </div>
             
             <!-- Info adicional -->
-            <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                <p style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">
-                    💡 Las playlists TOP son aquellas con más de 300 seguidores verificados.<br>
-                    ⭐ Las playlists PREMIUM tienen más de 1000 seguidores.
+            <div style="background: rgba(251, 191, 36, 0.1); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                <p style="font-size: 1rem;">
+                    <strong>⭐ Playlists PREMIUM</strong> tienen mayor alcance y visibilidad destacada
                 </p>
             </div>
         </div>
     </div>
+
+    <!-- MODAL GUÍA PITCH SPOTIFY -->
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL GUÍA PITCH SPOTIFY -->
     <div class="modal" id="modalPitchGuia">
         <div class="modal-content" style="max-width: 900px;">
@@ -5031,6 +4306,57 @@
     </div>
 
     <!-- MODAL ANÁLISIS -->
+    <div class="modal" id="modalAnalisis">
+        <div class="modal-content" style="max-width: 700px;">
+            <button class="modal-close" onclick="closeAnalisisModal()">×</button>
+            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;" id="analisisModalTitulo">📊 Análisis de Artista</h2>
+            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;" id="analisisModalSubtitulo">Retroalimentación profesional para mejorar tu perfil</p>
+            
+            <!-- Contenido Artista -->
+            <div id="analisisContenidoArtista">
+                <div style="background: rgba(139, 92, 246, 0.1); border: 2px solid rgba(139, 92, 246, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">✅ Análisis Restantes: <span style="color: #8b5cf6;">1</span></h3>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem;">
+                        • <strong>Identifica tu audiencia objetivo</strong><br>
+                        • <strong>Comprueba si los números de artista son reales o falsos</strong><br>
+                        • <strong>Descubre cómo promocionar/mejorar tu perfil de artista</strong>
+                    </p>
+                </div>
+                
+                <div style="margin-bottom: 2rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">URL de tu perfil de Spotify:</label>
+                    <input type="text" id="urlPerfilAnalisis" placeholder="https://open.spotify.com/artist/..." style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: white;">
+                    <small style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Pega el enlace directo a tu perfil de artista en Spotify</small>
+                </div>
+                
+                <button onclick="iniciarAnalisisArtista()" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 0.5rem; color: white; font-weight: 700; font-size: 1.1rem; cursor: pointer;">
+                    🔍 Analizar Perfil
+                </button>
+            </div>
+            
+            <!-- Contenido Curador -->
+            <div id="analisisContenidoCurador" style="display: none;">
+                <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem;">
+                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">✅ Análisis Restantes: <span style="color: #10b981;">Ilimitados</span></h3>
+                    <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem;">
+                        • <strong>Verifica si un artista tiene números reales</strong><br>
+                        • <strong>Analiza la calidad de su audiencia</strong><br>
+                        • <strong>Toma mejores decisiones sobre qué envíos aceptar</strong>
+                    </p>
+                </div>
+                
+                <div style="margin-bottom: 2rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">URL del perfil del artista:</label>
+                    <input type="text" id="urlPerfilCuradorAnalisis" placeholder="https://open.spotify.com/artist/..." style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: white;">
+                    <small style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Pega el enlace del artista que quieres analizar</small>
+                </div>
+                
+                <button onclick="iniciarAnalisisCurador()" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #10b981, #06b6d4); border: none; border-radius: 0.5rem; color: white; font-weight: 700; font-size: 1.1rem; cursor: pointer;">
+                    🔍 Analizar Artista
+                </button>
+            </div>
+        </div>
+    </div>
 
     <!-- MODAL AFILIADOS -->
     <div class="modal" id="modalAfiliados">
@@ -5331,7 +4657,7 @@
             <div style="background: linear-gradient(135deg, #7c3aed, #ec4899); border-radius: 1rem; padding: 2rem; text-align: center; margin-bottom: 2rem;">
                 <div style="font-size: 3rem; margin-bottom: 1rem;">📬</div>
                 <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">Email de Soporte</h3>
-                <a href="javascript:void(0)" onclick="window.location.href='mailto:' + 'soportealgoritmoenmovimiento' + '@' + 'gmail.com'" style="color: white; font-weight: 700; font-size: 1.2rem; text-decoration: none; word-break: break-all; cursor: pointer;">soportealgoritmoenmovimiento@gmail.com</a>
+                <a href="/cdn-cgi/l/email-protection#0774687768757362666b6068756e736a6862696a68716e6a6e6269736847606a666e6b2964686a" style="color: white; font-weight: 700; font-size: 1.2rem; text-decoration: none; word-break: break-all;"><span class="__cf_email__" data-cfemail="11627e617e636574707d767e6378657c7e747f7c7e67787c78747f657e51767c70787d3f727e7c">[email&#160;protected]</span></a>
                 <p style="color: rgba(255,255,255,0.9); margin-top: 1rem; font-size: 0.95rem;">Respondemos en menos de 24 horas</p>
             </div>
             
@@ -5423,81 +4749,31 @@
             <div style="text-align: center; margin-top: 3rem; padding: 2rem; background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem;">
                 <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">¿Quieres unirte al equipo?</h3>
                 <p style="color: rgba(255,255,255,0.8); margin-bottom: 1.5rem;">Estamos siempre buscando talento apasionado por la música</p>
-                <a href="javascript:void(0)" onclick="window.location.href='mailto:' + 'soportealgoritmoenmovimiento' + '@' + 'gmail.com' + '?subject=CV%20-%20Quiero%20unirme%20al%20equipo'" style="display: inline-block; padding: 1rem 2rem; background: linear-gradient(135deg, #7c3aed, #ec4899); border-radius: 0.75rem; color: white; text-decoration: none; font-weight: 700; cursor: pointer;">📧 Envía tu CV</a>
+                <a href="/cdn-cgi/l/email-protection#f685998699848293979a9199849f829b9993989b99809f9b9f93988299b6919b979f9ad895999b" style="display: inline-block; padding: 1rem 2rem; background: linear-gradient(135deg, #7c3aed, #ec4899); border-radius: 0.75rem; color: white; text-decoration: none; font-weight: 700;">📧 Envía tu CV</a>
             </div>
         </div>
     </div>
 
     
     
-    <script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         console.log('🔵🔵🔵 ALGORITMO v6.0 SUPABASE - Script INICIADO 🔵🔵🔵');
         console.log('🔍 Verificando que el script se carga...');
         
         // ========================================
-        // FUNCIONES DE MODAL - DEFINIR PRIMERO
+        // CONFIGURACIÓN SUPABASE
         // ========================================
-        window.openLoginModal = function() {
-            console.log('🔓 Abriendo modal de login...');
-            const modal = document.getElementById('loginModal');
-            if (modal) {
-                modal.classList.add('active');
-                console.log('✅ Modal de login abierto');
-            } else {
-                console.error('❌ Modal de login no encontrado');
-            }
-        };
+        const SUPABASE_URL = 'https://wesmqqaijlmqhctrtaje.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_LgSAsCVW7tlDfDvkD8enyA_pQp42IZF';
         
-        window.closeLoginModal = function() {
-            const modal = document.getElementById('loginModal');
-            if (modal) {
-                modal.classList.remove('active');
-            }
-        };
-        
-        window.openRegisterModal = function() {
-            const modal = document.getElementById('registerModal');
-            if (modal) {
-                modal.classList.add('active');
-            }
-        };
-        
-        window.closeRegisterModal = function() {
-            const modal = document.getElementById('registerModal');
-            if (modal) {
-                modal.classList.remove('active');
-            }
-        };
-        
-        // ========================================
-        // FUNCIÓN ABRIR CORREO MASTERING
-        // ========================================
-        function abrirCorreoMastering() {
-            const trackName = document.getElementById('trackName')?.value || 'Mi Canción';
-            const artistName = document.getElementById('artistName')?.value || 'Artista';
-            const intensity = document.getElementById('masteringIntensity')?.value || 'medium';
-            
-            const email = 'soportealgoritmoenmovimiento' + '@' + 'gmail.com';
-            const subject = encodeURIComponent('Mastering - ' + trackName);
-            const body = encodeURIComponent(
-                'Hola,\n\n' +
-                'Quiero solicitar el servicio de Mastering IA.\n\n' +
-                'Datos del pedido:\n' +
-                '- Nombre de la pista: ' + trackName + '\n' +
-                '- Artista: ' + artistName + '\n' +
-                '- Intensidad: ' + intensity + '\n\n' +
-                'Adjunto el archivo de audio.\n\n' +
-                'Gracias!'
-            );
-            
-            window.open('mailto:' + email + '?subject=' + subject + '&body=' + body);
+        // Esperar a que Supabase esté disponible
+        let supabaseClient;
+        if (typeof supabase !== 'undefined') {
+            supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('✅ Supabase inicializado', supabaseClient);
+        } else {
+            console.error('❌ Supabase no está disponible');
         }
-        
-        // ========================================
-        // CONFIGURACIÓN SUPABASE - YA INICIALIZADO EN HEAD
-        // ========================================
-        // supabaseClient ya está definido globalmente en el <head>
-        console.log('✅ Usando Supabase del HEAD:', supabaseClient);
         
         // ========================================
         // CONFIGURACIÓN SPOTIFY API
@@ -6874,6 +6150,12 @@
             document.getElementById('modalSocial').classList.remove('active');
         }
         
+        async function openHistorialModal(){
+            if(!isUserRegistered()){ showRegisterAlert(); return; }
+            document.getElementById('modalHistorial').classList.add('active');
+            await cargarHistorialEnvios();
+        }
+        
         async function cargarHistorialEnvios() {
             const userId = localStorage.getItem('userId');
             if (!userId) return;
@@ -7135,32 +6417,100 @@
             document.getElementById('modalEstadisticas').classList.remove('active');
         }
         
-        function openPlaylistsTOPModal(){
+        async function openPlaylistsTOPModal(){
             document.getElementById('modalPlaylistsTOP').classList.add('active');
+            await cargarPlaylistsTOP();
         }
         
         function closePlaylistsTOPModal(){
             document.getElementById('modalPlaylistsTOP').classList.remove('active');
         }
         
-        function filterTOPPlaylists(genre){
-            // Quitar active de todos los botones
-            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-            // Agregar active al botón clickeado
-            event.target.classList.add('active');
+        async function cargarPlaylistsTOP() {
+            const grid = document.getElementById('playlistsTOPGrid');
             
-            // Mostrar/ocultar playlists según género
-            document.querySelectorAll('.top-playlist-card').forEach(card => {
-                if(genre === 'all'){
-                    card.style.display = 'block';
-                } else {
-                    if(card.getAttribute('data-genre') === genre){
-                        card.style.display = 'block';
-                    } else {
-                        card.style.display = 'none';
-                    }
+            try {
+                // Cargar playlists destacadas con datos del curador
+                const { data: playlists, error } = await supabaseClient
+                    .from('playlists')
+                    .select(`
+                        *,
+                        usuarios:curador_id (
+                            nombre
+                        )
+                    `)
+                    .eq('estado', 'aprobada')
+                    .eq('destacada', true)
+                    .order('seguidores', { ascending: false });
+                
+                if (error) {
+                    console.error('Error cargando playlists TOP:', error);
+                    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🏆</div>
+                        <div style="font-size: 1.2rem;">Próximamente playlists destacadas</div>
+                    </div>`;
+                    return;
                 }
-            });
+                
+                if (!playlists || playlists.length === 0) {
+                    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                        <div style="font-size: 4rem; margin-bottom: 1rem;">🏆</div>
+                        <div style="font-size: 1.2rem;">Próximamente playlists destacadas</div>
+                    </div>`;
+                    return;
+                }
+                
+                // Colores para los gradientes (fallback si no hay imagen)
+                const gradientes = [
+                    'linear-gradient(135deg, #ec4899, #8b5cf6)',
+                    'linear-gradient(135deg, #8b5cf6, #6366f1)',
+                    'linear-gradient(135deg, #06b6d4, #3b82f6)',
+                    'linear-gradient(135deg, #10b981, #06b6d4)',
+                    'linear-gradient(135deg, #f59e0b, #ef4444)',
+                    'linear-gradient(135deg, #ec4899, #ef4444)'
+                ];
+                
+                grid.innerHTML = playlists.map((p, index) => {
+                    // Obtener nombre del curador del join
+                    const curadorNombre = p.usuarios?.nombre || p.curador_nombre || 'Curador';
+                    const seguidores = p.seguidores || p.followers || 0;
+                    const seguidoresDisplay = seguidores >= 1000 ? `${(seguidores/1000).toFixed(0)}K` : seguidores;
+                    const gradiente = gradientes[index % gradientes.length];
+                    const genero = p.genero || 'Música';
+                    
+                    // Mostrar imagen si existe, sino gradiente con emoji
+                    const imagenPlaylist = p.imagen_url || p.cover_url || p.image_url || null;
+                    const imagenHTML = imagenPlaylist 
+                        ? `<img src="${imagenPlaylist}" alt="${p.nombre}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 0.75rem; margin-bottom: 1rem;">`
+                        : `<div style="width: 100%; height: 180px; background: ${gradiente}; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">🎵</div>`;
+                    
+                    return `
+                        <div class="top-playlist-card" style="position: relative; background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; transition: transform 0.3s;">
+                            <div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; color: #1e293b; z-index: 1;">
+                                ⭐ PREMIUM
+                            </div>
+                            ${imagenHTML}
+                            <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">${p.nombre}</h3>
+                            <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por ${curadorNombre}</p>
+                            <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
+                                <span>👥 <strong>${seguidoresDisplay}</strong> seguidores</span>
+                            </div>
+                            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
+                                <span style="background: rgba(139, 92, 246, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #8b5cf6;">#${genero}</span>
+                            </div>
+                            <a href="${p.url_spotify || '#'}" target="_blank" style="display: block; width: 100%; padding: 0.75rem; background: ${gradiente}; border: none; border-radius: 0.5rem; color: white; font-weight: 700; text-decoration: none; text-align: center; cursor: pointer;">
+                                🎵 Ver en Spotify
+                            </a>
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (err) {
+                console.error('Error:', err);
+                grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
+                    ❌ Error al cargar playlists
+                </div>`;
+            }
         }
         
         function enviarAPlaylist(playlistName){
@@ -7429,6 +6779,9 @@
         
         async function canjearServicioCurador(servicio, puntos){
             const userId = localStorage.getItem('userId');
+            const userName = localStorage.getItem('userName');
+            const userEmail = localStorage.getItem('userEmail');
+            
             if (!userId) {
                 alert('⚠️ Debes iniciar sesión');
                 return;
@@ -7458,10 +6811,58 @@
                 'promo_tiktok': 'Promo TikTok',
                 'playlist_top': 'Destacar en Playlist TOP',
                 'mastering_ia': 'Mastering IA',
-                'portadas_ia': 'Creador de Portadas IA'
             };
             
-            if (!confirm(`🎁 CANJEAR SERVICIO\n\nServicio: ${serviciosNombres[servicio]}\nCosto: ${puntos} puntos\n\n¿Confirmar canje?`)) {
+            // Pedir datos adicionales según el servicio
+            let datosExtra = {};
+            
+            if (servicio === 'promo_tiktok') {
+                const linkVideo = prompt('📱 PROMO TIKTOK\n\nPega el link del video de TikTok que quieres promocionar:');
+                if (!linkVideo || !linkVideo.trim()) {
+                    alert('⚠️ Debes proporcionar el link del video');
+                    return;
+                }
+                datosExtra.link_video = linkVideo.trim();
+                datosExtra.instrucciones = prompt('¿Alguna instrucción especial para la promoción? (opcional)') || '';
+            }
+            
+            if (servicio === 'mastering_ia') {
+                const linkCancion = prompt('🎛️ MASTERING IA\n\nPega el link de tu canción (Google Drive, Dropbox, WeTransfer, etc):');
+                if (!linkCancion || !linkCancion.trim()) {
+                    alert('⚠️ Debes proporcionar el link de la canción');
+                    return;
+                }
+                datosExtra.link_cancion = linkCancion.trim();
+                datosExtra.nombre_cancion = prompt('¿Nombre de la canción?') || 'Sin nombre';
+            }
+            
+            if (servicio === 'playlist_top') {
+                // Obtener playlists del curador para que elija
+                const { data: playlists } = await supabaseClient
+                    .from('playlists')
+                    .select('id, nombre, seguidores')
+                    .eq('curador_id', userId)
+                    .eq('estado', 'aprobada');
+                
+                if (!playlists || playlists.length === 0) {
+                    alert('⚠️ No tienes playlists aprobadas para destacar');
+                    return;
+                }
+                
+                const opcionesPlaylists = playlists.map((p, i) => `${i+1}. ${p.nombre} (${p.seguidores} seguidores)`).join('\n');
+                const seleccion = prompt(`🏆 PLAYLIST TOP\n\nElige qué playlist quieres destacar:\n\n${opcionesPlaylists}\n\nEscribe el número:`);
+                
+                const indice = parseInt(seleccion) - 1;
+                if (isNaN(indice) || indice < 0 || indice >= playlists.length) {
+                    alert('⚠️ Selección inválida');
+                    return;
+                }
+                
+                datosExtra.playlist_id = playlists[indice].id;
+                datosExtra.playlist_nombre = playlists[indice].nombre;
+            }
+            
+            if (!confirm(`🎁 CANJEAR SERVICIO\n\nServicio: ${serviciosNombres[servicio]}\nCosto: ${puntos} puntos\nPuntos actuales: ${puntosActuales}\n\n¿Confirmar canje?`)) {
                 return;
             }
             
@@ -7474,20 +6875,24 @@
                 
                 if (updateError) throw updateError;
                 
-                // Registrar canje
+                // Registrar canje en tabla canjes_servicios
                 await supabaseClient
-                    .from('canjes')
+                    .from('canjes_servicios')
                     .insert({
                         curador_id: userId,
+                        curador_nombre: userName,
+                        curador_email: userEmail,
                         tipo: servicio,
                         puntos: puntos,
-                        estado: 'pendiente'
+                        estado: 'pendiente',
+                        datos_extra: datosExtra
                     });
                 
-                alert(`✅ ¡CANJE EXITOSO!\n\nServicio: ${serviciosNombres[servicio]}\nPuntos usados: ${puntos}\nPuntos restantes: ${puntosActuales - puntos}\n\n📧 Te contactaremos para completar el servicio.`);
+                alert(`✅ ¡CANJE EXITOSO!\n\nServicio: ${serviciosNombres[servicio]}\nPuntos usados: ${puntos}\nPuntos restantes: ${puntosActuales - puntos}\n\n⏳ Tu solicitud está siendo procesada.\nTe notificaremos cuando esté lista.`);
                 
                 // Actualizar displays
                 await cargarPuntosCurador();
+                closeServiciosCuradorModal();
                 
             } catch(err) {
                 console.error('Error en canje:', err);
@@ -7931,7 +7336,7 @@
             // Cambiar Playlist TOP para que sea "Destacar tu Playlist"
             document.getElementById('servicioPlaylistTOP').onclick = function(){ openPremiumCuradorModal(); };
             document.getElementById('playlistTOPTitulo').textContent = 'Destacar tu Playlist';
-            document.getElementById('playlistTOPDesc').textContent = '14.99€/mes';
+            document.getElementById('playlistTOPDesc').textContent = '14.99€ (30 días)';
             
             // Cambiar Analytics para que sea "Analytics de Curador"
             document.getElementById('servicioAnalytics').onclick = function(){ openEstadisticasCuradorModal(); };
@@ -8501,17 +7906,27 @@
                 let playlistsMap = {};
                 if (envios && envios.length > 0) {
                     const playlistIds = [...new Set(envios.map(e => e.playlist_id).filter(id => id))];
+                    console.log('📋 Playlist IDs encontrados:', playlistIds);
+                    
                     if (playlistIds.length > 0) {
-                        const { data: playlists } = await supabaseClient
+                        const { data: playlists, error: playlistError } = await supabaseClient
                             .from('playlists')
                             .select('id, nombre')
                             .in('id', playlistIds);
                         
-                        playlists?.forEach(p => {
-                            playlistsMap[p.id] = p.nombre;
-                        });
+                        console.log('📋 Playlists obtenidas:', playlists);
+                        
+                        if (playlists && !playlistError) {
+                            playlists.forEach(p => {
+                                // Guardar tanto como string como número por si acaso
+                                playlistsMap[p.id] = p.nombre;
+                                playlistsMap[String(p.id)] = p.nombre;
+                            });
+                        }
                     }
                 }
+                
+                console.log('📋 PlaylistsMap:', playlistsMap);
                 
                 // Calcular ganancias
                 let totalDisponible = 0;
@@ -8519,7 +7934,13 @@
                 let gananciasPorPlaylist = {};
                 
                 envios?.forEach(envio => {
-                    const playlistNombre = playlistsMap[envio.playlist_id] || envio.playlist_nombre || 'Playlist';
+                    // Intentar obtener el nombre de la playlist de varias formas
+                    const playlistNombre = playlistsMap[envio.playlist_id] || 
+                                          playlistsMap[String(envio.playlist_id)] || 
+                                          envio.playlist_nombre || 
+                                          'Playlist desconocida';
+                    
+                    console.log('📊 Envio playlist_id:', envio.playlist_id, '-> Nombre:', playlistNombre);
                     
                     // Calcular ganancia según tipo - FREE NO genera dinero
                     let ganancia = 0;
@@ -8608,38 +8029,110 @@
             document.getElementById('modalGanancias').classList.remove('active');
         }
         
-        function openPremiumCuradorModal(){
+        async function openPremiumCuradorModal(){
             document.getElementById('modalPremiumCurador').classList.add('active');
+            
+            // Cargar playlists del curador en el dropdown
+            const userId = localStorage.getItem('userId');
+            if (!userId) return;
+            
+            try {
+                const { data: playlists, error } = await supabaseClient
+                    .from('playlists')
+                    .select('id, nombre, followers, destacada')
+                    .eq('curador_id', userId)
+                    .eq('estado', 'aprobada');
+                
+                const select = document.getElementById('playlistParaDestacar');
+                select.innerHTML = '<option value="" style="color: #000;">-- Selecciona una playlist --</option>';
+                
+                if (playlists && playlists.length > 0) {
+                    playlists.forEach(p => {
+                        // No mostrar si ya está destacada
+                        if (p.destacada) return;
+                        
+                        const option = document.createElement('option');
+                        option.value = p.id;
+                        option.style.color = '#000';
+                        option.textContent = `🎵 ${p.nombre} (${(p.followers || 0).toLocaleString()} seguidores)`;
+                        select.appendChild(option);
+                    });
+                    
+                    // Si todas están destacadas
+                    if (select.options.length === 1) {
+                        const option = document.createElement('option');
+                        option.disabled = true;
+                        option.style.color = '#666';
+                        option.textContent = '⚠️ Ya tienes una playlist destacada';
+                        select.appendChild(option);
+                    }
+                } else {
+                    const option = document.createElement('option');
+                    option.disabled = true;
+                    option.style.color = '#666';
+                    option.textContent = '⚠️ No tienes playlists aprobadas';
+                    select.appendChild(option);
+                }
+            } catch (err) {
+                console.error('Error cargando playlists:', err);
+            }
         }
         
         function closePremiumCuradorModal(){
             document.getElementById('modalPremiumCurador').classList.remove('active');
         }
         
-        function activarPremiumPlaylist(){
-            const playlist = document.getElementById('playlistParaDestacar').value;
+        async function activarPremiumPlaylist(){
+            const playlistId = document.getElementById('playlistParaDestacar').value;
+            const userId = localStorage.getItem('userId');
+            const userName = localStorage.getItem('userName');
+            const userEmail = localStorage.getItem('userEmail');
             
-            if(!playlist){
+            if(!playlistId){
                 alert('⚠️ SELECCIONA UNA PLAYLIST\n\nPor favor selecciona la playlist que quieres destacar.');
                 return;
             }
             
-            if(confirm('⭐ CONFIRMAR ACTIVACIÓN PREMIUM\n\n' +
-                      'Precio: 14.99€/mes\n' +
+            if(!confirm('⭐ CONFIRMAR PAGO\n\n' +
+                      'Precio: 14.99€ (pago único)\n' +
+                      'Duración: 30 días destacada\n\n' +
                       'Beneficios:\n' +
                       '• Aparece en sección TOP\n' +
                       '• Badge PREMIUM\n' +
-                      '• 10x más envíos\n' +
-                      '• Analytics avanzados\n\n' +
-                      'El cargo se realizará mensualmente.\n\n' +
-                      '¿Confirmar activación?')){
-                alert('🎉 ¡PLAYLIST DESTACADA!\n\n' +
-                      'Tu playlist ahora aparece en la sección TOP.\n\n' +
-                      '✨ Badge PREMIUM activado\n' +
-                      '📈 Comenzarás a recibir más envíos\n' +
-                      '💳 Primer cargo: 14.99€\n\n' +
-                      'Puedes cancelar en cualquier momento desde tu panel.');
-                closePremiumCuradorModal();
+                      '• 10x más envíos\n\n' +
+                      'Serás redirigido a Stripe para completar el pago.\n\n' +
+                      '¿Continuar?')){
+                return;
+            }
+            
+            try {
+                // Obtener nombre de la playlist
+                const { data: playlist } = await supabaseClient
+                    .from('playlists')
+                    .select('nombre')
+                    .eq('id', playlistId)
+                    .single();
+                
+                // Guardar solicitud en Supabase antes de redirigir
+                await supabaseClient
+                    .from('solicitudes_destacar')
+                    .insert({
+                        curador_id: userId,
+                        curador_nombre: userName,
+                        curador_email: userEmail,
+                        playlist_id: playlistId,
+                        playlist_nombre: playlist?.nombre || 'Playlist',
+                        precio: 14.99,
+                        estado: 'pendiente_pago'
+                    });
+                
+                // Redirigir al Payment Link de Stripe
+                window.location.href = 'https://buy.stripe.com/28EfZi7HV45R0oN6JH0x20c';
+                
+            } catch (err) {
+                console.error('Error:', err);
+                // Aunque falle guardar, redirigir igual
+                window.location.href = 'https://buy.stripe.com/28EfZi7HV45R0oN6JH0x20c';
             }
         }
         
@@ -8930,15 +8423,6 @@
         }
 
         
-        function openPortadasModal(){
-            if(!isUserRegistered()){ showRegisterAlert(); return; }
-            document.getElementById('modalPortadas').classList.add('active');
-        }
-        
-        function closePortadasModal(){
-            document.getElementById('modalPortadas').classList.remove('active');
-        }
-        
         function handlePricingClick(type){
             if(!isUserRegistered()){ showRegisterAlert(); return; }
             
@@ -9008,6 +8492,41 @@
         
         function closeCreditosModal(){
             document.getElementById('modalCreditos').classList.remove('active');
+        }
+        
+        async function comprarCredito(tipo, precio){
+            const userId = localStorage.getItem('userId');
+            const codigoAfiliado = localStorage.getItem('codigoAfiliadoDelUsuario');
+            
+            // Registrar comisión para el afiliado (15% de CADA compra)
+            if (codigoAfiliado && userId) {
+                const monto = tipo === 'standard' ? 1.50 : 3.00;
+                const comision = monto * 0.15;
+                
+                try {
+                    await supabaseClient
+                        .from('comisiones_afiliados')
+                        .insert({
+                            codigo_afiliado: codigoAfiliado,
+                            usuario_comprador_id: userId,
+                            monto_compra: monto,
+                            comision: comision,
+                            tipo_compra: 'credito_' + tipo,
+                            estado: 'pendiente'
+                        });
+                    
+                    console.log('💰 Comisión de afiliado registrada:', comision.toFixed(2) + '€');
+                } catch(err) {
+                    console.log('Error registrando comisión:', err);
+                }
+            }
+            
+            // Redirigir a Stripe Payment Link (sin descuento en créditos individuales)
+            if(tipo === 'standard'){
+                window.open('https://buy.stripe.com/eVq28s2nBaufb3r6JH0x20a', '_blank');
+            } else if(tipo === 'premium'){
+                window.open('https://buy.stripe.com/8x2fZi0ft1XJ3AZ3xv0x20b', '_blank');
+            }
         }
         
         async function comprarPaquete(monto, creditos){
@@ -9087,6 +8606,131 @@
             document.getElementById('modalPitchGuia').classList.remove('active');
         }
         
+        function openAnalisisModal(){
+            document.getElementById('modalAnalisis').classList.add('active');
+        }
+        
+        function closeAnalisisModal(){
+            document.getElementById('modalAnalisis').classList.remove('active');
+        }
+        
+        async function iniciarAnalisisArtista(){
+            const url = document.getElementById('urlPerfilAnalisis').value.trim();
+            const userId = localStorage.getItem('userId');
+            const userEmail = localStorage.getItem('userEmail');
+            const userName = localStorage.getItem('userName');
+            
+            if(!url){
+                alert('⚠️ URL REQUERIDA\n\nPor favor ingresa la URL de tu perfil de Spotify.');
+                return;
+            }
+            
+            if(!url.includes('spotify.com/artist/')){
+                alert('❌ URL INVÁLIDA\n\nEl enlace debe ser de un perfil de artista en Spotify.\n\nEjemplo: https://open.spotify.com/artist/...');
+                return;
+            }
+            
+            try {
+                // Guardar solicitud en BD
+                const { error } = await supabaseClient
+                    .from('solicitudes_analisis')
+                    .insert({
+                        usuario_id: userId,
+                        usuario_nombre: userName,
+                        usuario_email: userEmail,
+                        spotify_url: url,
+                        tipo: 'artista',
+                        estado: 'pendiente'
+                    });
+                
+                // Si la tabla no existe, simplemente mostrar el mensaje
+                if (error && !error.message.includes('does not exist')) {
+                    console.error('Error:', error);
+                }
+                
+                alert('🔍 ANÁLISIS INICIADO\n\n' +
+                      'Tu perfil está siendo analizado...\n\n' +
+                      '📧 Recibirás los resultados por email a:\n' + userEmail + '\n\n' +
+                      '⏱️ Tiempo estimado: 24-48 horas\n\n' +
+                      'El análisis incluirá:\n' +
+                      '• Verificación de autenticidad de números\n' +
+                      '• Análisis de audiencia objetivo\n' +
+                      '• Recomendaciones personalizadas\n' +
+                      '• Estrategias de mejora');
+                
+                closeAnalisisModal();
+                document.getElementById('urlPerfilAnalisis').value = '';
+                
+            } catch (err) {
+                console.error('Error:', err);
+                alert('✅ Solicitud recibida. Recibirás el análisis por email.');
+                closeAnalisisModal();
+            }
+        }
+        
+        async function iniciarAnalisisCurador(){
+            const url = document.getElementById('urlPerfilCuradorAnalisis').value.trim();
+            const userId = localStorage.getItem('userId');
+            const userEmail = localStorage.getItem('userEmail');
+            const userName = localStorage.getItem('userName');
+            
+            if(!url){
+                alert('⚠️ URL REQUERIDA\n\nPor favor ingresa la URL del perfil del artista.');
+                return;
+            }
+            
+            if(!url.includes('spotify.com/artist/')){
+                alert('❌ URL INVÁLIDA\n\nEl enlace debe ser de un perfil de artista en Spotify.\n\nEjemplo: https://open.spotify.com/artist/...');
+                return;
+            }
+            
+            try {
+                // Guardar solicitud en BD
+                const { error } = await supabaseClient
+                    .from('solicitudes_analisis')
+                    .insert({
+                        usuario_id: userId,
+                        usuario_nombre: userName,
+                        usuario_email: userEmail,
+                        spotify_url: url,
+                        tipo: 'curador',
+                        estado: 'pendiente'
+                    });
+                
+                if (error && !error.message.includes('does not exist')) {
+                    console.error('Error:', error);
+                }
+                
+                alert('🔍 ANÁLISIS SOLICITADO\n\n' +
+                      'Estamos analizando este artista...\n\n' +
+                      '📧 Recibirás los resultados por email a:\n' + userEmail + '\n\n' +
+                      '⏱️ Tiempo estimado: 24-48 horas\n\n' +
+                      'El análisis incluirá:\n' +
+                      '• Verificación de números reales/falsos\n' +
+                      '• Análisis de calidad de audiencia\n' +
+                      '• Recomendación de aceptar/rechazar');
+                
+                closeAnalisisModal();
+                document.getElementById('urlPerfilCuradorAnalisis').value = '';
+                
+            } catch (err) {
+                console.error('Error:', err);
+                alert('✅ Solicitud recibida. Recibirás el análisis por email.');
+                closeAnalisisModal();
+            }
+        }
+        
+        function cambiarAnalisisACurador(){
+            // Cambiar tarjeta en Herramientas
+            document.getElementById('analisisTitulo').textContent = 'Análisis de Artistas';
+            document.getElementById('analisisDesc').textContent = 'Verifica autenticidad';
+            
+            // Cambiar contenido del modal
+            document.getElementById('analisisModalTitulo').textContent = '📊 Análisis de Artistas';
+            document.getElementById('analisisModalSubtitulo').textContent = 'Verifica la autenticidad de los números antes de aceptar';
+            document.getElementById('analisisContenidoArtista').style.display = 'none';
+            document.getElementById('analisisContenidoCurador').style.display = 'block';
+        }
         
         function openAfiliadosModal(){
             document.getElementById('modalAfiliados').classList.add('active');
@@ -10314,9 +9958,118 @@
             console.log('🚀 Página cargada');
             
             // ========================================
-            // DETECTAR LINK DE REFERIDO (?ref=CODIGO)
+            // DETECTAR PAGO EXITOSO DE DESTACAR PLAYLIST
             // ========================================
             const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.get('destacar_success') === 'true') {
+                const playlistId = urlParams.get('playlist_id');
+                console.log('✅ Pago de destacar exitoso para playlist:', playlistId);
+                
+                // Mostrar mensaje de éxito
+                setTimeout(() => {
+                    alert('🎉 ¡PAGO COMPLETADO!\n\n' +
+                          'Tu playlist ahora está DESTACADA.\n\n' +
+                          '✨ Aparecerá en la sección TOP\n' +
+                          '📈 Comenzarás a recibir más envíos\n' +
+                          '⏱️ Duración: 30 días\n\n' +
+                          '¡Gracias por tu confianza!');
+                }, 500);
+                
+                // Limpiar URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            
+            if (urlParams.get('destacar_cancel') === 'true') {
+                console.log('❌ Pago cancelado');
+                setTimeout(() => {
+                    alert('⚠️ Pago cancelado\n\nNo se realizó ningún cargo.');
+                }, 500);
+                window.history.replaceState({}, document.title, window.location.pathname);
+            }
+            
+            // ========================================
+            // DETECTAR PAGO EXITOSO DE SMARTLINK
+            // ========================================
+            // Verificar si hay SmartLink pendiente en localStorage (vuelve de Stripe)
+            const pendingSmartlink = localStorage.getItem('pendingSmartlink');
+            if (pendingSmartlink) {
+                const smartlinkData = JSON.parse(pendingSmartlink);
+                // Si los datos son recientes (menos de 1 hora), preguntar si completó el pago
+                const timeDiff = Date.now() - smartlinkData.timestamp;
+                if (timeDiff < 3600000) { // 1 hora
+                    const completoPago = confirm('🔗 SMARTLINK\n\n¿Completaste el pago de 1.99€?\n\nSi es así, tu pedido será procesado.');
+                    
+                    if (completoPago) {
+                        try {
+                            const slug = smartlinkData.nombre_cancion.toLowerCase()
+                                .replace(/[^a-z0-9]/g, '-')
+                                .replace(/-+/g, '-')
+                                .substring(0, 30) + '-' + Date.now().toString(36);
+                            
+                            const { error } = await supabaseClient
+                                .from('smartlinks')
+                                .insert({
+                                    ...smartlinkData,
+                                    slug: slug,
+                                    estado: 'pendiente'
+                                });
+                            
+                            if (!error) {
+                                alert('✅ ¡PAGO CONFIRMADO!\n\n' +
+                                      '📧 Recibirás tu SmartLink en:\n' + smartlinkData.artista_email + '\n\n' +
+                                      '⏱️ Tiempo estimado: 24-48 horas\n\n' +
+                                      '¡Gracias por tu compra!');
+                            }
+                        } catch (err) {
+                            console.error('Error guardando SmartLink:', err);
+                        }
+                    }
+                }
+                localStorage.removeItem('pendingSmartlink');
+            }
+            
+            // ========================================
+            // DETECTAR PAGO EXITOSO DE MASTERING
+            // ========================================
+            const pendingMastering = localStorage.getItem('pendingMastering');
+            if (pendingMastering) {
+                const masteringData = JSON.parse(pendingMastering);
+                const timeDiff = Date.now() - masteringData.timestamp;
+                if (timeDiff < 3600000) { // 1 hora
+                    const completoPago = confirm('🎛️ MASTERING IA\n\n¿Completaste el pago de 4.99€?\n\nSi es así, tu pedido será procesado.');
+                    
+                    if (completoPago) {
+                        try {
+                            const { error } = await supabaseClient
+                                .from('solicitudes_mastering')
+                                .insert({
+                                    ...masteringData,
+                                    estado: 'pendiente',
+                                    es_gratuito: false,
+                                    precio: 4.99
+                                });
+                            
+                            if (!error) {
+                                alert('✅ ¡PAGO CONFIRMADO!\n\n' +
+                                      '📤 PASO IMPORTANTE:\n' +
+                                      'Envía tu archivo de audio a:\n' +
+                                      'soportealgoritmoenmovimiento@gmail.com\n\n' +
+                                      'Asunto: Mastering - ' + masteringData.nombre_pista + '\n\n' +
+                                      '📧 Recibirás el resultado en:\n' + masteringData.artista_email + '\n\n' +
+                                      '⏱️ Tiempo estimado: 24-48 horas');
+                            }
+                        } catch (err) {
+                            console.error('Error guardando Mastering:', err);
+                        }
+                    }
+                }
+                localStorage.removeItem('pendingMastering');
+            }
+            
+            // ========================================
+            // DETECTAR LINK DE REFERIDO (?ref=CODIGO)
+            // ========================================
             const refCode = urlParams.get('ref');
             
             if (refCode) {
@@ -10652,4 +10405,192 @@
                         current = stat.target;
                         clearInterval(timer);
                     }
-                    if (st
+                    if (stat.suffix === 'M+') {
+                        stat.element.textContent = Math.floor(current) + stat.suffix;
+                    } else {
+                        stat.element.textContent = Math.floor(current).toLocaleString() + stat.suffix;
+                    }
+                }, 30);
+            });
+        }
+        
+        // ==================== SMARTLINK ====================
+        // ==================== CONFIGURACIÓN STRIPE PAYMENT LINKS ====================
+        const STRIPE_LINKS = {
+            smartlink: 'https://buy.stripe.com/bJefZi2nB1XJefD6JH0x20d',
+            mastering: 'https://buy.stripe.com/dRm6oId2f45R2wV3xv0x20e'
+        };
+        
+        // ==================== SMARTLINK ====================
+        document.getElementById('smartLinkForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const userId = localStorage.getItem('userId');
+            const userEmail = localStorage.getItem('userEmail');
+            const userName = localStorage.getItem('userName');
+            
+            const songName = document.getElementById('slSongName').value.trim();
+            const artistName = document.getElementById('slArtistName').value.trim();
+            const coverUrl = document.getElementById('slCoverUrl').value.trim();
+            const spotify = document.getElementById('slSpotify').value.trim();
+            const apple = document.getElementById('slApple').value.trim();
+            const youtube = document.getElementById('slYoutube').value.trim();
+            const deezer = document.getElementById('slDeezer').value.trim();
+            const soundcloud = document.getElementById('slSoundcloud').value.trim();
+            const email = document.getElementById('slEmail').value.trim();
+            
+            // Validar que tenga al menos un enlace
+            if (!spotify && !apple && !youtube && !deezer && !soundcloud) {
+                alert('⚠️ Debes agregar al menos un enlace de plataforma');
+                return;
+            }
+            
+            // Guardar datos en localStorage antes de redirigir a Stripe
+            const smartlinkData = {
+                artista_id: userId,
+                artista_nombre: userName,
+                artista_email: email || userEmail,
+                nombre_cancion: songName,
+                nombre_artista: artistName,
+                cover_url: coverUrl,
+                spotify_url: spotify,
+                apple_url: apple,
+                youtube_url: youtube,
+                deezer_url: deezer,
+                soundcloud_url: soundcloud,
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem('pendingSmartlink', JSON.stringify(smartlinkData));
+            
+            // Redirigir a Stripe Payment Link
+            window.location.href = STRIPE_LINKS.smartlink + '?prefilled_email=' + encodeURIComponent(email || userEmail);
+        });
+        
+        // ==================== MASTERING IA ====================
+        document.getElementById('masteringForm')?.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const userId = localStorage.getItem('userId');
+            const userEmail = localStorage.getItem('userEmail');
+            const userName = localStorage.getItem('userName');
+            
+            const trackName = document.getElementById('trackName').value.trim();
+            const artistName = document.getElementById('artistName').value.trim();
+            const intensity = document.getElementById('masteringIntensity').value;
+            const email = document.getElementById('masteringEmail').value.trim();
+            
+            // Guardar datos en localStorage antes de redirigir a Stripe
+            const masteringData = {
+                artista_id: userId,
+                artista_nombre: userName,
+                artista_email: email || userEmail,
+                nombre_pista: trackName,
+                nombre_artista: artistName,
+                intensidad: intensity,
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem('pendingMastering', JSON.stringify(masteringData));
+            
+            // Redirigir a Stripe Payment Link
+            window.location.href = STRIPE_LINKS.mastering + '?prefilled_email=' + encodeURIComponent(email || userEmail);
+        });
+        
+        // ==================== ESTADÍSTICAS REALES ====================
+        async function cargarEstadisticasArtista() {
+            const userId = localStorage.getItem('userId');
+            if (!userId) return;
+            
+            try {
+                // Cargar envíos del artista
+                const { data: envios, error } = await supabaseClient
+                    .from('envios')
+                    .select(`
+                        *,
+                        playlists:playlist_id (
+                            nombre,
+                            seguidores
+                        )
+                    `)
+                    .eq('artista_id', userId)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                const totalEnvios = envios?.length || 0;
+                const aceptados = envios?.filter(e => e.estado === 'aceptado').length || 0;
+                const rechazados = envios?.filter(e => e.estado === 'rechazado').length || 0;
+                const pendientes = envios?.filter(e => e.estado === 'pendiente').length || 0;
+                
+                // Actualizar cards principales
+                document.getElementById('statTotalEnvios').textContent = totalEnvios;
+                document.getElementById('statAceptados').textContent = aceptados;
+                document.getElementById('statRechazados').textContent = rechazados;
+                document.getElementById('statPendientes').textContent = pendientes;
+                
+                // Actualizar barras
+                document.getElementById('barAceptados').textContent = aceptados;
+                document.getElementById('barRechazados').textContent = rechazados;
+                document.getElementById('barPendientes').textContent = pendientes;
+                
+                // Calcular y mostrar tasa de aceptación
+                const totalResueltos = aceptados + rechazados;
+                const tasa = totalResueltos > 0 ? Math.round((aceptados / totalResueltos) * 100) : 0;
+                document.getElementById('tasaAceptacion').textContent = tasa + '%';
+                
+                // Animar círculo de progreso
+                const circle = document.getElementById('progressCircle');
+                if (circle) {
+                    const circumference = 377; // 2 * PI * 60
+                    const offset = circumference - (tasa / 100) * circumference;
+                    circle.style.strokeDashoffset = offset;
+                }
+                
+                // Mostrar últimos envíos
+                const listaEnvios = document.getElementById('listaUltimosEnvios');
+                if (envios && envios.length > 0) {
+                    const ultimos5 = envios.slice(0, 5);
+                    listaEnvios.innerHTML = ultimos5.map(e => {
+                        const fecha = new Date(e.created_at).toLocaleDateString('es-ES');
+                        const playlistNombre = e.playlists?.nombre || 'Playlist';
+                        let estadoBadge = '';
+                        if (e.estado === 'aceptado') {
+                            estadoBadge = '<span style="background: #10b981; color: white; padding: 0.25rem 0.5rem; border-radius: 0.5rem; font-size: 0.75rem;">✅ Aceptado</span>';
+                        } else if (e.estado === 'rechazado') {
+                            estadoBadge = '<span style="background: #ef4444; color: white; padding: 0.25rem 0.5rem; border-radius: 0.5rem; font-size: 0.75rem;">❌ Rechazado</span>';
+                        } else {
+                            estadoBadge = '<span style="background: #f59e0b; color: white; padding: 0.25rem 0.5rem; border-radius: 0.5rem; font-size: 0.75rem;">⏳ Pendiente</span>';
+                        }
+                        
+                        return `
+                            <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 0.5rem;">
+                                <div>
+                                    <div style="font-weight: 600;">${e.nombre_cancion || 'Canción'}</div>
+                                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">→ ${playlistNombre}</div>
+                                </div>
+                                <div style="text-align: right;">
+                                    ${estadoBadge}
+                                    <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5); margin-top: 0.25rem;">${fecha}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                } else {
+                    listaEnvios.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.5); padding: 2rem;">Aún no has enviado música a playlists</p>';
+                }
+                
+            } catch (err) {
+                console.error('Error cargando estadísticas:', err);
+            }
+        }
+        
+        // Actualizar apertura del modal de estadísticas
+        window.openEstadisticasModal = async function() {
+            if(!isUserRegistered()){ showRegisterAlert(); return; }
+            document.getElementById('modalEstadisticas').classList.add('active');
+            await cargarEstadisticasArtista();
+        };
+    </script>
+</body>
+</html>
