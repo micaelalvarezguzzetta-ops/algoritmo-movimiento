@@ -1806,11 +1806,6 @@
                 <h3 class="step-title">Mastering IA</h3>
                 <p class="step-desc">Mejora el sonido con inteligencia artificial</p>
             </div>
-            <div class="step-card" onclick="openAnalisisModal()" style="cursor: pointer;">
-                <div class="step-icon">🔍</div>
-                <h3 class="step-title">Análisis Artista</h3>
-                <p class="step-desc">Analiza tu perfil de Spotify</p>
-            </div>
             <div class="step-card" onclick="openAfiliadosModal()" style="cursor: pointer;">
                 <div class="step-icon">🤝</div>
                 <h3 class="step-title">Afiliados</h3>
@@ -2533,7 +2528,7 @@
                         Después de completar el pedido, envía tu audio a:
                     </p>
                     <p style="background: rgba(0,0,0,0.3); padding: 0.75rem 1rem; border-radius: 0.5rem; font-weight: 700; color: #a78bfa; font-size: 1rem; margin: 0.75rem 0;">
-                        soportealgoritmoenmovimiento@gmail.com
+                        <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e1928e918e939584808d868e9388958c8e848f8c8e97888c88848f958ea1868c80888dcf828e8c">[email&#160;protected]</a>
                     </p>
                     <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem;">
                         Formatos: MP3, WAV o FLAC (máx 100MB)<br>
@@ -4305,59 +4300,6 @@
         </div>
     </div>
 
-    <!-- MODAL ANÁLISIS -->
-    <div class="modal" id="modalAnalisis">
-        <div class="modal-content" style="max-width: 700px;">
-            <button class="modal-close" onclick="closeAnalisisModal()">×</button>
-            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;" id="analisisModalTitulo">📊 Análisis de Artista</h2>
-            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;" id="analisisModalSubtitulo">Retroalimentación profesional para mejorar tu perfil</p>
-            
-            <!-- Contenido Artista -->
-            <div id="analisisContenidoArtista">
-                <div style="background: rgba(139, 92, 246, 0.1); border: 2px solid rgba(139, 92, 246, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem;">
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">✅ Análisis Restantes: <span style="color: #8b5cf6;">1</span></h3>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem;">
-                        • <strong>Identifica tu audiencia objetivo</strong><br>
-                        • <strong>Comprueba si los números de artista son reales o falsos</strong><br>
-                        • <strong>Descubre cómo promocionar/mejorar tu perfil de artista</strong>
-                    </p>
-                </div>
-                
-                <div style="margin-bottom: 2rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">URL de tu perfil de Spotify:</label>
-                    <input type="text" id="urlPerfilAnalisis" placeholder="https://open.spotify.com/artist/..." style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: white;">
-                    <small style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Pega el enlace directo a tu perfil de artista en Spotify</small>
-                </div>
-                
-                <button onclick="iniciarAnalisisArtista()" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 0.5rem; color: white; font-weight: 700; font-size: 1.1rem; cursor: pointer;">
-                    🔍 Analizar Perfil
-                </button>
-            </div>
-            
-            <!-- Contenido Curador -->
-            <div id="analisisContenidoCurador" style="display: none;">
-                <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem;">
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">✅ Análisis Restantes: <span style="color: #10b981;">Ilimitados</span></h3>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem;">
-                        • <strong>Verifica si un artista tiene números reales</strong><br>
-                        • <strong>Analiza la calidad de su audiencia</strong><br>
-                        • <strong>Toma mejores decisiones sobre qué envíos aceptar</strong>
-                    </p>
-                </div>
-                
-                <div style="margin-bottom: 2rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">URL del perfil del artista:</label>
-                    <input type="text" id="urlPerfilCuradorAnalisis" placeholder="https://open.spotify.com/artist/..." style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: white;">
-                    <small style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Pega el enlace del artista que quieres analizar</small>
-                </div>
-                
-                <button onclick="iniciarAnalisisCurador()" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #10b981, #06b6d4); border: none; border-radius: 0.5rem; color: white; font-weight: 700; font-size: 1.1rem; cursor: pointer;">
-                    🔍 Analizar Artista
-                </button>
-            </div>
-        </div>
-    </div>
-
     <!-- MODAL AFILIADOS -->
     <div class="modal" id="modalAfiliados">
         <div class="modal-content" style="max-width: 900px;">
@@ -4756,7 +4698,7 @@
 
     
     
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         console.log('🔵🔵🔵 ALGORITMO v6.0 SUPABASE - Script INICIADO 🔵🔵🔵');
         console.log('🔍 Verificando que el script se carga...');
         
@@ -6401,7 +6343,7 @@
             document.getElementById('modalMastering').classList.remove('active');
         }
         
-        function openEstadisticasModal(){
+        async function openEstadisticasModal(){
             console.log('🟢 openEstadisticasModal llamada');
             if(!isUserRegistered()){ 
                 console.log('❌ Usuario no registrado');
@@ -6410,6 +6352,9 @@
             }
             console.log('✅ Abriendo modal estadísticas');
             document.getElementById('modalEstadisticas').classList.add('active');
+            
+            // Cargar datos reales de estadísticas
+            await cargarEstadisticasArtista();
         }
         
         function closeEstadisticasModal(){
@@ -8606,132 +8551,6 @@
             document.getElementById('modalPitchGuia').classList.remove('active');
         }
         
-        function openAnalisisModal(){
-            document.getElementById('modalAnalisis').classList.add('active');
-        }
-        
-        function closeAnalisisModal(){
-            document.getElementById('modalAnalisis').classList.remove('active');
-        }
-        
-        async function iniciarAnalisisArtista(){
-            const url = document.getElementById('urlPerfilAnalisis').value.trim();
-            const userId = localStorage.getItem('userId');
-            const userEmail = localStorage.getItem('userEmail');
-            const userName = localStorage.getItem('userName');
-            
-            if(!url){
-                alert('⚠️ URL REQUERIDA\n\nPor favor ingresa la URL de tu perfil de Spotify.');
-                return;
-            }
-            
-            if(!url.includes('spotify.com/artist/')){
-                alert('❌ URL INVÁLIDA\n\nEl enlace debe ser de un perfil de artista en Spotify.\n\nEjemplo: https://open.spotify.com/artist/...');
-                return;
-            }
-            
-            try {
-                // Guardar solicitud en BD
-                const { error } = await supabaseClient
-                    .from('solicitudes_analisis')
-                    .insert({
-                        usuario_id: userId,
-                        usuario_nombre: userName,
-                        usuario_email: userEmail,
-                        spotify_url: url,
-                        tipo: 'artista',
-                        estado: 'pendiente'
-                    });
-                
-                // Si la tabla no existe, simplemente mostrar el mensaje
-                if (error && !error.message.includes('does not exist')) {
-                    console.error('Error:', error);
-                }
-                
-                alert('🔍 ANÁLISIS INICIADO\n\n' +
-                      'Tu perfil está siendo analizado...\n\n' +
-                      '📧 Recibirás los resultados por email a:\n' + userEmail + '\n\n' +
-                      '⏱️ Tiempo estimado: 24-48 horas\n\n' +
-                      'El análisis incluirá:\n' +
-                      '• Verificación de autenticidad de números\n' +
-                      '• Análisis de audiencia objetivo\n' +
-                      '• Recomendaciones personalizadas\n' +
-                      '• Estrategias de mejora');
-                
-                closeAnalisisModal();
-                document.getElementById('urlPerfilAnalisis').value = '';
-                
-            } catch (err) {
-                console.error('Error:', err);
-                alert('✅ Solicitud recibida. Recibirás el análisis por email.');
-                closeAnalisisModal();
-            }
-        }
-        
-        async function iniciarAnalisisCurador(){
-            const url = document.getElementById('urlPerfilCuradorAnalisis').value.trim();
-            const userId = localStorage.getItem('userId');
-            const userEmail = localStorage.getItem('userEmail');
-            const userName = localStorage.getItem('userName');
-            
-            if(!url){
-                alert('⚠️ URL REQUERIDA\n\nPor favor ingresa la URL del perfil del artista.');
-                return;
-            }
-            
-            if(!url.includes('spotify.com/artist/')){
-                alert('❌ URL INVÁLIDA\n\nEl enlace debe ser de un perfil de artista en Spotify.\n\nEjemplo: https://open.spotify.com/artist/...');
-                return;
-            }
-            
-            try {
-                // Guardar solicitud en BD
-                const { error } = await supabaseClient
-                    .from('solicitudes_analisis')
-                    .insert({
-                        usuario_id: userId,
-                        usuario_nombre: userName,
-                        usuario_email: userEmail,
-                        spotify_url: url,
-                        tipo: 'curador',
-                        estado: 'pendiente'
-                    });
-                
-                if (error && !error.message.includes('does not exist')) {
-                    console.error('Error:', error);
-                }
-                
-                alert('🔍 ANÁLISIS SOLICITADO\n\n' +
-                      'Estamos analizando este artista...\n\n' +
-                      '📧 Recibirás los resultados por email a:\n' + userEmail + '\n\n' +
-                      '⏱️ Tiempo estimado: 24-48 horas\n\n' +
-                      'El análisis incluirá:\n' +
-                      '• Verificación de números reales/falsos\n' +
-                      '• Análisis de calidad de audiencia\n' +
-                      '• Recomendación de aceptar/rechazar');
-                
-                closeAnalisisModal();
-                document.getElementById('urlPerfilCuradorAnalisis').value = '';
-                
-            } catch (err) {
-                console.error('Error:', err);
-                alert('✅ Solicitud recibida. Recibirás el análisis por email.');
-                closeAnalisisModal();
-            }
-        }
-        
-        function cambiarAnalisisACurador(){
-            // Cambiar tarjeta en Herramientas
-            document.getElementById('analisisTitulo').textContent = 'Análisis de Artistas';
-            document.getElementById('analisisDesc').textContent = 'Verifica autenticidad';
-            
-            // Cambiar contenido del modal
-            document.getElementById('analisisModalTitulo').textContent = '📊 Análisis de Artistas';
-            document.getElementById('analisisModalSubtitulo').textContent = 'Verifica la autenticidad de los números antes de aceptar';
-            document.getElementById('analisisContenidoArtista').style.display = 'none';
-            document.getElementById('analisisContenidoCurador').style.display = 'block';
-        }
-        
         function openAfiliadosModal(){
             document.getElementById('modalAfiliados').classList.add('active');
         }
@@ -10503,16 +10322,10 @@
             if (!userId) return;
             
             try {
-                // Cargar envíos del artista
+                // Cargar envíos del artista desde envios_canciones
                 const { data: envios, error } = await supabaseClient
-                    .from('envios')
-                    .select(`
-                        *,
-                        playlists:playlist_id (
-                            nombre,
-                            seguidores
-                        )
-                    `)
+                    .from('envios_canciones')
+                    .select('*')
                     .eq('artista_id', userId)
                     .order('created_at', { ascending: false });
                 
@@ -10552,8 +10365,9 @@
                 if (envios && envios.length > 0) {
                     const ultimos5 = envios.slice(0, 5);
                     listaEnvios.innerHTML = ultimos5.map(e => {
-                        const fecha = new Date(e.created_at).toLocaleDateString('es-ES');
-                        const playlistNombre = e.playlists?.nombre || 'Playlist';
+                        const fecha = new Date(e.created_at || e.fecha_envio).toLocaleDateString('es-ES');
+                        const playlistNombre = e.playlist_nombre || 'Playlist';
+                        const cancionNombre = e.cancion_nombre || 'Canción';
                         let estadoBadge = '';
                         if (e.estado === 'aceptado') {
                             estadoBadge = '<span style="background: #10b981; color: white; padding: 0.25rem 0.5rem; border-radius: 0.5rem; font-size: 0.75rem;">✅ Aceptado</span>';
@@ -10566,7 +10380,7 @@
                         return `
                             <div style="display: flex; justify-content: space-between; align-items: center; padding: 1rem; background: rgba(255,255,255,0.05); border-radius: 0.5rem;">
                                 <div>
-                                    <div style="font-weight: 600;">${e.nombre_cancion || 'Canción'}</div>
+                                    <div style="font-weight: 600;">${cancionNombre}</div>
                                     <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">→ ${playlistNombre}</div>
                                 </div>
                                 <div style="text-align: right;">
@@ -10585,12 +10399,6 @@
             }
         }
         
-        // Actualizar apertura del modal de estadísticas
-        window.openEstadisticasModal = async function() {
-            if(!isUserRegistered()){ showRegisterAlert(); return; }
-            document.getElementById('modalEstadisticas').classList.add('active');
-            await cargarEstadisticasArtista();
-        };
     </script>
 </body>
 </html>
