@@ -1295,6 +1295,123 @@
             border-color: var(--border-hover);
         }
         
+        /* ==================== STATS GRID (Modal Estadísticas) ==================== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+        
+        .stat-card:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-2px);
+        }
+        
+        .stat-card .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-card .stat-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--text-primary);
+        }
+        
+        .stat-card .stat-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+        }
+        
+        .chart-container {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 1rem;
+            padding: 1.5rem;
+        }
+        
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+        
+        /* ==================== MOBILE MENU ==================== */
+        .mobile-menu-btn {
+            display: none;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10,10,11,0.98);
+            backdrop-filter: blur(20px);
+            z-index: 1500;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+        }
+        
+        .mobile-nav.active {
+            display: flex;
+        }
+        
+        .mobile-nav-close {
+            position: absolute;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-primary);
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.5rem;
+        }
+        
+        .mobile-nav a {
+            color: var(--text-primary);
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 600;
+            padding: 0.75rem 2rem;
+            transition: color 0.3s;
+        }
+        
+        .mobile-nav a:hover {
+            color: var(--accent-primary);
+        }
+        
         /* ==================== RESPONSIVE ==================== */
         @media (max-width: 1024px) {
             .nav-menu {
@@ -1310,12 +1427,21 @@
             }
             
             .pricing-grid {
-                grid-template-columns: 1fr;
-                max-width: 400px;
+                grid-template-columns: repeat(2, 1fr);
+                max-width: 600px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .panel-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
         
         @media (max-width: 768px) {
+            /* Navbar */
             .navbar {
                 padding: 0.75rem 1rem;
             }
@@ -1324,8 +1450,27 @@
                 display: none;
             }
             
+            .mobile-menu-btn {
+                display: flex;
+            }
+            
+            .logo-text {
+                font-size: 0.85rem;
+            }
+            
+            /* Hero */
             .hero {
-                padding: 7rem 1rem 3rem;
+                padding: 6rem 1rem 3rem;
+                min-height: auto;
+            }
+            
+            .hero-title {
+                font-size: clamp(2rem, 8vw, 3rem);
+            }
+            
+            .hero-subtitle {
+                font-size: 1rem;
+                margin-bottom: 2rem;
             }
             
             .hero-stats {
@@ -1342,15 +1487,68 @@
                 width: 100%;
             }
             
+            /* Sections */
             .section {
-                padding: 4rem 1rem;
+                padding: 3rem 1rem;
             }
             
+            .section-header {
+                margin-bottom: 2rem;
+            }
+            
+            .section-title {
+                font-size: clamp(1.5rem, 6vw, 2rem);
+            }
+            
+            .section-subtitle {
+                font-size: 0.95rem;
+            }
+            
+            /* Grids */
             .pricing-grid {
                 grid-template-columns: 1fr;
                 max-width: 100%;
             }
             
+            .panel-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.75rem;
+            }
+            
+            .stat-card {
+                padding: 1rem;
+            }
+            
+            .stat-card .stat-value {
+                font-size: 1.75rem;
+            }
+            
+            .stat-card .stat-icon {
+                font-size: 1.5rem;
+            }
+            
+            .steps-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            /* Panel */
+            .panel-header {
+                padding: 1.5rem;
+            }
+            
+            .panel-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .panel-card {
+                padding: 1.5rem;
+            }
+            
+            /* Footer */
             .footer-grid {
                 grid-template-columns: 1fr;
                 gap: 2rem;
@@ -1361,14 +1559,350 @@
                 text-align: center;
             }
             
+            /* Auth */
+            .auth-section {
+                padding: 2rem 1rem;
+            }
+            
             .auth-panel {
                 padding: 2rem 1.5rem;
             }
             
-            .modal-content {
-                padding: 2rem 1.5rem;
-                margin: 1rem;
+            .auth-panel h3 {
+                font-size: 1.5rem;
             }
+            
+            .user-type-selector {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Modals */
+            .modal {
+                padding: 0.5rem;
+                align-items: flex-start;
+                padding-top: 1rem;
+            }
+            
+            .modal-content {
+                padding: 1.5rem;
+                margin: 0;
+                border-radius: 20px;
+                max-height: calc(100vh - 2rem);
+            }
+            
+            .modal-content h2 {
+                font-size: 1.5rem !important;
+                padding-right: 2rem;
+            }
+            
+            .modal-close {
+                top: 1rem;
+                right: 1rem;
+                width: 32px;
+                height: 32px;
+            }
+            
+            /* Chart container responsive */
+            .chart-container {
+                padding: 1rem;
+            }
+            
+            .chart-container > div {
+                flex-direction: column !important;
+                gap: 1.5rem !important;
+            }
+            
+            /* Pricing cards */
+            .pricing-card {
+                padding: 1.5rem;
+            }
+            
+            .price-amount {
+                font-size: 2rem;
+            }
+            
+            /* Step cards */
+            .step-card {
+                padding: 1.5rem;
+            }
+            
+            .step-icon {
+                font-size: 2rem;
+            }
+            
+            .step-title {
+                font-size: 1.1rem;
+            }
+            
+            /* Pack cards */
+            .packs-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .pack-card {
+                padding: 1.5rem !important;
+            }
+            
+            /* Playlist items */
+            .playlist-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+            
+            .playlist-item > div:last-child {
+                width: 100%;
+            }
+            
+            /* Payment methods */
+            .payment-methods {
+                flex-direction: column !important;
+            }
+            
+            .payment-method {
+                width: 100% !important;
+            }
+            
+            /* Top playlist cards */
+            .top-playlist-card {
+                padding: 1rem !important;
+            }
+            
+            .top-playlist-card h3 {
+                font-size: 1.1rem !important;
+            }
+            
+            /* Testimonials */
+            .testimonials-grid {
+                grid-template-columns: 1fr !important;
+            }
+            
+            .testimonial-card {
+                padding: 1.5rem;
+            }
+            
+            /* FAQ */
+            .faq-container {
+                padding: 0;
+            }
+            
+            .faq-question {
+                padding: 1rem;
+                font-size: 0.95rem;
+            }
+            
+            /* Buttons */
+            .btn-primary,
+            .btn-secondary {
+                padding: 0.875rem 1.25rem;
+                font-size: 0.9rem;
+            }
+            
+            /* Forms */
+            .form-group input,
+            .form-group textarea,
+            .form-group select {
+                padding: 0.875rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            /* Extra small screens */
+            .navbar {
+                padding: 0.5rem 0.75rem;
+            }
+            
+            .logo-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1.1rem;
+            }
+            
+            .logo-text {
+                font-size: 0.75rem;
+            }
+            
+            .nav-icon-btn,
+            .user-avatar,
+            .mobile-menu-btn {
+                width: 36px;
+                height: 36px;
+            }
+            
+            .hero {
+                padding: 5rem 0.75rem 2rem;
+            }
+            
+            .hero-badge {
+                font-size: 0.75rem;
+                padding: 0.4rem 0.75rem;
+            }
+            
+            .hero-title {
+                font-size: 1.75rem;
+            }
+            
+            .hero-subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .section {
+                padding: 2.5rem 0.75rem;
+            }
+            
+            .section-badge {
+                font-size: 0.7rem;
+                padding: 0.4rem 0.75rem;
+            }
+            
+            .section-title {
+                font-size: 1.4rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 0.5rem;
+            }
+            
+            .stat-card {
+                padding: 0.75rem;
+            }
+            
+            .stat-card .stat-value {
+                font-size: 1.5rem;
+            }
+            
+            .stat-card .stat-icon {
+                font-size: 1.25rem;
+            }
+            
+            .stat-card .stat-label {
+                font-size: 0.75rem;
+            }
+            
+            .modal-content {
+                padding: 1.25rem;
+                border-radius: 16px;
+            }
+            
+            .modal-content h2 {
+                font-size: 1.25rem !important;
+            }
+            
+            .modal-content p {
+                font-size: 0.9rem;
+            }
+            
+            .panel-header {
+                padding: 1.25rem;
+            }
+            
+            .panel-header h2 {
+                font-size: 1.25rem;
+            }
+            
+            .panel-card {
+                padding: 1.25rem;
+            }
+            
+            .panel-card-title {
+                font-size: 1.1rem;
+            }
+            
+            .panel-card-icon {
+                font-size: 2rem;
+            }
+            
+            .pricing-card {
+                padding: 1.25rem;
+            }
+            
+            .pricing-name {
+                font-size: 1.1rem;
+            }
+            
+            .price-amount {
+                font-size: 1.75rem;
+            }
+            
+            .auth-panel {
+                padding: 1.5rem 1rem;
+            }
+            
+            .auth-panel h3 {
+                font-size: 1.25rem;
+            }
+            
+            .user-type-btn {
+                padding: 1rem;
+            }
+            
+            .user-type-icon {
+                font-size: 1.5rem;
+            }
+            
+            .btn-submit {
+                padding: 0.875rem;
+                font-size: 0.9rem;
+            }
+            
+            .footer {
+                padding: 2rem 0.75rem 1rem;
+            }
+            
+            .footer-brand p {
+                font-size: 0.85rem;
+            }
+            
+            /* Fix for inline styles in modals */
+            [style*="font-size: 2.5rem"] {
+                font-size: 1.5rem !important;
+            }
+            
+            [style*="padding: 2rem"] {
+                padding: 1rem !important;
+            }
+            
+            [style*="gap: 2rem"] {
+                gap: 1rem !important;
+            }
+            
+            /* Circle chart responsive */
+            svg[width="150"] {
+                width: 120px !important;
+                height: 120px !important;
+            }
+            
+            [style*="font-size: 2.5rem"][id="tasaAceptacion"] {
+                font-size: 1.75rem !important;
+            }
+        }
+        
+        /* Ensure images don't overflow */
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+        
+        /* Fix horizontal overflow */
+        html, body {
+            overflow-x: hidden;
+            width: 100%;
+        }
+        
+        * {
+            max-width: 100%;
+        }
+        
+        /* Exceptions for specific elements that need to overflow */
+        .modal-content *,
+        svg,
+        canvas,
+        input,
+        textarea,
+        select,
+        button {
+            max-width: none;
         }
         
         /* ==================== PLAYLIST ITEMS ==================== */
@@ -1541,9 +2075,21 @@
                     <span id="userInitial">U</span>
                 </div>
                 <button class="btn-secondary hidden" id="logoutBtn" onclick="cerrarSesion()">Cerrar Sesión</button>
+                <button class="mobile-menu-btn" onclick="openMobileNav()">☰</button>
             </div>
         </div>
     </nav>
+
+    <!-- MOBILE NAVIGATION -->
+    <div class="mobile-nav" id="mobileNav">
+        <button class="mobile-nav-close" onclick="closeMobileNav()">✕</button>
+        <a href="#como-funciona" onclick="closeMobileNav()">Cómo Funciona</a>
+        <a href="#servicios" onclick="closeMobileNav()">Servicios</a>
+        <a href="#precios" onclick="closeMobileNav()">Precios</a>
+        <a href="#testimonios" onclick="closeMobileNav()">Opiniones</a>
+        <a href="#faq" onclick="closeMobileNav()">FAQ</a>
+        <a href="javascript:void(0)" onclick="closeMobileNav(); window.openContactoModal()">Contacto</a>
+    </div>
 
     <!-- HERO SECTION -->
     <section class="hero" id="hero">
@@ -5068,6 +5614,27 @@
                 console.error('❌ No se encontraron los botones');
             }
         }, 100);
+        
+        // ==================== MOBILE MENU ====================
+        function openMobileNav() {
+            document.getElementById('mobileNav').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+        
+        function closeMobileNav() {
+            document.getElementById('mobileNav').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        // Cerrar menú móvil al hacer click fuera
+        document.addEventListener('click', function(e) {
+            const mobileNav = document.getElementById('mobileNav');
+            if (mobileNav && mobileNav.classList.contains('active')) {
+                if (e.target === mobileNav) {
+                    closeMobileNav();
+                }
+            }
+        });
         
         // Esperar a que TODO cargue (igual que en el test que SÍ funcionó)
         window.addEventListener('load', function() {
