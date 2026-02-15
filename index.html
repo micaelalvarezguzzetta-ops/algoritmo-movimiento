@@ -3672,13 +3672,17 @@
                         <span style="color: rgba(255,255,255,0.6);">Plan actual:</span>
                         <span style="font-weight: 700; color: #10b981;" id="profilePlanActual">Créditos por demanda</span>
                     </div>
+                    <div style="display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);" id="profileEnviosGratisRow">
+                        <span style="color: rgba(255,255,255,0.6);">🎁 Envíos gratis este mes:</span>
+                        <span style="font-weight: 700; color: #10b981;" id="profileEnviosGratis">3 restantes</span>
+                    </div>
                     <div style="display: flex; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid rgba(255,255,255,0.1);">
                         <span style="color: rgba(255,255,255,0.6);" id="profileCreditosLabel">Créditos:</span>
                         <span style="font-weight: 700;" id="profileCreditosStandard">0 💰</span>
                     </div>
                     <div style="display: flex; justify-content: space-between; padding: 1rem 0;">
                         <span style="color: rgba(255,255,255,0.6);">Miembro desde:</span>
-                        <span style="font-weight: 700;">Enero 2026</span>
+                        <span style="font-weight: 700;" id="profileMiembroDesde">Enero 2026</span>
                     </div>
                 </div>
             </div>
@@ -10002,7 +10006,41 @@
                             </div>
                         `;
                         
-                        // TODO: Cargar estadísticas reales desde Supabase
+                        // Calcular envíos gratis restantes este mes
+                        const ENVIOS_GRATIS_MENSUALES = 3;
+                        const ahora = new Date();
+                        const inicioMes = new Date(ahora.getFullYear(), ahora.getMonth(), 1).toISOString();
+                        const finMes = new Date(ahora.getFullYear(), ahora.getMonth() + 1, 0, 23, 59, 59).toISOString();
+                        
+                        // Contar envíos del mes actual (los primeros 3 son gratis)
+                        const { data: enviosMes, error: errorEnvios } = await supabaseClient
+                            .from('envios_canciones')
+                            .select('id')
+                            .eq('artista_id', userId)
+                            .gte('created_at', inicioMes)
+                            .lte('created_at', finMes);
+                        
+                        const enviosMesActual = enviosMes?.length || 0;
+                        const enviosGratisUsados = Math.min(enviosMesActual, ENVIOS_GRATIS_MENSUALES);
+                        const enviosGratisRestantes = Math.max(0, ENVIOS_GRATIS_MENSUALES - enviosGratisUsados);
+                        
+                        // Actualizar UI de envíos gratis
+                        const enviosGratisElement = document.getElementById('profileEnviosGratis');
+                        if (enviosGratisElement) {
+                            if (enviosGratisRestantes > 0) {
+                                enviosGratisElement.textContent = `${enviosGratisRestantes} restantes`;
+                                enviosGratisElement.style.color = '#10b981';
+                            } else {
+                                enviosGratisElement.textContent = '0 (agotados)';
+                                enviosGratisElement.style.color = '#ef4444';
+                            }
+                        }
+                        
+                        // Mostrar fila de envíos gratis (solo para artistas)
+                        const enviosGratisRow = document.getElementById('profileEnviosGratisRow');
+                        if (enviosGratisRow) {
+                            enviosGratisRow.style.display = 'flex';
+                        }
                         
                         // Mostrar créditos
                         document.getElementById('profileCreditosStandard').textContent = (usuario.creditos || 0) + ' 💰';
@@ -10022,6 +10060,12 @@
                         }
                         
                     } else if (userType === 'curador') {
+                        // Ocultar fila de envíos gratis (no aplica a curadores)
+                        const enviosGratisRow = document.getElementById('profileEnviosGratisRow');
+                        if (enviosGratisRow) {
+                            enviosGratisRow.style.display = 'none';
+                        }
+                        
                         // Cargar estadísticas de curador
                         const statsContainer = document.getElementById('profileStats');
                         statsContainer.innerHTML = `
