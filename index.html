@@ -233,12 +233,12 @@
         // Cargar estadísticas reales de Supabase
         async function cargarEstadisticasCompletas() {
             var userId = localStorage.getItem('userId');
+            console.log('📊 userId desde localStorage:', userId);
+            
             if (!userId || !supabaseClient) {
-                console.log('No hay userId o supabaseClient');
+                console.log('❌ No hay userId o supabaseClient');
                 return;
             }
-            
-            console.log('Cargando estadísticas para userId:', userId);
             
             try {
                 // Obtener envíos del usuario
@@ -248,10 +248,12 @@
                     .eq('artista_id', userId)
                     .order('created_at', { ascending: false });
                 
-                console.log('Resultado envíos:', enviosResult);
+                console.log('📊 Consulta envios_canciones:', enviosResult);
+                console.log('📊 Datos:', enviosResult.data);
+                console.log('📊 Error:', enviosResult.error);
                 
                 if (enviosResult.error) {
-                    console.error('Error en consulta:', enviosResult.error);
+                    console.error('❌ Error en consulta:', enviosResult.error);
                     return;
                 }
                 
@@ -262,7 +264,7 @@
                 var rechazados = envios.filter(function(e) { return e.estado === 'rechazado'; }).length;
                 var tasaAceptacion = totalEnvios > 0 ? Math.round((aceptados / totalEnvios) * 100) : 0;
                 
-                console.log('Estadísticas:', { totalEnvios, aceptados, pendientes, rechazados });
+                console.log('📊 Estadísticas calculadas:', { totalEnvios, aceptados, pendientes, rechazados });
                 
                 // Actualizar UI
                 var statTotal = document.getElementById('statTotalEnvios');
@@ -298,7 +300,7 @@
                     ultimosEnviosList.innerHTML = html;
                 }
             } catch (err) {
-                console.error('Error cargando estadísticas:', err);
+                console.error('❌ Error cargando estadísticas:', err);
             }
         }
         
@@ -555,7 +557,7 @@
             if (modal) modal.classList.remove('active');
         }
         
-        // Cargar playlists TOP de Supabase
+        // Cargar playlists TOP de Supabase (desde tabla solicitudes_destacar)
         async function cargarPlaylistsTOP() {
             var container = document.getElementById('playlistsTOPGrid');
             if (!container || !supabaseClient) {
@@ -563,42 +565,58 @@
                 return;
             }
             
-            container.innerHTML = '<div style="text-align: center; padding: 2rem; grid-column: 1/-1;"><p>Cargando playlists...</p></div>';
+            container.innerHTML = '<div style="text-align: center; padding: 2rem; grid-column: 1/-1;"><p>Cargando playlists destacadas...</p></div>';
             
-            console.log('Cargando playlists TOP...');
+            console.log('Cargando playlists destacadas...');
             
             try {
-                // Cargar todas las playlists ordenadas por seguidores
+                // Consultar solicitudes_destacar con estado aprobado
                 var result = await supabaseClient
-                    .from('playlists')
+                    .from('solicitudes_destacar')
                     .select('*')
-                    .order('followers', { ascending: false })
+                    .eq('estado', 'aprobado')
+                    .order('created_at', { ascending: false })
                     .limit(12);
                 
-                console.log('Resultado playlists TOP:', result);
+                console.log('Resultado solicitudes_destacar:', result);
                 
                 if (result.error) {
                     console.error('Error en consulta:', result.error);
-                    throw result.error;
                 }
                 
                 if (!result.data || result.data.length === 0) {
-                    container.innerHTML = '<div style="text-align: center; padding: 3rem; grid-column: 1/-1; color: rgba(255,255,255,0.5);"><div style="font-size: 4rem; margin-bottom: 1rem;">📭</div><p>No hay playlists disponibles todavía</p></div>';
+                    container.innerHTML = '<div style="text-align: center; padding: 3rem; grid-column: 1/-1; color: rgba(255,255,255,0.6);"><div style="font-size: 4rem; margin-bottom: 1rem;">🏆</div><h3 style="margin-bottom: 1rem;">No hay playlists destacadas actualmente</h3><p style="font-size: 0.9rem;">Los curadores pueden pagar para aparecer aquí y recibir más envíos.</p></div>';
                     return;
                 }
                 
+                // Obtener datos completos de las playlists
+                var playlistIds = result.data.map(function(s) { return s.playlist_id; }).filter(function(id) { return id; });
+                var playlistsMap = {};
+                
+                if (playlistIds.length > 0) {
+                    var playlistsResult = await supabaseClient
+                        .from('playlists')
+                        .select('*')
+                        .in('id', playlistIds);
+                    
+                    if (playlistsResult.data) {
+                        playlistsResult.data.forEach(function(p) {
+                            playlistsMap[p.id] = p;
+                        });
+                    }
+                }
+                
                 var html = '';
-                result.data.forEach(function(playlist) {
+                result.data.forEach(function(item) {
+                    var playlist = playlistsMap[item.playlist_id] || {};
                     var seguidores = playlist.followers || 0;
                     var seguidoresText = seguidores >= 1000 ? Math.round(seguidores/1000) + 'K' : seguidores;
-                    var isPremium = seguidores >= 1000;
+                    var nombre = item.playlist_nombre || playlist.nombre || 'Sin nombre';
                     
-                    html += '<div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 1.5rem; position: relative;">';
-                    if (isPremium) {
-                        html += '<div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.3rem 0.6rem; border-radius: 0.5rem; font-size: 0.7rem; font-weight: 800; color: #1e293b;">⭐ PREMIUM</div>';
-                    }
-                    html += '<div style="width: 100%; height: 140px; background: linear-gradient(135deg, #7c3aed, #ec4899); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 1rem;">🎵</div>';
-                    html += '<h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem;">' + (playlist.nombre || 'Sin nombre') + '</h3>';
+                    html += '<div style="background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(236, 72, 153, 0.1)); border: 2px solid rgba(139, 92, 246, 0.3); border-radius: 1rem; padding: 1.5rem; position: relative;">';
+                    html += '<div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.3rem 0.6rem; border-radius: 0.5rem; font-size: 0.7rem; font-weight: 800; color: #1e293b;">⭐ DESTACADA</div>';
+                    html += '<div style="width: 100%; height: 140px; background: linear-gradient(135deg, #7c3aed, #ec4899); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 1rem;">🏆</div>';
+                    html += '<h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem;">' + nombre + '</h3>';
                     html += '<p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.75rem;">👥 <strong>' + seguidoresText + '</strong> seguidores</p>';
                     if (playlist.genero) {
                         html += '<p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-bottom: 1rem;">' + playlist.genero + '</p>';
@@ -611,7 +629,7 @@
                 container.innerHTML = html;
             } catch (err) {
                 console.error('Error cargando playlists TOP:', err);
-                container.innerHTML = '<div style="text-align: center; padding: 3rem; grid-column: 1/-1; color: rgba(255,255,255,0.5);"><p>Error al cargar playlists</p></div>';
+                container.innerHTML = '<div style="text-align: center; padding: 3rem; grid-column: 1/-1; color: rgba(255,255,255,0.5);"><p>Error al cargar playlists destacadas</p></div>';
             }
         }
         // Modales de curador
