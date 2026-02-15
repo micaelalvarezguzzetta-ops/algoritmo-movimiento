@@ -7171,7 +7171,7 @@
             const grid = document.getElementById('playlistsTOPGrid');
             
             try {
-                // Cargar playlists destacadas con datos del curador
+                // Cargar las 5 playlists con más seguidores (aprobadas)
                 const { data: playlists, error } = await supabaseClient
                     .from('playlists')
                     .select(`
@@ -7181,8 +7181,8 @@
                         )
                     `)
                     .eq('estado', 'aprobada')
-                    .eq('destacada', true)
-                    .order('seguidores', { ascending: false });
+                    .order('followers', { ascending: false })
+                    .limit(5);
                 
                 if (error) {
                     console.error('Error cargando playlists TOP:', error);
@@ -7201,23 +7201,25 @@
                     return;
                 }
                 
-                // Colores para los gradientes (fallback si no hay imagen)
+                // Colores para los gradientes según posición
                 const gradientes = [
-                    'linear-gradient(135deg, #ec4899, #8b5cf6)',
-                    'linear-gradient(135deg, #8b5cf6, #6366f1)',
-                    'linear-gradient(135deg, #06b6d4, #3b82f6)',
-                    'linear-gradient(135deg, #10b981, #06b6d4)',
-                    'linear-gradient(135deg, #f59e0b, #ef4444)',
-                    'linear-gradient(135deg, #ec4899, #ef4444)'
+                    'linear-gradient(135deg, #fbbf24, #f59e0b)', // 1º - Oro
+                    'linear-gradient(135deg, #94a3b8, #64748b)', // 2º - Plata
+                    'linear-gradient(135deg, #cd7c32, #b45309)', // 3º - Bronce
+                    'linear-gradient(135deg, #ec4899, #8b5cf6)', // 4º
+                    'linear-gradient(135deg, #8b5cf6, #6366f1)'  // 5º
                 ];
+                
+                const medallas = ['🥇', '🥈', '🥉', '4️⃣', '5️⃣'];
                 
                 grid.innerHTML = playlists.map((p, index) => {
                     // Obtener nombre del curador del join
                     const curadorNombre = p.usuarios?.nombre || p.curador_nombre || 'Curador';
-                    const seguidores = p.seguidores || p.followers || 0;
-                    const seguidoresDisplay = seguidores >= 1000 ? `${(seguidores/1000).toFixed(0)}K` : seguidores;
+                    const seguidores = p.followers || p.seguidores || 0;
+                    const seguidoresDisplay = seguidores >= 1000 ? `${(seguidores/1000).toFixed(1).replace('.0', '')}K` : seguidores.toLocaleString();
                     const gradiente = gradientes[index % gradientes.length];
                     const genero = p.genero || 'Música';
+                    const medalla = medallas[index];
                     
                     // Mostrar imagen si existe, sino gradiente con emoji
                     const imagenPlaylist = p.imagen_url || p.cover_url || p.image_url || null;
@@ -7225,21 +7227,31 @@
                         ? `<img src="${imagenPlaylist}" alt="${p.nombre}" style="width: 100%; height: 180px; object-fit: cover; border-radius: 0.75rem; margin-bottom: 1rem;">`
                         : `<div style="width: 100%; height: 180px; background: ${gradiente}; border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 4rem; margin-bottom: 1rem;">🎵</div>`;
                     
+                    // Badge de posición
+                    const posicionBadge = index < 3 
+                        ? `<div style="position: absolute; top: 1rem; left: 1rem; background: ${gradiente}; padding: 0.5rem 0.75rem; border-radius: 0.75rem; font-size: 1.2rem; font-weight: 800; z-index: 1; box-shadow: 0 4px 15px rgba(0,0,0,0.3);">
+                            ${medalla}
+                           </div>`
+                        : `<div style="position: absolute; top: 1rem; left: 1rem; background: rgba(255,255,255,0.1); padding: 0.5rem 0.75rem; border-radius: 0.75rem; font-size: 1rem; font-weight: 800; z-index: 1;">
+                            ${medalla}
+                           </div>`;
+                    
                     return `
-                        <div class="top-playlist-card" style="position: relative; background: rgba(255,255,255,0.05); border-radius: 1rem; padding: 1.5rem; transition: transform 0.3s;">
-                            <div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 800; color: #1e293b; z-index: 1;">
-                                ⭐ PREMIUM
+                        <div class="top-playlist-card" style="position: relative; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 1rem; padding: 1.5rem; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.borderColor='rgba(139,92,246,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.08)';">
+                            ${posicionBadge}
+                            <div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, rgba(139,92,246,0.9), rgba(236,72,153,0.9)); padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.7rem; font-weight: 800; color: white; z-index: 1; text-transform: uppercase; letter-spacing: 0.5px;">
+                                🔥 TOP ${index + 1}
                             </div>
                             ${imagenHTML}
-                            <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 0.5rem;">${p.nombre}</h3>
-                            <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.5rem;">Por ${curadorNombre}</p>
+                            <h3 style="font-size: 1.2rem; font-weight: 800; margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.nombre}</h3>
+                            <p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.75rem;">Por ${curadorNombre}</p>
                             <div style="display: flex; gap: 1rem; margin-bottom: 1rem; font-size: 0.9rem;">
-                                <span>👥 <strong>${seguidoresDisplay}</strong> seguidores</span>
+                                <span style="display: flex; align-items: center; gap: 0.3rem;">👥 <strong style="color: #a78bfa;">${seguidoresDisplay}</strong> seguidores</span>
                             </div>
                             <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem;">
-                                <span style="background: rgba(139, 92, 246, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #8b5cf6;">#${genero}</span>
+                                <span style="background: rgba(139, 92, 246, 0.2); padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; color: #a78bfa;">#${genero}</span>
                             </div>
-                            <a href="${p.url_spotify || '#'}" target="_blank" style="display: block; width: 100%; padding: 0.75rem; background: ${gradiente}; border: none; border-radius: 0.5rem; color: white; font-weight: 700; text-decoration: none; text-align: center; cursor: pointer;">
+                            <a href="${p.url_spotify || '#'}" target="_blank" style="display: block; width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #1DB954, #1ed760); border: none; border-radius: 0.5rem; color: white; font-weight: 700; text-decoration: none; text-align: center; cursor: pointer; transition: all 0.3s;" onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 4px 15px rgba(29,185,84,0.4)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='none';">
                                 🎵 Ver en Spotify
                             </a>
                         </div>
