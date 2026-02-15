@@ -233,15 +233,27 @@
         // Cargar estadísticas reales de Supabase
         async function cargarEstadisticasCompletas() {
             var userId = localStorage.getItem('userId');
-            if (!userId || !supabaseClient) return;
+            if (!userId || !supabaseClient) {
+                console.log('No hay userId o supabaseClient');
+                return;
+            }
+            
+            console.log('Cargando estadísticas para userId:', userId);
             
             try {
                 // Obtener envíos del usuario
                 var enviosResult = await supabaseClient
                     .from('envios_canciones')
-                    .select('*, playlists(nombre)')
+                    .select('*')
                     .eq('artista_id', userId)
                     .order('created_at', { ascending: false });
+                
+                console.log('Resultado envíos:', enviosResult);
+                
+                if (enviosResult.error) {
+                    console.error('Error en consulta:', enviosResult.error);
+                    return;
+                }
                 
                 var envios = enviosResult.data || [];
                 var totalEnvios = envios.length;
@@ -250,15 +262,25 @@
                 var rechazados = envios.filter(function(e) { return e.estado === 'rechazado'; }).length;
                 var tasaAceptacion = totalEnvios > 0 ? Math.round((aceptados / totalEnvios) * 100) : 0;
                 
+                console.log('Estadísticas:', { totalEnvios, aceptados, pendientes, rechazados });
+                
                 // Actualizar UI
-                document.getElementById('statTotalEnvios').textContent = totalEnvios;
-                document.getElementById('statAceptados').textContent = aceptados;
-                document.getElementById('statPendientes').textContent = pendientes;
-                document.getElementById('statRechazados').textContent = rechazados;
-                document.getElementById('statTasaAceptacion').textContent = tasaAceptacion + '%';
+                var statTotal = document.getElementById('statTotalEnvios');
+                var statAcept = document.getElementById('statAceptados');
+                var statPend = document.getElementById('statPendientes');
+                var statRech = document.getElementById('statRechazados');
+                var statTasa = document.getElementById('statTasaAceptacion');
+                
+                if (statTotal) statTotal.textContent = totalEnvios;
+                if (statAcept) statAcept.textContent = aceptados;
+                if (statPend) statPend.textContent = pendientes;
+                if (statRech) statRech.textContent = rechazados;
+                if (statTasa) statTasa.textContent = tasaAceptacion + '%';
                 
                 // Mostrar últimos 5 envíos
                 var ultimosEnviosList = document.getElementById('ultimosEnviosList');
+                if (!ultimosEnviosList) return;
+                
                 if (envios.length === 0) {
                     ultimosEnviosList.innerHTML = '<p style="text-align: center; color: rgba(255,255,255,0.5);">No tienes envíos todavía</p>';
                 } else {
@@ -266,9 +288,10 @@
                     envios.slice(0, 5).forEach(function(envio) {
                         var estadoColor = envio.estado === 'aceptado' ? '#10b981' : envio.estado === 'rechazado' ? '#ef4444' : '#fbbf24';
                         var estadoIcon = envio.estado === 'aceptado' ? '✅' : envio.estado === 'rechazado' ? '❌' : '⏳';
-                        var playlistNombre = envio.playlists ? envio.playlists.nombre : 'Playlist';
+                        var playlistNombre = envio.playlist_nombre || 'Playlist';
+                        var cancionNombre = envio.cancion_nombre || 'Sin nombre';
                         html += '<div style="display: flex; justify-content: space-between; align-items: center; padding: 0.75rem; background: rgba(0,0,0,0.2); border-radius: 0.5rem;">';
-                        html += '<div><strong>' + (envio.nombre_cancion || 'Sin nombre') + '</strong><br><small style="color: rgba(255,255,255,0.6);">' + playlistNombre + '</small></div>';
+                        html += '<div><strong>' + cancionNombre + '</strong><br><small style="color: rgba(255,255,255,0.6);">' + playlistNombre + '</small></div>';
                         html += '<span style="color: ' + estadoColor + '; font-weight: 600;">' + estadoIcon + ' ' + (envio.estado || 'pendiente') + '</span>';
                         html += '</div>';
                     });
@@ -347,7 +370,7 @@
         function openHistorialModal() {
             var modal = document.getElementById('modalHistorial');
             if (modal) modal.classList.add('active');
-            cargarHistorialEnvios();
+            cargarHistorialEnviosHEAD();
         }
         function closeHistorialModal() {
             var modal = document.getElementById('modalHistorial');
@@ -355,20 +378,27 @@
         }
         
         // Cargar historial de envíos de Supabase
-        async function cargarHistorialEnvios() {
+        async function cargarHistorialEnviosHEAD() {
             var userId = localStorage.getItem('userId');
             var container = document.getElementById('historialEnviosList');
-            if (!container || !userId || !supabaseClient) return;
+            if (!container || !userId || !supabaseClient) {
+                console.log('Faltan datos para cargar historial');
+                return;
+            }
             
             container.innerHTML = '<div style="text-align: center; padding: 2rem;"><p>Cargando...</p></div>';
+            
+            console.log('Cargando historial para userId:', userId);
             
             try {
                 var result = await supabaseClient
                     .from('envios_canciones')
-                    .select('*, playlists(nombre, seguidores)')
+                    .select('*')
                     .eq('artista_id', userId)
                     .order('created_at', { ascending: false })
                     .limit(50);
+                
+                console.log('Resultado historial:', result);
                 
                 if (result.error) throw result.error;
                 
@@ -381,12 +411,13 @@
                 result.data.forEach(function(envio) {
                     var estadoColor = envio.estado === 'aceptado' ? '#10b981' : envio.estado === 'rechazado' ? '#ef4444' : '#fbbf24';
                     var estadoIcon = envio.estado === 'aceptado' ? '✅' : envio.estado === 'rechazado' ? '❌' : '⏳';
-                    var fecha = new Date(envio.created_at).toLocaleDateString('es-ES');
-                    var playlistNombre = envio.playlists ? envio.playlists.nombre : 'Playlist';
+                    var fecha = envio.created_at ? new Date(envio.created_at).toLocaleDateString('es-ES') : 'Sin fecha';
+                    var playlistNombre = envio.playlist_nombre || 'Playlist';
+                    var cancionNombre = envio.cancion_nombre || 'Sin nombre';
                     
                     html += '<div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 1.5rem;">';
                     html += '<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">';
-                    html += '<h4 style="font-weight: 700;">' + (envio.nombre_cancion || 'Sin nombre') + '</h4>';
+                    html += '<h4 style="font-weight: 700;">' + cancionNombre + '</h4>';
                     html += '<span style="background: ' + estadoColor + '22; color: ' + estadoColor + '; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.85rem; font-weight: 600;">' + estadoIcon + ' ' + (envio.estado || 'pendiente') + '</span>';
                     html += '</div>';
                     html += '<p style="color: rgba(255,255,255,0.7); font-size: 0.9rem;">📋 ' + playlistNombre + '</p>';
@@ -396,7 +427,7 @@
                 container.innerHTML = html;
             } catch (err) {
                 console.error('Error cargando historial:', err);
-                container.innerHTML = '<div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);"><p>Error al cargar historial</p></div>';
+                container.innerHTML = '<div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);"><p>Error al cargar historial: ' + err.message + '</p></div>';
             }
         }
         
@@ -448,14 +479,6 @@
         }
         function closePerfilModal() {
             var modal = document.getElementById('modalPerfil');
-            if (modal) modal.classList.remove('active');
-        }
-        function openAnalisisModal() {
-            var modal = document.getElementById('modalAnalisis');
-            if (modal) modal.classList.add('active');
-        }
-        function closeAnalisisModal() {
-            var modal = document.getElementById('modalAnalisis');
             if (modal) modal.classList.remove('active');
         }
         function openEventosModal() {
@@ -535,30 +558,40 @@
         // Cargar playlists TOP de Supabase
         async function cargarPlaylistsTOP() {
             var container = document.getElementById('playlistsTOPGrid');
-            if (!container || !supabaseClient) return;
+            if (!container || !supabaseClient) {
+                console.log('No hay container o supabaseClient');
+                return;
+            }
             
             container.innerHTML = '<div style="text-align: center; padding: 2rem; grid-column: 1/-1;"><p>Cargando playlists...</p></div>';
             
+            console.log('Cargando playlists TOP...');
+            
             try {
+                // Cargar todas las playlists ordenadas por seguidores
                 var result = await supabaseClient
                     .from('playlists')
                     .select('*')
-                    .eq('estado', 'aprobada')
-                    .gte('seguidores', 300)
-                    .order('seguidores', { ascending: false })
+                    .order('followers', { ascending: false })
                     .limit(12);
                 
-                if (result.error) throw result.error;
+                console.log('Resultado playlists TOP:', result);
+                
+                if (result.error) {
+                    console.error('Error en consulta:', result.error);
+                    throw result.error;
+                }
                 
                 if (!result.data || result.data.length === 0) {
-                    container.innerHTML = '<div style="text-align: center; padding: 3rem; grid-column: 1/-1; color: rgba(255,255,255,0.5);"><div style="font-size: 4rem; margin-bottom: 1rem;">📭</div><p>No hay playlists TOP disponibles</p></div>';
+                    container.innerHTML = '<div style="text-align: center; padding: 3rem; grid-column: 1/-1; color: rgba(255,255,255,0.5);"><div style="font-size: 4rem; margin-bottom: 1rem;">📭</div><p>No hay playlists disponibles todavía</p></div>';
                     return;
                 }
                 
                 var html = '';
                 result.data.forEach(function(playlist) {
-                    var seguidores = playlist.seguidores >= 1000 ? Math.round(playlist.seguidores/1000) + 'K' : playlist.seguidores;
-                    var isPremium = playlist.seguidores >= 1000;
+                    var seguidores = playlist.followers || 0;
+                    var seguidoresText = seguidores >= 1000 ? Math.round(seguidores/1000) + 'K' : seguidores;
+                    var isPremium = seguidores >= 1000;
                     
                     html += '<div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 1rem; padding: 1.5rem; position: relative;">';
                     if (isPremium) {
@@ -566,11 +599,13 @@
                     }
                     html += '<div style="width: 100%; height: 140px; background: linear-gradient(135deg, #7c3aed, #ec4899); border-radius: 0.75rem; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin-bottom: 1rem;">🎵</div>';
                     html += '<h3 style="font-size: 1.1rem; font-weight: 800; margin-bottom: 0.5rem;">' + (playlist.nombre || 'Sin nombre') + '</h3>';
-                    html += '<p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.75rem;">👥 <strong>' + seguidores + '</strong> seguidores</p>';
-                    if (playlist.generos) {
-                        html += '<p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-bottom: 1rem;">' + playlist.generos + '</p>';
+                    html += '<p style="color: rgba(255,255,255,0.6); font-size: 0.85rem; margin-bottom: 0.75rem;">👥 <strong>' + seguidoresText + '</strong> seguidores</p>';
+                    if (playlist.genero) {
+                        html += '<p style="color: rgba(255,255,255,0.5); font-size: 0.8rem; margin-bottom: 1rem;">' + playlist.genero + '</p>';
                     }
-                    html += '<a href="' + (playlist.url_spotify || '#') + '" target="_blank" style="display: block; width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #1db954, #1ed760); border: none; border-radius: 0.5rem; color: white; font-weight: 700; text-align: center; text-decoration: none; font-size: 0.9rem;">Ver en Spotify</a>';
+                    if (playlist.url_spotify) {
+                        html += '<a href="' + playlist.url_spotify + '" target="_blank" style="display: block; width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #1db954, #1ed760); border: none; border-radius: 0.5rem; color: white; font-weight: 700; text-align: center; text-decoration: none; font-size: 0.9rem;">Ver en Spotify</a>';
+                    }
                     html += '</div>';
                 });
                 container.innerHTML = html;
@@ -2553,11 +2588,6 @@
                 <div class="step-icon">🎚️</div>
                 <h3 class="step-title">Mastering IA</h3>
                 <p class="step-desc">Mejora el sonido con inteligencia artificial</p>
-            </div>
-            <div class="step-card" onclick="openAnalisisModal()" style="cursor: pointer;">
-                <div class="step-icon">🔍</div>
-                <h3 class="step-title">Análisis Artista</h3>
-                <p class="step-desc">Analiza tu perfil de Spotify</p>
             </div>
             <div class="step-card" onclick="openAfiliadosModal()" style="cursor: pointer;">
                 <div class="step-icon">🤝</div>
@@ -4990,57 +5020,6 @@
     </div>
 
     <!-- MODAL ANÁLISIS -->
-    <div class="modal" id="modalAnalisis">
-        <div class="modal-content" style="max-width: 700px;">
-            <button class="modal-close" onclick="closeAnalisisModal()">×</button>
-            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 1rem;" id="analisisModalTitulo">📊 Análisis de Artista</h2>
-            <p style="text-align: center; color: rgba(255,255,255,0.7); margin-bottom: 2rem;" id="analisisModalSubtitulo">Retroalimentación profesional para mejorar tu perfil</p>
-            
-            <!-- Contenido Artista -->
-            <div id="analisisContenidoArtista">
-                <div style="background: rgba(139, 92, 246, 0.1); border: 2px solid rgba(139, 92, 246, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem;">
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">✅ Análisis Restantes: <span style="color: #8b5cf6;">1</span></h3>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem;">
-                        • <strong>Identifica tu audiencia objetivo</strong><br>
-                        • <strong>Comprueba si los números de artista son reales o falsos</strong><br>
-                        • <strong>Descubre cómo promocionar/mejorar tu perfil de artista</strong>
-                    </p>
-                </div>
-                
-                <div style="margin-bottom: 2rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">URL de tu perfil de Spotify:</label>
-                    <input type="text" id="urlPerfilAnalisis" placeholder="https://open.spotify.com/artist/..." style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: white;">
-                    <small style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Pega el enlace directo a tu perfil de artista en Spotify</small>
-                </div>
-                
-                <button onclick="iniciarAnalisisArtista()" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 0.5rem; color: white; font-weight: 700; font-size: 1.1rem; cursor: pointer;">
-                    🔍 Analizar Perfil
-                </button>
-            </div>
-            
-            <!-- Contenido Curador -->
-            <div id="analisisContenidoCurador" style="display: none;">
-                <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem;">
-                    <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">✅ Análisis Restantes: <span style="color: #10b981;">Ilimitados</span></h3>
-                    <p style="color: rgba(255,255,255,0.8); font-size: 0.95rem;">
-                        • <strong>Verifica si un artista tiene números reales</strong><br>
-                        • <strong>Analiza la calidad de su audiencia</strong><br>
-                        • <strong>Toma mejores decisiones sobre qué envíos aceptar</strong>
-                    </p>
-                </div>
-                
-                <div style="margin-bottom: 2rem;">
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">URL del perfil del artista:</label>
-                    <input type="text" id="urlPerfilCuradorAnalisis" placeholder="https://open.spotify.com/artist/..." style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: white;">
-                    <small style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Pega el enlace del artista que quieres analizar</small>
-                </div>
-                
-                <button onclick="iniciarAnalisisCurador()" style="width: 100%; padding: 1rem; background: linear-gradient(135deg, #10b981, #06b6d4); border: none; border-radius: 0.5rem; color: white; font-weight: 700; font-size: 1.1rem; cursor: pointer;">
-                    🔍 Analizar Artista
-                </button>
-            </div>
-        </div>
-    </div>
 
     <!-- MODAL AFILIADOS -->
     <div class="modal" id="modalAfiliados">
@@ -9138,74 +9117,6 @@
             document.getElementById('modalPitchGuia').classList.remove('active');
         }
         
-        function openAnalisisModal(){
-            document.getElementById('modalAnalisis').classList.add('active');
-        }
-        
-        function closeAnalisisModal(){
-            document.getElementById('modalAnalisis').classList.remove('active');
-        }
-        
-        function iniciarAnalisisArtista(){
-            const url = document.getElementById('urlPerfilAnalisis').value.trim();
-            
-            if(!url){
-                alert('⚠️ URL REQUERIDA\n\nPor favor ingresa la URL de tu perfil de Spotify.');
-                return;
-            }
-            
-            if(!url.includes('spotify.com/artist/')){
-                alert('❌ URL INVÁLIDA\n\nEl enlace debe ser de un perfil de artista en Spotify.\n\nEjemplo: https://open.spotify.com/artist/...');
-                return;
-            }
-            
-            alert('🔍 ANÁLISIS INICIADO\n\n' +
-                  'Tu perfil está siendo analizado...\n\n' +
-                  'Recibirás los resultados por email en las próximas 24-48 horas.\n\n' +
-                  'El análisis incluirá:\n' +
-                  '• Verificación de autenticidad de números\n' +
-                  '• Análisis de audiencia objetivo\n' +
-                  '• Recomendaciones personalizadas\n' +
-                  '• Estrategias de mejora');
-            
-            closeAnalisisModal();
-        }
-        
-        function iniciarAnalisisCurador(){
-            const url = document.getElementById('urlPerfilCuradorAnalisis').value.trim();
-            
-            if(!url){
-                alert('⚠️ URL REQUERIDA\n\nPor favor ingresa la URL del perfil del artista.');
-                return;
-            }
-            
-            if(!url.includes('spotify.com/artist/')){
-                alert('❌ URL INVÁLIDA\n\nEl enlace debe ser de un perfil de artista en Spotify.\n\nEjemplo: https://open.spotify.com/artist/...');
-                return;
-            }
-            
-            alert('🔍 ANÁLISIS COMPLETADO\n\n' +
-                  'Resultados del análisis:\n\n' +
-                  '✅ Números verificados como REALES\n' +
-                  '📊 Oyentes mensuales: Crecimiento orgánico detectado\n' +
-                  '🎯 Audiencia: 78% real, 22% promocionada\n' +
-                  '💚 Recomendación: ACEPTAR\n\n' +
-                  'Este artista muestra patrones de crecimiento orgánico y auténtico.');
-            
-            closeAnalisisModal();
-        }
-        
-        function cambiarAnalisisACurador(){
-            // Cambiar tarjeta en Herramientas
-            document.getElementById('analisisTitulo').textContent = 'Análisis de Artistas';
-            document.getElementById('analisisDesc').textContent = 'Verifica autenticidad';
-            
-            // Cambiar contenido del modal
-            document.getElementById('analisisModalTitulo').textContent = '📊 Análisis de Artistas';
-            document.getElementById('analisisModalSubtitulo').textContent = 'Verifica la autenticidad de los números antes de aceptar';
-            document.getElementById('analisisContenidoArtista').style.display = 'none';
-            document.getElementById('analisisContenidoCurador').style.display = 'block';
-        }
         
         function openAfiliadosModal(){
             document.getElementById('modalAfiliados').classList.add('active');
