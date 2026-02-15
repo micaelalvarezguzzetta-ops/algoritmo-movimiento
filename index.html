@@ -4450,7 +4450,7 @@
                         • Banner destacado<br>
                         • +1000% visibilidad
                     </div>
-                    <button onclick="canjearPuntos('top_playlist', 150)" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
+                    <button onclick="canjearPlaylistTOP()" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
                         Canjear
                     </button>
                 </div>
@@ -7737,12 +7737,23 @@
                     const fecha = new Date(canje.created_at).toLocaleDateString('es-ES');
                     const tipo = canje.tipo === 'redes_sociales' ? '📱 Redes Sociales' : '🏆 Playlist TOP';
                     const estado = canje.estado === 'completado' ? '✅ Completado' : 
-                                   canje.estado === 'pendiente' ? '⏳ Pendiente' : '❌ Cancelado';
+                                   canje.estado === 'pendiente' ? '⏳ Pendiente' : 
+                                   canje.estado === 'aprobado' ? '✅ Aprobado' : '❌ Rechazado';
+                    
+                    // Extraer nombre de playlist de notas si existe
+                    let playlistInfo = '';
+                    if (canje.tipo === 'top_playlist' && canje.notas) {
+                        const match = canje.notas.match(/Playlist: ([^|]+)/);
+                        if (match) {
+                            playlistInfo = `<div style="font-size: 0.8rem; color: #a78bfa; margin-top: 0.25rem;">📋 ${match[1].trim()}</div>`;
+                        }
+                    }
                     
                     historial.innerHTML += `
                         <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); border-radius: 0.5rem; padding: 1rem; display: flex; justify-content: space-between; align-items: center;">
                             <div>
                                 <div style="font-weight: 700;">${tipo}</div>
+                                ${playlistInfo}
                                 <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">${fecha}</div>
                             </div>
                             <div style="text-align: right;">
@@ -7823,6 +7834,171 @@
             } catch (err) {
                 console.error('Error al canjear puntos:', err);
                 alert('❌ Error al canjear puntos. Intenta de nuevo.');
+            }
+        }
+        
+        // Función especial para canjear Playlist TOP con selección de playlist
+        async function canjearPlaylistTOP() {
+            const COSTO_PUNTOS = 150;
+            const userId = localStorage.getItem('userId');
+            
+            if (!userId) {
+                alert('⚠️ Error: Sesión no encontrada. Por favor inicia sesión de nuevo.');
+                return;
+            }
+            
+            try {
+                // Verificar puntos suficientes primero
+                const { data: usuario, error: errorUser } = await supabaseClient
+                    .from('usuarios')
+                    .select('puntos, nombre')
+                    .eq('id', userId)
+                    .single();
+                
+                if (errorUser) throw errorUser;
+                
+                const puntosActuales = usuario.puntos || 0;
+                
+                if (puntosActuales < COSTO_PUNTOS) {
+                    alert(`⚠️ PUNTOS INSUFICIENTES\n\nNecesitas ${COSTO_PUNTOS} puntos\nTienes: ${puntosActuales} puntos\nTe faltan: ${COSTO_PUNTOS - puntosActuales} puntos`);
+                    return;
+                }
+                
+                // Cargar playlists del curador (solo aprobadas)
+                const { data: playlists, error: errorPlaylists } = await supabaseClient
+                    .from('playlists')
+                    .select('id, nombre, followers, genero, estado')
+                    .eq('curador_id', userId)
+                    .eq('estado', 'aprobada')
+                    .order('followers', { ascending: false });
+                
+                if (errorPlaylists) throw errorPlaylists;
+                
+                if (!playlists || playlists.length === 0) {
+                    alert('⚠️ NO TIENES PLAYLISTS APROBADAS\n\nPara destacar una playlist en el TOP, primero necesitas tener al menos una playlist aprobada por un administrador.\n\nVe a "Mis Playlists" para agregar o verificar el estado de tus playlists.');
+                    return;
+                }
+                
+                // Crear opciones para el selector
+                let opcionesHTML = '';
+                playlists.forEach((p, index) => {
+                    const seguidoresDisplay = p.followers >= 1000 
+                        ? `${(p.followers/1000).toFixed(1).replace('.0', '')}K` 
+                        : p.followers;
+                    opcionesHTML += `${index + 1}. ${p.nombre} (${seguidoresDisplay} seguidores)\n`;
+                });
+                
+                // Pedir selección
+                const seleccion = prompt(
+                    `🏆 SELECCIONA LA PLAYLIST A DESTACAR\n\n` +
+                    `Tienes ${puntosActuales} puntos. Costo: ${COSTO_PUNTOS} puntos.\n\n` +
+                    `Tus playlists aprobadas:\n${opcionesHTML}\n` +
+                    `Escribe el número de la playlist (1-${playlists.length}):`
+                );
+                
+                if (!seleccion) return;
+                
+                const indice = parseInt(seleccion) - 1;
+                
+                if (isNaN(indice) || indice < 0 || indice >= playlists.length) {
+                    alert('⚠️ Selección inválida. Por favor escribe un número válido.');
+                    return;
+                }
+                
+                const playlistSeleccionada = playlists[indice];
+                
+                // Confirmar canje
+                if (!confirm(
+                    `¿CONFIRMAR CANJE?\n\n` +
+                    `🏆 Playlist: ${playlistSeleccionada.nombre}\n` +
+                    `👥 Seguidores: ${playlistSeleccionada.followers}\n` +
+                    `🎵 Género: ${playlistSeleccionada.genero || 'Sin género'}\n\n` +
+                    `💰 Costo: ${COSTO_PUNTOS} puntos\n` +
+                    `⏱️ Duración: 1 semana en el TOP\n\n` +
+                    `¿Confirmar?`
+                )) {
+                    return;
+                }
+                
+                // Restar puntos
+                const nuevosPuntos = puntosActuales - COSTO_PUNTOS;
+                
+                const { error: errorUpdate } = await supabaseClient
+                    .from('usuarios')
+                    .update({ puntos: nuevosPuntos })
+                    .eq('id', userId);
+                
+                if (errorUpdate) throw errorUpdate;
+                
+                // Registrar canje con datos de la playlist
+                const fechaInicio = new Date();
+                const fechaFin = new Date();
+                fechaFin.setDate(fechaFin.getDate() + 7); // 1 semana
+                
+                // Preparar datos del canje
+                const datosCanje = {
+                    curador_id: userId,
+                    tipo: 'top_playlist',
+                    puntos_gastados: COSTO_PUNTOS,
+                    estado: 'pendiente',
+                    fecha_inicio: fechaInicio.toISOString().split('T')[0],
+                    fecha_fin: fechaFin.toISOString().split('T')[0],
+                    playlist_id: playlistSeleccionada.id,
+                    notas: `Playlist: ${playlistSeleccionada.nombre} | Seguidores: ${playlistSeleccionada.followers} | Curador: ${usuario.nombre || 'Sin nombre'}`
+                };
+                
+                console.log('📋 Intentando guardar canje:', datosCanje);
+                
+                // Intentar insertar con todos los campos
+                let { data: canjeData, error: errorCanje } = await supabaseClient
+                    .from('canjes')
+                    .insert([datosCanje])
+                    .select();
+                
+                // Si falla por campos no existentes, intentar con campos básicos
+                if (errorCanje) {
+                    console.warn('⚠️ Error con campos completos, intentando con básicos:', errorCanje);
+                    
+                    const datosBasicos = {
+                        curador_id: userId,
+                        tipo: 'top_playlist',
+                        puntos_gastados: COSTO_PUNTOS,
+                        estado: 'pendiente',
+                        fecha_inicio: fechaInicio.toISOString().split('T')[0],
+                        fecha_fin: fechaFin.toISOString().split('T')[0]
+                    };
+                    
+                    const { data: canjeBasico, error: errorBasico } = await supabaseClient
+                        .from('canjes')
+                        .insert([datosBasicos])
+                        .select();
+                    
+                    if (errorBasico) {
+                        console.error('❌ Error guardando canje:', errorBasico);
+                        throw errorBasico;
+                    }
+                    
+                    console.log('✅ Canje guardado (básico):', canjeBasico);
+                } else {
+                    console.log('✅ Canje guardado (completo):', canjeData);
+                }
+                
+                alert(
+                    `✅ ¡CANJE EXITOSO!\n\n` +
+                    `🏆 Playlist: ${playlistSeleccionada.nombre}\n` +
+                    `💰 Puntos gastados: ${COSTO_PUNTOS}\n` +
+                    `📊 Puntos restantes: ${nuevosPuntos}\n\n` +
+                    `⏳ Tu solicitud está pendiente de aprobación.\n` +
+                    `Un administrador la revisará pronto.`
+                );
+                
+                // Recargar datos
+                await cargarPuntosCurador();
+                await cargarHistorialCanjes();
+                
+            } catch (err) {
+                console.error('Error al canjear playlist TOP:', err);
+                alert('❌ Error al procesar el canje. Intenta de nuevo.\n\nDetalle: ' + (err.message || err));
             }
         }
         
