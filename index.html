@@ -10037,15 +10037,15 @@
                         const statsContainer = document.getElementById('profileStats');
                         statsContainer.innerHTML = `
                             <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                                <div style="font-size: 2rem; font-weight: 900; color: #10b981; margin-bottom: 0.5rem;" id="statEnviosAceptados">0</div>
+                                <div style="font-size: 2rem; font-weight: 900; color: #10b981; margin-bottom: 0.5rem;" id="profileEnviosAceptados">0</div>
                                 <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Envíos Aceptados</div>
                             </div>
                             <div style="background: rgba(251, 191, 36, 0.1); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                                <div style="font-size: 2rem; font-weight: 900; color: #fbbf24; margin-bottom: 0.5rem;" id="statEnviosPendientes">0</div>
+                                <div style="font-size: 2rem; font-weight: 900; color: #fbbf24; margin-bottom: 0.5rem;" id="profileEnviosPendientes">0</div>
                                 <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Envíos Pendientes</div>
                             </div>
                             <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                                <div style="font-size: 2rem; font-weight: 900; color: #7c3aed; margin-bottom: 0.5rem;" id="statTotalEnvios">0</div>
+                                <div style="font-size: 2rem; font-weight: 900; color: #7c3aed; margin-bottom: 0.5rem;" id="profileTotalEnvios">0</div>
                                 <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Total Envíos</div>
                             </div>
                         `;
@@ -10061,10 +10061,10 @@
                             const enviosAceptados = enviosArtista.filter(e => e.estado === 'aceptado').length;
                             const enviosPendientes = enviosArtista.filter(e => e.estado === 'pendiente').length;
                             
-                            // Actualizar los valores en el DOM
-                            document.getElementById('statTotalEnvios').textContent = totalEnvios;
-                            document.getElementById('statEnviosAceptados').textContent = enviosAceptados;
-                            document.getElementById('statEnviosPendientes').textContent = enviosPendientes;
+                            // Actualizar los valores en el DOM (usando IDs únicos del perfil)
+                            document.getElementById('profileTotalEnvios').textContent = totalEnvios;
+                            document.getElementById('profileEnviosAceptados').textContent = enviosAceptados;
+                            document.getElementById('profileEnviosPendientes').textContent = enviosPendientes;
                         }
                         
                         // Calcular envíos gratis restantes este mes
