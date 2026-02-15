@@ -5768,11 +5768,52 @@
         function closeSpotifyModal(){
             document.getElementById('modalSpotify').classList.remove('active');
             // Resetear wizard al cerrar
+            resetearWizardEnvio();
+        }
+        
+        // Función para resetear completamente el wizard de envío
+        function resetearWizardEnvio() {
+            // Resetear variables
             currentStep = 1;
             selectedSong = null;
             selectedGenre = null;
             selectedPlaylists = [];
+            
+            // Limpiar input del link de Spotify
+            const spotifyInput = document.getElementById('spotifyLinkInput');
+            if (spotifyInput) {
+                spotifyInput.value = '';
+            }
+            
+            // Ocultar preview de canción
+            const preview = document.getElementById('spotifyPreview');
+            if (preview) {
+                preview.style.display = 'none';
+                preview.innerHTML = '';
+            }
+            
+            // Ocultar error
+            const error = document.getElementById('linkError');
+            if (error) {
+                error.style.display = 'none';
+            }
+            
+            // Resetear contador de playlists
+            const countElement = document.getElementById('count');
+            if (countElement) {
+                countElement.textContent = '0';
+            }
+            
+            // Deshabilitar botón siguiente
+            const nextBtn = document.getElementById('next');
+            if (nextBtn) {
+                nextBtn.disabled = true;
+            }
+            
+            // Actualizar UI del wizard
             updateWizardUI();
+            
+            console.log('✅ Wizard de envío reseteado completamente');
         }
         
         // ==================== VERIFICAR LINK DE SPOTIFY ====================
@@ -6628,6 +6669,9 @@
                 mensaje += `Los curadores revisarán tu música en 48-72 horas.`;
                 
                 alert(mensaje);
+                
+                // Resetear el wizard completamente antes de cerrar
+                resetearWizardEnvio();
                 
                 closeSpotifyModal();
                 
