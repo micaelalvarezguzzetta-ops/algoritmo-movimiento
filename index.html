@@ -2331,6 +2331,11 @@
                 <h3 class="panel-card-title">Enviar Música</h3>
                 <p class="panel-card-desc">Conecta Spotify y envía tu canción</p>
             </div>
+            <div class="panel-card" onclick="openPlaylistsTOPModal()" style="background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1)); border: 2px solid rgba(251, 191, 36, 0.3);">
+                <div class="panel-card-icon">🏆</div>
+                <h3 class="panel-card-title">Playlists TOP</h3>
+                <p class="panel-card-desc">Las 5 más populares</p>
+            </div>
             <div class="panel-card" onclick="openHistorialModal()">
                 <div class="panel-card-icon">📋</div>
                 <h3 class="panel-card-title">Historial de Envíos</h3>
@@ -3871,9 +3876,15 @@
             
             <form id="formAgregarPlaylist" style="display: grid; gap: 1.5rem;">
                 <div>
-                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">URL de tu Playlist de Spotify</label>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">URL de tu Playlist de Spotify *</label>
                     <input type="url" id="urlPlaylistNueva" placeholder="https://open.spotify.com/playlist/..." style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: white;">
                     <small style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Copia y pega el enlace completo de tu playlist desde Spotify</small>
+                </div>
+                
+                <div>
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 700;">URL de la imagen de portada (opcional)</label>
+                    <input type="url" id="imagenPlaylistNueva" placeholder="https://i.scdn.co/image/..." style="width: 100%; padding: 0.75rem; background: rgba(255,255,255,0.05); border: 2px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: white;">
+                    <small style="color: rgba(255,255,255,0.5); font-size: 0.85rem;">Click derecho en la imagen de tu playlist en Spotify → "Copiar dirección de imagen"</small>
                 </div>
                 
                 <div style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 0.75rem; padding: 1rem;">
@@ -6200,6 +6211,9 @@
                         genero,
                         followers,
                         curador_id,
+                        url_spotify,
+                        imagen_url,
+                        spotify_playlist_id,
                         usuarios!playlists_curador_id_fkey (
                             nombre
                         )
@@ -6219,8 +6233,11 @@
                     name: p.nombre,
                     curator: p.usuarios?.nombre || 'Curador',
                     followers: p.followers || 0,
-                    songs: 0, // No tenemos este dato aún
-                    genre: p.genero || 'Sin género'
+                    songs: 0,
+                    genre: p.genero || 'Sin género',
+                    spotifyUrl: p.url_spotify || null,
+                    imageUrl: p.imagen_url || null,
+                    spotifyId: p.spotify_playlist_id || null
                 }));
                 
                 console.log('✅ Playlists aprobadas cargadas:', PLAYLISTS_DATA.length);
@@ -6553,7 +6570,7 @@
                 const typeInfo = getPlaylistType(p.followers);
                 const isSelected = selectedPlaylists.includes(p.id);
                 
-                // Determinar el gradiente del cover basado en el tipo
+                // Determinar el gradiente del cover basado en el tipo (fallback)
                 let coverGradient = 'linear-gradient(135deg, #8b5cf6, #ec4899)';
                 let coverIcon = '🎵';
                 
@@ -6573,15 +6590,19 @@
                     ? (p.followers / 1000).toFixed(1).replace('.0', '') + 'K' 
                     : p.followers.toLocaleString();
                 
+                // Determinar si mostrar imagen o gradiente
+                const tieneImagen = p.imageUrl && p.imageUrl.trim() !== '';
+                const coverHTML = tieneImagen
+                    ? `<img src="${p.imageUrl}" alt="${p.name}" style="width: 56px; height: 56px; border-radius: 12px; object-fit: cover; flex-shrink: 0;">`
+                    : `<div class="playlist-cover" style="background: ${coverGradient};">${coverIcon}</div>`;
+                
                 return `
                 <div class="playlist-item ${isSelected ? 'selected' : ''}" onclick="togglePlaylist('${p.id}')">
                     <div class="playlist-checkbox">
                         <span class="playlist-checkbox-icon">✓</span>
                     </div>
                     <div class="playlist-header">
-                        <div class="playlist-cover" style="background: ${coverGradient};">
-                            ${coverIcon}
-                        </div>
+                        ${coverHTML}
                         <div class="playlist-info">
                             <div class="playlist-name">${p.name}</div>
                             <div class="playlist-curator">Por ${p.curator} • ${p.genre || 'Varios'}</div>
@@ -7834,6 +7855,7 @@
         
         async function confirmarAgregarPlaylist(){
             const url = document.getElementById('urlPlaylistNueva').value.trim();
+            const imagenUrl = document.getElementById('imagenPlaylistNueva').value.trim();
             
             if(!url){
                 alert('⚠️ URL REQUERIDA\n\nPor favor pega el enlace de tu playlist de Spotify.');
@@ -7883,20 +7905,29 @@
                 
                 console.log('📋 Guardando playlist:', playlistId);
                 
+                // Preparar datos a insertar
+                const datosPlaylist = {
+                    curador_id: userId,
+                    nombre: nombrePlaylist.trim(),
+                    url_spotify: url,
+                    genero: genero.trim(),
+                    followers: seguidores,
+                    precio_standard: 1.5,
+                    precio_premium: 3.0,
+                    activa: true,
+                    estado: 'pendiente',
+                    spotify_playlist_id: playlistId
+                };
+                
+                // Añadir imagen si se proporcionó
+                if (imagenUrl && (imagenUrl.startsWith('http://') || imagenUrl.startsWith('https://'))) {
+                    datosPlaylist.imagen_url = imagenUrl;
+                }
+                
                 // Guardar en Supabase
                 const { data, error } = await supabaseClient
                     .from('playlists')
-                    .insert({
-                        curador_id: userId,
-                        nombre: nombrePlaylist.trim(),
-                        url_spotify: url,
-                        genero: genero.trim(),
-                        followers: seguidores,
-                        precio_standard: 1.5,
-                        precio_premium: 3.0,
-                        activa: true,
-                        estado: 'pendiente'
-                    })
+                    .insert(datosPlaylist)
                     .select();
                 
                 if (error) {
@@ -7906,6 +7937,10 @@
                 }
                 
                 console.log('✅ Playlist guardada:', data);
+                
+                // Limpiar formulario
+                document.getElementById('urlPlaylistNueva').value = '';
+                document.getElementById('imagenPlaylistNueva').value = '';
                 
                 closeAgregarPlaylistModal();
                 
@@ -7918,8 +7953,9 @@
                       `📝 Nombre: ${nombrePlaylist}\n` +
                       `🎵 Género: ${genero}\n` +
                       `👥 Seguidores: ${seguidores}\n` +
-                      `💰 Tipo: ${tipo}\n\n` +
-                      `Ya puedes recibir envíos de artistas.`);
+                      `💰 Tipo: ${tipo}\n` +
+                      `🖼️ Imagen: ${imagenUrl ? 'Sí' : 'No'}\n\n` +
+                      `⏳ Tu playlist será revisada por un administrador antes de aparecer públicamente.`);
                 
                 // Recargar lista de playlists si está abierta
                 if (document.getElementById('modalMisPlaylists').classList.contains('active')) {
