@@ -1905,62 +1905,94 @@
             max-width: none;
         }
         
-        /* ==================== PLAYLIST ITEMS ==================== */
+        /* ==================== PLAYLIST ITEMS - DISEÑO PROFESIONAL ==================== */
         .playlist-item {
-            background: var(--bg-card);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            padding: 1rem;
-            margin-bottom: 0.75rem;
+            background: linear-gradient(145deg, rgba(24, 24, 27, 0.9), rgba(24, 24, 27, 0.6));
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 16px;
+            padding: 1.25rem;
+            margin-bottom: 1rem;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             display: flex;
             align-items: center;
             gap: 1rem;
+            overflow: hidden;
+        }
+        
+        .playlist-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
         }
         
         .playlist-item:hover {
-            border-color: var(--accent-primary);
-            background: var(--bg-card-hover);
+            border-color: rgba(139, 92, 246, 0.4);
+            background: linear-gradient(145deg, rgba(30, 30, 35, 0.95), rgba(24, 24, 27, 0.8));
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15), 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+        
+        .playlist-item:hover::before {
+            opacity: 1;
         }
         
         .playlist-item.selected {
-            border-color: var(--accent-green);
-            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.6);
+            background: linear-gradient(145deg, rgba(16, 185, 129, 0.12), rgba(16, 185, 129, 0.05));
+            box-shadow: 0 4px 20px rgba(16, 185, 129, 0.2), inset 0 1px 0 rgba(16, 185, 129, 0.2);
+        }
+        
+        .playlist-item.selected::before {
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), transparent);
+            opacity: 1;
         }
         
         .playlist-checkbox {
-            width: 24px;
-            height: 24px;
-            min-width: 24px;
-            border: 2px solid var(--border-color);
-            border-radius: 6px;
+            width: 26px;
+            height: 26px;
+            min-width: 26px;
+            border: 2px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.3s;
-            background: var(--bg-secondary);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.03);
+            position: relative;
+            z-index: 1;
         }
         
         .playlist-item:hover .playlist-checkbox {
-            border-color: var(--accent-primary);
+            border-color: rgba(139, 92, 246, 0.5);
+            background: rgba(139, 92, 246, 0.1);
         }
         
         .playlist-item.selected .playlist-checkbox {
-            background: var(--accent-green);
-            border-color: var(--accent-green);
+            background: linear-gradient(135deg, #10b981, #06d6a0);
+            border-color: transparent;
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.4);
         }
         
         .playlist-checkbox-icon {
             color: white;
             font-size: 14px;
+            font-weight: 700;
             opacity: 0;
-            transition: opacity 0.2s;
+            transform: scale(0.5);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .playlist-item.selected .playlist-checkbox-icon {
             opacity: 1;
+            transform: scale(1);
         }
         
         .playlist-header {
@@ -1968,18 +2000,38 @@
             align-items: center;
             gap: 1rem;
             flex: 1;
+            position: relative;
+            z-index: 1;
         }
         
         .playlist-cover {
-            width: 50px;
-            height: 50px;
+            width: 56px;
+            height: 56px;
             background: linear-gradient(135deg, var(--accent-primary), var(--accent-pink));
-            border-radius: 8px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 1.5rem;
             flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .playlist-cover::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+        
+        .playlist-item:hover .playlist-cover::after {
+            left: 100%;
         }
         
         .playlist-info {
@@ -1988,48 +2040,130 @@
         }
         
         .playlist-name {
-            font-weight: 700;
-            font-size: 1rem;
-            margin-bottom: 0.25rem;
+            font-weight: 800;
+            font-size: 1.05rem;
+            margin-bottom: 0.35rem;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
         }
         
         .playlist-curator {
             font-size: 0.85rem;
             color: var(--text-secondary);
-            margin-bottom: 0.25rem;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .playlist-curator::before {
+            content: '';
+            width: 4px;
+            height: 4px;
+            background: var(--accent-primary);
+            border-radius: 50%;
         }
         
         .playlist-stats {
             font-size: 0.8rem;
             color: var(--text-muted);
             display: flex;
+            align-items: center;
             gap: 1rem;
+        }
+        
+        .playlist-stats span {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
         }
         
         .playlist-price {
             font-weight: 800;
-            font-size: 1rem;
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
+            font-size: 1.1rem;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
             white-space: nowrap;
+            position: relative;
+            z-index: 1;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+            letter-spacing: -0.02em;
         }
         
         .playlist-price.price-free {
-            background: rgba(16, 185, 129, 0.2);
-            color: #10b981;
+            background: linear-gradient(135deg, rgba(16, 185, 129, 0.25), rgba(6, 214, 160, 0.15));
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            box-shadow: 0 2px 10px rgba(16, 185, 129, 0.2);
         }
         
         .playlist-price.price-standard {
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.25), rgba(245, 158, 11, 0.15));
+            color: #fbbf24;
+            border: 1px solid rgba(251, 191, 36, 0.3);
+            box-shadow: 0 2px 10px rgba(251, 191, 36, 0.2);
+        }
+        
+        .playlist-price.price-premium {
+            background: linear-gradient(135deg, rgba(236, 72, 153, 0.25), rgba(168, 85, 247, 0.15));
+            color: #f472b6;
+            border: 1px solid rgba(236, 72, 153, 0.3);
+            box-shadow: 0 2px 10px rgba(236, 72, 153, 0.2);
+        }
+        
+        /* Indicador de tipo de playlist */
+        .playlist-type-badge {
+            position: absolute;
+            top: 0.75rem;
+            right: 0.75rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            opacity: 0.8;
+        }
+        
+        .playlist-type-badge.free {
+            background: rgba(16, 185, 129, 0.2);
+            color: #34d399;
+        }
+        
+        .playlist-type-badge.standard {
             background: rgba(251, 191, 36, 0.2);
             color: #fbbf24;
         }
         
-        .playlist-price.price-premium {
+        .playlist-type-badge.premium {
             background: rgba(236, 72, 153, 0.2);
-            color: #ec4899;
+            color: #f472b6;
+        }
+        
+        /* Custom Scrollbar para lista de playlists */
+        .items-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .items-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 3px;
+        }
+        
+        .items-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, var(--accent-primary), var(--accent-pink));
+            border-radius: 3px;
+        }
+        
+        .items-list::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(180deg, var(--accent-secondary), var(--accent-pink));
         }
 
         /* ==================== UTILITY CLASSES ==================== */
@@ -2697,21 +2831,47 @@
             </div>
             
             <div class="wiz-content" id="wcontent2">
-                <div style="display: flex; justify-content: space-between; margin-bottom: 2rem;">
-                    <h3 class="wiz-title" style="margin: 0;">Selecciona Playlists</h3>
-                    <div>Seleccionadas: <strong id="count" style="color: #7c3aed;">0</strong></div>
-                </div>
-                
-                <div style="background: rgba(59, 130, 246, 0.1); border: 2px solid rgba(59, 130, 246, 0.3); border-radius: 0.75rem; padding: 1.5rem; margin-bottom: 2rem;">
-                    <div style="font-weight: 700; margin-bottom: 1rem; font-size: 1.1rem;">💡 Tipos de Playlists:</div>
-                    <div style="display: grid; gap: 0.75rem; font-size: 0.95rem;">
-                        <div>🎁 <strong>Free:</strong> Menos de 100 seguidores (0 créditos)</div>
-                        <div>💰 <strong>Standard:</strong> 100-299 seguidores (1.5 créditos)</div>
-                        <div>⭐ <strong>Premium:</strong> 300+ seguidores (3 créditos)</div>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <div>
+                        <h3 style="font-size: 1.5rem; font-weight: 900; margin: 0 0 0.25rem 0; background: linear-gradient(135deg, #fff, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">Selecciona Playlists</h3>
+                        <p style="margin: 0; font-size: 0.9rem; color: rgba(255,255,255,0.5);">Elige donde quieres que aparezca tu música</p>
+                    </div>
+                    <div style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(236, 72, 153, 0.2)); border: 1px solid rgba(124, 58, 237, 0.3); padding: 0.75rem 1.25rem; border-radius: 12px; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Seleccionadas:</span>
+                        <strong id="count" style="font-size: 1.4rem; color: #a78bfa;">0</strong>
                     </div>
                 </div>
                 
-                <div class="items-list" id="playlistsList"></div>
+                <div style="background: linear-gradient(145deg, rgba(17, 17, 20, 0.8), rgba(24, 24, 30, 0.6)); border: 1px solid rgba(255,255,255,0.06); border-radius: 16px; padding: 1.5rem; margin-bottom: 1.5rem;">
+                    <div style="font-weight: 800; margin-bottom: 1rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.2rem;">💎</span> Tipos de Playlists
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 0.75rem;">
+                        <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 10px; padding: 0.875rem 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                            <span style="font-size: 1.3rem;">🎧</span>
+                            <div>
+                                <div style="font-weight: 700; font-size: 0.9rem; color: #34d399;">Free</div>
+                                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">&lt;100 seguidores • 0 créditos</div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 10px; padding: 0.875rem 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                            <span style="font-size: 1.3rem;">🎵</span>
+                            <div>
+                                <div style="font-weight: 700; font-size: 0.9rem; color: #fbbf24;">Standard</div>
+                                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">100-299 seg. • 1.5 créditos</div>
+                            </div>
+                        </div>
+                        <div style="background: rgba(236, 72, 153, 0.08); border: 1px solid rgba(236, 72, 153, 0.2); border-radius: 10px; padding: 0.875rem 1rem; display: flex; align-items: center; gap: 0.75rem;">
+                            <span style="font-size: 1.3rem;">⭐</span>
+                            <div>
+                                <div style="font-weight: 700; font-size: 0.9rem; color: #f472b6;">Premium</div>
+                                <div style="font-size: 0.75rem; color: rgba(255,255,255,0.5);">300+ seg. • 3 créditos</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="items-list" id="playlistsList" style="max-height: 400px; overflow-y: auto; padding-right: 0.5rem;"></div>
             </div>
             
             <div class="wiz-content" id="wcontent3">
@@ -6380,10 +6540,10 @@
             
             if (!PLAYLISTS_DATA || PLAYLISTS_DATA.length === 0) {
                 container.innerHTML = `
-                    <div style="text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
-                        <div style="font-size: 4rem; margin-bottom: 1rem;">📭</div>
-                        <p style="margin-bottom: 0.5rem;">No hay playlists disponibles</p>
-                        <p style="font-size: 0.9rem; opacity: 0.7;">Los curadores deben agregar playlists para que puedas enviar música.</p>
+                    <div style="text-align: center; padding: 4rem 2rem; color: rgba(255,255,255,0.5);">
+                        <div style="font-size: 5rem; margin-bottom: 1.5rem; opacity: 0.5;">📭</div>
+                        <p style="font-size: 1.2rem; margin-bottom: 0.75rem; color: rgba(255,255,255,0.7);">No hay playlists disponibles</p>
+                        <p style="font-size: 0.9rem; opacity: 0.6;">Los curadores deben agregar playlists para que puedas enviar música.</p>
                     </div>
                 `;
                 return;
@@ -6393,19 +6553,40 @@
                 const typeInfo = getPlaylistType(p.followers);
                 const isSelected = selectedPlaylists.includes(p.id);
                 
+                // Determinar el gradiente del cover basado en el tipo
+                let coverGradient = 'linear-gradient(135deg, #8b5cf6, #ec4899)';
+                let coverIcon = '🎵';
+                
+                if (typeInfo.type === 'free') {
+                    coverGradient = 'linear-gradient(135deg, #10b981, #06d6a0)';
+                    coverIcon = '🎧';
+                } else if (typeInfo.type === 'standard') {
+                    coverGradient = 'linear-gradient(135deg, #f59e0b, #fbbf24)';
+                    coverIcon = '🎵';
+                } else {
+                    coverGradient = 'linear-gradient(135deg, #ec4899, #8b5cf6)';
+                    coverIcon = '⭐';
+                }
+                
+                // Formatear seguidores
+                const followersFormatted = p.followers >= 1000 
+                    ? (p.followers / 1000).toFixed(1).replace('.0', '') + 'K' 
+                    : p.followers.toLocaleString();
+                
                 return `
                 <div class="playlist-item ${isSelected ? 'selected' : ''}" onclick="togglePlaylist('${p.id}')">
                     <div class="playlist-checkbox">
                         <span class="playlist-checkbox-icon">✓</span>
                     </div>
                     <div class="playlist-header">
-                        <div class="playlist-cover">🎵</div>
+                        <div class="playlist-cover" style="background: ${coverGradient};">
+                            ${coverIcon}
+                        </div>
                         <div class="playlist-info">
                             <div class="playlist-name">${p.name}</div>
-                            <div class="playlist-curator">Por ${p.curator} • ${p.genre}</div>
+                            <div class="playlist-curator">Por ${p.curator} • ${p.genre || 'Varios'}</div>
                             <div class="playlist-stats">
-                                <span>👥 ${p.followers.toLocaleString()} seguidores</span>
-                                ${p.songs > 0 ? `<span>🎵 ${p.songs} canciones</span>` : ''}
+                                <span>👥 ${followersFormatted} seguidores</span>
                             </div>
                         </div>
                         <div class="playlist-price price-${typeInfo.type}">${typeInfo.price}</div>
