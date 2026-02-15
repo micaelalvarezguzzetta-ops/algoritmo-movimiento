@@ -10040,15 +10040,32 @@
                                 <div style="font-size: 2rem; font-weight: 900; color: #10b981; margin-bottom: 0.5rem;" id="statEnviosAceptados">0</div>
                                 <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Envíos Aceptados</div>
                             </div>
+                            <div style="background: rgba(251, 191, 36, 0.1); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                                <div style="font-size: 2rem; font-weight: 900; color: #fbbf24; margin-bottom: 0.5rem;" id="statEnviosPendientes">0</div>
+                                <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Envíos Pendientes</div>
+                            </div>
                             <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
                                 <div style="font-size: 2rem; font-weight: 900; color: #7c3aed; margin-bottom: 0.5rem;" id="statTotalEnvios">0</div>
                                 <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Total Envíos</div>
                             </div>
-                            <div style="background: rgba(236, 72, 153, 0.1); border: 2px solid rgba(236, 72, 153, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                                <div style="font-size: 2rem; font-weight: 900; color: #ec4899; margin-bottom: 0.5rem;" id="statReproducciones">0</div>
-                                <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Reproducciones</div>
-                            </div>
                         `;
+                        
+                        // Cargar estadísticas REALES desde Supabase
+                        const { data: enviosArtista, error: errorStats } = await supabaseClient
+                            .from('envios_canciones')
+                            .select('estado')
+                            .eq('artista_id', userId);
+                        
+                        if (!errorStats && enviosArtista) {
+                            const totalEnvios = enviosArtista.length;
+                            const enviosAceptados = enviosArtista.filter(e => e.estado === 'aceptado').length;
+                            const enviosPendientes = enviosArtista.filter(e => e.estado === 'pendiente').length;
+                            
+                            // Actualizar los valores en el DOM
+                            document.getElementById('statTotalEnvios').textContent = totalEnvios;
+                            document.getElementById('statEnviosAceptados').textContent = enviosAceptados;
+                            document.getElementById('statEnviosPendientes').textContent = enviosPendientes;
+                        }
                         
                         // Calcular envíos gratis restantes este mes
                         const ENVIOS_GRATIS_MENSUALES = 3;
@@ -10114,15 +10131,15 @@
                         const statsContainer = document.getElementById('profileStats');
                         statsContainer.innerHTML = `
                             <div style="background: rgba(16, 185, 129, 0.1); border: 2px solid rgba(16, 185, 129, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                                <div style="font-size: 2rem; font-weight: 900; color: #10b981; margin-bottom: 0.5rem;" id="statEnviosAceptados">0</div>
+                                <div style="font-size: 2rem; font-weight: 900; color: #10b981; margin-bottom: 0.5rem;" id="statEnviosAceptadosCurador">0</div>
                                 <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Envíos Aceptados</div>
                             </div>
                             <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                                <div style="font-size: 2rem; font-weight: 900; color: #ef4444; margin-bottom: 0.5rem;" id="statEnviosRechazados">0</div>
+                                <div style="font-size: 2rem; font-weight: 900; color: #ef4444; margin-bottom: 0.5rem;" id="statEnviosRechazadosCurador">0</div>
                                 <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Envíos Rechazados</div>
                             </div>
                             <div style="background: rgba(251, 191, 36, 0.1); border: 2px solid rgba(251, 191, 36, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center;">
-                                <div style="font-size: 2rem; font-weight: 900; color: #fbbf24; margin-bottom: 0.5rem;" id="statEnviosPendientes">0</div>
+                                <div style="font-size: 2rem; font-weight: 900; color: #fbbf24; margin-bottom: 0.5rem;" id="statEnviosPendientesCurador">0</div>
                                 <div style="font-size: 0.9rem; color: rgba(255,255,255,0.7);">Envíos Pendientes</div>
                             </div>
                             <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; text-align: center; grid-column: span 2;">
@@ -10135,7 +10152,22 @@
                             </div>
                         `;
                         
-                        // TODO: Cargar estadísticas reales de envíos desde Supabase
+                        // Cargar estadísticas REALES del curador desde Supabase
+                        const { data: enviosCurador, error: errorStatsCurador } = await supabaseClient
+                            .from('envios_canciones')
+                            .select('estado')
+                            .eq('curador_id', userId);
+                        
+                        if (!errorStatsCurador && enviosCurador) {
+                            const aceptadosCurador = enviosCurador.filter(e => e.estado === 'aceptado').length;
+                            const rechazadosCurador = enviosCurador.filter(e => e.estado === 'rechazado').length;
+                            const pendientesCurador = enviosCurador.filter(e => e.estado === 'pendiente').length;
+                            
+                            // Actualizar los valores en el DOM
+                            document.getElementById('statEnviosAceptadosCurador').textContent = aceptadosCurador;
+                            document.getElementById('statEnviosRechazadosCurador').textContent = rechazadosCurador;
+                            document.getElementById('statEnviosPendientesCurador').textContent = pendientesCurador;
+                        }
                         
                         // Mostrar puntos
                         document.getElementById('profileCreditosStandard').textContent = (usuario.puntos || 0) + ' ⭐';
