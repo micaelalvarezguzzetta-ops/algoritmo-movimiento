@@ -7738,7 +7738,7 @@
                     const tipo = canje.tipo === 'redes_sociales' ? '📱 Redes Sociales' : '🏆 Playlist TOP';
                     const estado = canje.estado === 'completado' ? '✅ Completado' : 
                                    canje.estado === 'pendiente' ? '⏳ Pendiente' : 
-                                   canje.estado === 'aprobado' ? '✅ Aprobado' : '❌ Rechazado';
+                                   canje.estado === 'cancelado' ? '❌ Cancelado' : canje.estado;
                     
                     // Extraer nombre de playlist de notas si existe
                     let playlistInfo = '';
