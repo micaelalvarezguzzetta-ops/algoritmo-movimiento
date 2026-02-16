@@ -4523,7 +4523,7 @@
                     <h3 style="font-weight: 800; margin-bottom: 0.5rem;">Playlist TOP</h3>
                     <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-bottom: 1rem;">Destacar en sección TOP por 7 días</p>
                     <div style="font-size: 1.5rem; font-weight: 900; color: #8b5cf6; margin-bottom: 1rem;">150 puntos</div>
-                    <button onclick="canjearServicioCurador('playlist_top', 150)" style="width: 100%; padding: 0.75rem; background: #8b5cf6; color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer;">
+                    <button onclick="canjearPlaylistTOP()" style="width: 100%; padding: 0.75rem; background: #8b5cf6; color: white; border: none; border-radius: 0.5rem; font-weight: 700; cursor: pointer;">
                         Canjear
                     </button>
                 </div>
@@ -7900,6 +7900,8 @@
                     .eq('estado', 'aprobada')
                     .order('followers', { ascending: false });
                 
+                console.log('📋 Playlists cargadas para canje:', playlists);
+                
                 if (errorPlaylists) throw errorPlaylists;
                 
                 if (!playlists || playlists.length === 0) {
@@ -7910,10 +7912,11 @@
                 // Crear opciones para el selector
                 let opcionesHTML = '';
                 playlists.forEach((p, index) => {
-                    const seguidoresDisplay = p.followers >= 1000 
-                        ? `${(p.followers/1000).toFixed(1).replace('.0', '')}K` 
-                        : p.followers;
-                    opcionesHTML += `${index + 1}. ${p.nombre} (${seguidoresDisplay} seguidores)\n`;
+                    const seguidores = p.followers || 0;
+                    const seguidoresDisplay = seguidores >= 1000 
+                        ? `${(seguidores/1000).toFixed(1).replace('.0', '')}K` 
+                        : seguidores.toLocaleString();
+                    opcionesHTML += `${index + 1}. ${p.nombre.toUpperCase()} (${seguidoresDisplay} seguidores)\n`;
                 });
                 
                 // Pedir selección
