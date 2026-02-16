@@ -7194,8 +7194,8 @@
             const grid = document.getElementById('playlistsTOPGrid');
             
             try {
-                // Cargar las 5 playlists con más seguidores (aprobadas)
-                const { data: playlists, error } = await supabaseClient
+                // Primero cargar playlists destacadas (las que pagaron/canjearon)
+                const { data: destacadas, error: errorDestacadas } = await supabaseClient
                     .from('playlists')
                     .select(`
                         *,
@@ -7204,17 +7204,36 @@
                         )
                     `)
                     .eq('estado', 'aprobada')
+                    .eq('destacada', true)
                     .order('followers', { ascending: false })
                     .limit(5);
                 
-                if (error) {
-                    console.error('Error cargando playlists TOP:', error);
-                    grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
-                        <div style="font-size: 4rem; margin-bottom: 1rem;">🏆</div>
-                        <div style="font-size: 1.2rem;">Próximamente playlists destacadas</div>
-                    </div>`;
-                    return;
+                // Si no hay suficientes destacadas, completar con las de más seguidores
+                let playlistsTOP = destacadas || [];
+                
+                if (playlistsTOP.length < 5) {
+                    const idsDestacadas = playlistsTOP.map(p => p.id);
+                    const restantes = 5 - playlistsTOP.length;
+                    
+                    const { data: populares } = await supabaseClient
+                        .from('playlists')
+                        .select(`
+                            *,
+                            usuarios:curador_id (
+                                nombre
+                            )
+                        `)
+                        .eq('estado', 'aprobada')
+                        .not('id', 'in', `(${idsDestacadas.length > 0 ? idsDestacadas.join(',') : '00000000-0000-0000-0000-000000000000'})`)
+                        .order('followers', { ascending: false })
+                        .limit(restantes);
+                    
+                    if (populares) {
+                        playlistsTOP = [...playlistsTOP, ...populares];
+                    }
                 }
+                
+                const playlists = playlistsTOP;
                 
                 if (!playlists || playlists.length === 0) {
                     grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 3rem; color: rgba(255,255,255,0.5);">
@@ -7243,6 +7262,7 @@
                     const gradiente = gradientes[index % gradientes.length];
                     const genero = p.genero || 'Música';
                     const medalla = medallas[index];
+                    const esDestacada = p.destacada === true;
                     
                     // Mostrar imagen si existe, sino gradiente con emoji
                     const imagenPlaylist = p.imagen_url || p.cover_url || p.image_url || null;
@@ -7259,9 +7279,17 @@
                             ${medalla}
                            </div>`;
                     
+                    // Badge de destacada (si pagó/canjeó para estar en TOP)
+                    const destacadaBadge = esDestacada
+                        ? `<div style="position: absolute; top: 3.5rem; left: 1rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); padding: 0.25rem 0.5rem; border-radius: 0.5rem; font-size: 0.6rem; font-weight: 800; color: #000; z-index: 1;">
+                            ⭐ DESTACADA
+                           </div>`
+                        : '';
+                    
                     return `
-                        <div class="top-playlist-card" style="position: relative; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 1rem; padding: 1.5rem; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.borderColor='rgba(139,92,246,0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='rgba(255,255,255,0.08)';">
+                        <div class="top-playlist-card" style="position: relative; background: rgba(255,255,255,0.05); border: ${esDestacada ? '2px solid rgba(251,191,36,0.5)' : '1px solid rgba(255,255,255,0.08)'}; border-radius: 1rem; padding: 1.5rem; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.transform='translateY(-4px)'; this.style.borderColor='${esDestacada ? 'rgba(251,191,36,0.8)' : 'rgba(139,92,246,0.3)'}'; this.style.boxShadow='${esDestacada ? '0 8px 30px rgba(251,191,36,0.2)' : 'none'}';" onmouseout="this.style.transform='translateY(0)'; this.style.borderColor='${esDestacada ? 'rgba(251,191,36,0.5)' : 'rgba(255,255,255,0.08)'}'; this.style.boxShadow='none';">
                             ${posicionBadge}
+                            ${destacadaBadge}
                             <div style="position: absolute; top: 1rem; right: 1rem; background: linear-gradient(135deg, rgba(139,92,246,0.9), rgba(236,72,153,0.9)); padding: 0.4rem 0.8rem; border-radius: 1rem; font-size: 0.7rem; font-weight: 800; color: white; z-index: 1; text-transform: uppercase; letter-spacing: 0.5px;">
                                 🔥 TOP ${index + 1}
                             </div>
