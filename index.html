@@ -5575,7 +5575,8 @@
                         email: email,
                         password_hash: passwordHash,
                         tipo: userType,
-                        creditos: userType === 'artista' ? 4.5 : 0,
+                        creditos: 0,
+                        creditos_bienvenida: userType === 'artista' ? 4.5 : 0,
                         balance: 0,
                         codigo_referido: codigoReferido,
                         referido_por: referidoPorId,
@@ -6702,10 +6703,10 @@
                     return;
                 }
                 
-                // Obtener datos del usuario (envíos gratis, fecha reset)
+                // Obtener datos del usuario (envíos gratis, fecha reset, créditos)
                 const { data: userData, error: userError } = await supabaseClient
                     .from('usuarios')
-                    .select('creditos, envios_gratis_restantes, ultimo_reset_envios')
+                    .select('creditos, creditos_bienvenida, envios_gratis_restantes, ultimo_reset_envios')
                     .eq('id', userId)
                     .single();
                 
@@ -6715,7 +6716,10 @@
                     return;
                 }
                 
-                userCreditos = userData.creditos || 0;
+                // Créditos comprados (con dinero real) y de bienvenida (gratis)
+                let creditosComprados = userData.creditos || 0;
+                let creditosBienvenida = userData.creditos_bienvenida || 0;
+                userCreditos = creditosComprados + creditosBienvenida; // Total disponible
                 let enviosGratis = userData.envios_gratis_restantes || 0;
                 
                 // Verificar si necesita resetear envíos gratis (nuevo mes)
@@ -6760,18 +6764,28 @@
                     return;
                 }
                 
-                // Verificar créditos para playlists de pago
+                // Verificar créditos totales para playlists de pago
                 if (creditosNecesarios > userCreditos) {
                     alert(`⚠️ Créditos insuficientes\n\nNecesitas ${creditosNecesarios} créditos para las playlists de pago.\nTienes ${userCreditos} créditos.\n\nCompra más créditos para continuar.`);
                     return;
                 }
                 
                 console.log('💰 Envíos gratis:', enviosGratis, '/ FREE seleccionadas:', playlistsFree.length);
-                console.log('💰 Créditos necesarios:', creditosNecesarios, '/ Créditos disponibles:', userCreditos);
+                console.log('💰 Créditos comprados:', creditosComprados, '/ Créditos bienvenida:', creditosBienvenida);
+                console.log('💰 Créditos necesarios:', creditosNecesarios, '/ Total disponible:', userCreditos);
+                
+                // Calcular cuántos créditos se usan de cada tipo
+                // Primero se gastan los de bienvenida (gratis), luego los comprados
+                let creditosBienvenidaAUsar = Math.min(creditosBienvenida, creditosNecesarios);
+                let creditosCompradosAUsar = creditosNecesarios - creditosBienvenidaAUsar;
+                
+                console.log('💰 Usando créditos bienvenida:', creditosBienvenidaAUsar, '/ Usando créditos comprados:', creditosCompradosAUsar);
                 
                 // Crear envíos en Supabase
-                // Crear envíos en Supabase
                 const todosLosEnvios = [...playlistsFree, ...playlistsPago];
+                
+                // Track de créditos de bienvenida restantes para asignar a cada envío
+                let creditosBienvenidaRestantes = creditosBienvenidaAUsar;
                 
                 for (const { playlistId, playlist, typeInfo } of todosLosEnvios) {
                     // Obtener curador_id de la playlist
@@ -6791,6 +6805,29 @@
                     
                     console.log('✅ Playlist encontrada:', playlistData.nombre, '- Curador ID:', playlistData.curador_id);
                     
+                    // Determinar si este envío se paga con créditos de bienvenida (gratis)
+                    // Los envíos FREE siempre son "gratis" para el curador (solo puntos)
+                    // Los envíos de pago dependen de qué créditos se usaron
+                    let pagadoConCreditosGratis = false;
+                    
+                    if (typeInfo.type === 'free') {
+                        pagadoConCreditosGratis = true; // FREE siempre = puntos para curador
+                    } else if (typeInfo.credits <= creditosBienvenidaRestantes) {
+                        // Este envío de pago se cubre completamente con créditos de bienvenida
+                        pagadoConCreditosGratis = true;
+                        creditosBienvenidaRestantes -= typeInfo.credits;
+                    } else if (creditosBienvenidaRestantes > 0) {
+                        // Caso mixto: parte bienvenida, parte comprado - lo tratamos como gratis
+                        // para simplificar (el curador recibe puntos, no dinero parcial)
+                        pagadoConCreditosGratis = true;
+                        creditosBienvenidaRestantes = 0;
+                    } else {
+                        // Solo créditos comprados = curador recibe dinero
+                        pagadoConCreditosGratis = false;
+                    }
+                    
+                    console.log('💳 Envío pagado con créditos gratis:', pagadoConCreditosGratis);
+                    
                     const { data, error } = await supabaseClient
                         .from('envios_canciones')
                         .insert({
@@ -6804,6 +6841,7 @@
                             artista_nombre: selectedSong.artist || 'Artista desconocido',
                             tipo_envio: typeInfo.type,
                             creditos_usados: typeInfo.credits,
+                            pagado_con_creditos_gratis: pagadoConCreditosGratis,
                             estado: 'pendiente',
                             fecha_envio: new Date().toISOString()
                         })
@@ -6836,14 +6874,16 @@
                     }
                 }
                 
-                // Descontar créditos y envíos gratis
-                const nuevosCreditos = userCreditos - creditosNecesarios;
+                // Descontar créditos (primero bienvenida, luego comprados) y envíos gratis
+                const nuevosCreditosBienvenida = creditosBienvenida - creditosBienvenidaAUsar;
+                const nuevosCreditosComprados = creditosComprados - creditosCompradosAUsar;
                 const nuevosEnviosGratis = enviosGratis - playlistsFree.length;
                 
                 const { error: updateError } = await supabaseClient
                     .from('usuarios')
                     .update({ 
-                        creditos: nuevosCreditos,
+                        creditos: nuevosCreditosComprados,
+                        creditos_bienvenida: nuevosCreditosBienvenida,
                         envios_gratis_restantes: nuevosEnviosGratis
                     })
                     .eq('id', userId);
@@ -6854,9 +6894,10 @@
                     return;
                 }
                 
-                // Actualizar localStorage
-                localStorage.setItem('userCreditos', nuevosCreditos);
-                document.getElementById('creditosStandard').textContent = nuevosCreditos;
+                // Actualizar localStorage con total
+                const totalCreditosRestantes = nuevosCreditosBienvenida + nuevosCreditosComprados;
+                localStorage.setItem('userCreditos', totalCreditosRestantes);
+                document.getElementById('creditosStandard').textContent = totalCreditosRestantes;
                 
                 let mensaje = `🎉 ¡MÚSICA ENVIADA!\n\nTu canción ha sido enviada a ${selectedPlaylists.length} playlists.\n\n`;
                 
@@ -6867,7 +6908,10 @@
                 
                 if (creditosNecesarios > 0) {
                     mensaje += `💰 Créditos usados: ${creditosNecesarios}\n`;
-                    mensaje += `💰 Créditos restantes: ${nuevosCreditos}\n\n`;
+                    if (creditosBienvenidaAUsar > 0) {
+                        mensaje += `   (${creditosBienvenidaAUsar} de bienvenida)\n`;
+                    }
+                    mensaje += `💰 Créditos restantes: ${totalCreditosRestantes}\n\n`;
                 }
                 
                 mensaje += `Los curadores revisarán tu música en 48-72 horas.`;
@@ -8451,14 +8495,16 @@
                         const diasPasados = Math.floor((ahora - fechaAceptado) / (1000 * 60 * 60 * 24));
                         const diasRestantes = Math.max(0, diasRequeridos - diasPasados);
                         
-                        // Determinar ganancia
+                        // Determinar ganancia (puntos si es gratis, dinero si pagó)
+                        const esGratis = envio.pagado_con_creditos_gratis === true || envio.ganancia_es_puntos === true;
                         let gananciaTexto = '';
+                        
                         if (envio.tipo_envio === 'free') {
                             gananciaTexto = '+1 punto';
                         } else if (envio.tipo_envio === 'standard') {
-                            gananciaTexto = '+€0.20';
+                            gananciaTexto = esGratis ? '+2 puntos' : '+€0.20';
                         } else if (envio.tipo_envio === 'premium') {
-                            gananciaTexto = '+€0.45';
+                            gananciaTexto = esGratis ? '+3 puntos' : '+€0.45';
                         }
                         
                         const colorContador = diasRestantes === 0 ? '#10b981' : diasRestantes <= 2 ? '#fbbf24' : '#3b82f6';
@@ -8558,30 +8604,59 @@
                     return;
                 }
                 
+                // Verificar si fue pagado con créditos gratis (bienvenida)
+                const esGratis = envio.pagado_con_creditos_gratis === true;
+                
                 // Calcular ganancia y días según tipo
                 let ganancia = '';
                 let dias = 0;
+                let esPuntos = false; // Para saber si dar puntos o dinero
                 
                 if (envio.tipo_envio === 'free') {
                     ganancia = '+1 punto';
                     dias = 3;
+                    esPuntos = true;
                 } else if (envio.tipo_envio === 'standard') {
-                    ganancia = '+€0.20';
-                    dias = 7;
+                    if (esGratis) {
+                        // Créditos de bienvenida = solo puntos para curador
+                        ganancia = '+2 puntos';
+                        dias = 7;
+                        esPuntos = true;
+                    } else {
+                        // Créditos comprados = dinero para curador
+                        ganancia = '+€0.20';
+                        dias = 7;
+                        esPuntos = false;
+                    }
                 } else if (envio.tipo_envio === 'premium') {
-                    ganancia = '+€0.45';
-                    dias = 10;
+                    if (esGratis) {
+                        // Créditos de bienvenida = solo puntos para curador
+                        ganancia = '+3 puntos';
+                        dias = 10;
+                        esPuntos = true;
+                    } else {
+                        // Créditos comprados = dinero para curador
+                        ganancia = '+€0.45';
+                        dias = 10;
+                        esPuntos = false;
+                    }
                 }
                 
                 const cancionNombre = envio.cancion_nombre || 'esta canción';
                 
-                if (!confirm(
-                    `¿Aceptar este envío?\n\n` +
+                // Mostrar mensaje diferente según si es puntos o dinero
+                let mensajeConfirm = `¿Aceptar este envío?\n\n` +
                     `📀 Canción: ${cancionNombre}\n` +
-                    `💰 Ganancia: ${ganancia}\n` +
-                    `⏱️ Días obligatorios: ${dias} días\n\n` +
-                    `Debes mantener la canción en tu playlist durante ${dias} días para recibir tu ganancia.`
-                )) {
+                    `💰 Ganancia: ${ganancia}`;
+                
+                if (esPuntos) {
+                    mensajeConfirm += ` (envío gratuito)`;
+                }
+                
+                mensajeConfirm += `\n⏱️ Días obligatorios: ${dias} días\n\n` +
+                    `Debes mantener la canción en tu playlist durante ${dias} días para recibir tu ganancia.`;
+                
+                if (!confirm(mensajeConfirm)) {
                     return;
                 }
                 
@@ -8591,7 +8666,8 @@
                         estado: 'aceptado',
                         fecha_aceptado: new Date().toISOString(),
                         fecha_respuesta: new Date().toISOString(),
-                        ganancias_desbloqueadas: false
+                        ganancias_desbloqueadas: false,
+                        ganancia_es_puntos: esPuntos
                     })
                     .eq('id', envioId);
                 
@@ -8613,7 +8689,7 @@
                         leida: false
                     });
                 
-                alert(`✅ Envío aceptado\n\n${ganancia} se desbloqueará en ${dias} días.\n\nRecuerda: Debes mantener la canción en tu playlist durante ${dias} días.`);
+                alert(`✅ Envío aceptado\n\n${ganancia} se desbloqueará en ${dias} días.${esPuntos ? '\n\n(Envío con créditos gratuitos = ganas puntos)' : ''}\n\nRecuerda: Debes mantener la canción en tu playlist durante ${dias} días.`);
                 
                 // Recargar lista
                 await cargarEnviosRecibidos();
