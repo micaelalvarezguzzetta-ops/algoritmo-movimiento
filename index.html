@@ -5544,15 +5544,22 @@
             let tieneDescuentoPrimeraCompra = false;
             
             if (codigoReferidoInput && userType === 'artista') {
+                // Primero buscar si el código existe
                 const { data: afiliado, error: afiliadoError } = await supabaseClient
                     .from('solicitudes_afiliados')
                     .select('*')
                     .eq('codigo_afiliado', codigoReferidoInput)
-                    .eq('estado', 'aprobado')
                     .single();
                 
                 if (afiliadoError || !afiliado) {
-                    alert('⚠️ El código de referido no es válido o no está aprobado.\n\nPuedes continuar sin código o verificar que esté bien escrito.');
+                    // El código no existe en absoluto
+                    alert('⚠️ El código de referido no existe.\n\nVerifica que esté bien escrito o continúa sin código.');
+                    return false;
+                }
+                
+                // El código existe, verificar si está aprobado (estado = 'aceptado')
+                if (afiliado.estado !== 'aceptado') {
+                    alert(`⚠️ El código de referido existe pero aún no está aprobado.\n\nEstado actual: ${afiliado.estado}\n\nPuedes continuar sin código o esperar a que se apruebe.`);
                     return false;
                 }
                 
