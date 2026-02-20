@@ -2554,7 +2554,7 @@
                     <div class="pack-price">€8.50</div>
                     <p class="pack-credits">en créditos</p>
                     <span class="pack-save">✓ Ahorra €1.50</span>
-                    <button class="pack-btn" onclick="window.open('https://buy.stripe.com/aFa14oe6j59V5J7d850x209', '_blank')">
+                    <button class="pack-btn" onclick="comprarPaqueteCreditos('pack_10', 8.50, 10, 'https://buy.stripe.com/aFa14oe6j59V5J7d850x209')">
                         Comprar Pack
                     </button>
                 </div>
@@ -2566,7 +2566,7 @@
                     <div class="pack-price">€21.25</div>
                     <p class="pack-credits">en créditos</p>
                     <span class="pack-save">✓ Ahorra €3.75</span>
-                    <button class="pack-btn" onclick="window.open('https://buy.stripe.com/dRm5kEgerfOz5J79VT0x208', '_blank')">
+                    <button class="pack-btn" onclick="comprarPaqueteCreditos('pack_25', 21.25, 25, 'https://buy.stripe.com/dRm5kEgerfOz5J79VT0x208')">
                         Comprar Pack
                     </button>
                 </div>
@@ -2577,7 +2577,7 @@
                     <div class="pack-price">€42.50</div>
                     <p class="pack-credits">en créditos</p>
                     <span class="pack-save">✓ Ahorra €7.50</span>
-                    <button class="pack-btn" onclick="window.open('https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207', '_blank')">
+                    <button class="pack-btn" onclick="comprarPaqueteCreditos('pack_50', 42.50, 50, 'https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207')">
                         Comprar Pack
                     </button>
                 </div>
@@ -3567,7 +3567,7 @@
                         <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 1rem;">
                             ≈ 5-6 envíos Standard<br>≈ 2-3 envíos Premium
                         </div>
-                        <button onclick="window.open('https://buy.stripe.com/aFa14oe6j59V5J7d850x209', '_blank')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
+                        <button onclick="comprarPaqueteCreditos('pack_10', 8.50, 10, 'https://buy.stripe.com/aFa14oe6j59V5J7d850x209')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #fbbf24, #f59e0b); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
                             Comprar €10
                         </button>
                     </div>
@@ -3586,7 +3586,7 @@
                         <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 1rem;">
                             ≈ 14 envíos Standard<br>≈ 7 envíos Premium
                         </div>
-                        <button onclick="window.open('https://buy.stripe.com/dRm5kEgerfOz5J79VT0x208', '_blank')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #ec4899, #f97316); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
+                        <button onclick="comprarPaqueteCreditos('pack_25', 21.25, 25, 'https://buy.stripe.com/dRm5kEgerfOz5J79VT0x208')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #ec4899, #f97316); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
                             Comprar €25
                         </button>
                     </div>
@@ -3605,7 +3605,7 @@
                         <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5); margin-bottom: 1rem;">
                             ≈ 28 envíos Standard<br>≈ 14 envíos Premium
                         </div>
-                        <button onclick="window.open('https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207', '_blank')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
+                        <button onclick="comprarPaqueteCreditos('pack_50', 42.50, 50, 'https://buy.stripe.com/3cI4gA1jxfOz2wV2tr0x207')" style="width: 100%; padding: 0.75rem; background: linear-gradient(135deg, #8b5cf6, #6366f1); border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
                             Comprar €50
                         </button>
                     </div>
@@ -5198,10 +5198,55 @@
                     Sin costos de registro • Sin mínimo de ventas • Retiros desde 50€
                 </p>
             </div>
+            
+            <!-- SECCIÓN MIS REFERIDOS (solo visible para afiliados aprobados) -->
+            <div id="seccionMisReferidos" style="display: none; margin-top: 3rem; border-top: 2px solid rgba(255,255,255,0.1); padding-top: 3rem;">
+                <div style="text-align: center; margin-bottom: 2rem;">
+                    <h3 style="font-size: 1.8rem; font-weight: 900; margin-bottom: 0.5rem;">👥 Mis Referidos</h3>
+                    <p style="color: rgba(255,255,255,0.7);">Personas que se registraron con tu código de afiliado</p>
+                </div>
+                
+                <!-- Resumen de ganancias -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-bottom: 2rem;">
+                    <div style="background: linear-gradient(135deg, #7c3aed, #ec4899); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 900;" id="totalReferidos">0</div>
+                        <div style="font-size: 0.85rem; opacity: 0.9;">Referidos</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #10b981, #06b6d4); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 900;" id="totalComprasReferidos">0</div>
+                        <div style="font-size: 0.85rem; opacity: 0.9;">Compras</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #f59e0b, #ef4444); border-radius: 1rem; padding: 1.5rem; text-align: center;">
+                        <div style="font-size: 2rem; font-weight: 900;" id="totalComisionesReferidos">€0</div>
+                        <div style="font-size: 0.85rem; opacity: 0.9;">Comisiones</div>
+                    </div>
+                </div>
+                
+                <!-- Tu link de afiliado -->
+                <div style="background: rgba(124, 58, 237, 0.1); border: 2px solid rgba(124, 58, 237, 0.3); border-radius: 1rem; padding: 1.5rem; margin-bottom: 2rem;">
+                    <div style="font-weight: 700; margin-bottom: 0.75rem;">🔗 Tu Link de Afiliado:</div>
+                    <div style="display: flex; gap: 0.5rem;">
+                        <input type="text" id="miLinkAfiliado" readonly style="flex: 1; padding: 0.75rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 0.5rem; color: white; font-size: 0.9rem;">
+                        <button onclick="copiarLinkAfiliado()" style="padding: 0.75rem 1.5rem; background: #7c3aed; border: none; border-radius: 0.5rem; color: white; font-weight: 700; cursor: pointer;">
+                            📋 Copiar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Lista de referidos -->
+                <div style="background: rgba(255,255,255,0.05); border-radius: 1rem; overflow: hidden;">
+                    <div style="padding: 1rem 1.5rem; background: rgba(255,255,255,0.05); font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        📋 Historial de Referidos y Compras
+                    </div>
+                    <div id="listaReferidos" style="max-height: 400px; overflow-y: auto;">
+                        <div style="padding: 3rem; text-align: center; color: rgba(255,255,255,0.5);">
+                            Cargando referidos...
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-    <!-- MODAL FAQ -->
     <div class="modal" id="modalFAQ">
         <div class="modal-content" style="max-width: 800px;">
             <button class="modal-close" onclick="closeFAQModal()">×</button>
@@ -5678,6 +5723,35 @@
                 if (serviciosSection) serviciosSection.style.display = 'block';
                 if (recursosSection) recursosSection.style.display = 'block';
                 
+                // CAMBIAR NAVBAR PARA ARTISTAS LOGUEADOS
+                const navMenu = document.getElementById('navMenu');
+                if (navMenu) {
+                    navMenu.innerHTML = `
+                        <a href="javascript:void(0)" onclick="scrollToSection('como-funciona')">Cómo Funciona</a>
+                        <a href="javascript:void(0)" onclick="scrollToSection('servicios')">Servicios</a>
+                        <a href="javascript:void(0)" onclick="openPlaylistsTOPModal()" style="color: #fbbf24;">🏆 Playlists TOP</a>
+                        <a href="javascript:void(0)" onclick="scrollToSection('precios')">Precios</a>
+                        <a href="javascript:void(0)" onclick="window.openAfiliadosModal()">Afiliados</a>
+                        <a href="javascript:void(0)" onclick="scrollToSection('faq')">FAQ</a>
+                        <a href="javascript:void(0)" onclick="window.openContactoModal()">Contacto</a>
+                    `;
+                }
+                
+                // CAMBIAR MENÚ MÓVIL PARA ARTISTAS LOGUEADOS
+                const mobileNav = document.getElementById('mobileNav');
+                if (mobileNav) {
+                    mobileNav.innerHTML = `
+                        <button class="mobile-nav-close" onclick="closeMobileNav()">✕</button>
+                        <a href="javascript:void(0)" onclick="closeMobileNav(); scrollToSection('como-funciona')">Cómo Funciona</a>
+                        <a href="javascript:void(0)" onclick="closeMobileNav(); scrollToSection('servicios')">Servicios</a>
+                        <a href="javascript:void(0)" onclick="closeMobileNav(); openPlaylistsTOPModal()" style="color: #fbbf24;">🏆 Playlists TOP</a>
+                        <a href="javascript:void(0)" onclick="closeMobileNav(); scrollToSection('precios')">Precios</a>
+                        <a href="javascript:void(0)" onclick="closeMobileNav(); window.openAfiliadosModal()">Afiliados</a>
+                        <a href="javascript:void(0)" onclick="closeMobileNav(); scrollToSection('faq')">FAQ</a>
+                        <a href="javascript:void(0)" onclick="closeMobileNav(); window.openContactoModal()">Contacto</a>
+                    `;
+                }
+                
             } else if(userType === 'curador'){
                 console.log('💰 Activando panel de CURADOR');
                 curadorPanel.classList.add('active');
@@ -5799,6 +5873,25 @@
                 console.error('❌ No se encontraron los botones');
             }
         }, 100);
+        
+        // ==================== SCROLL TO SECTION ====================
+        function scrollToSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            if (section) {
+                // Asegurar que la sección esté visible
+                section.style.display = 'block';
+                
+                // Scroll suave con offset para el navbar
+                const navbarHeight = document.querySelector('.navbar').offsetHeight || 80;
+                const sectionTop = section.getBoundingClientRect().top + window.pageYOffset - navbarHeight - 20;
+                
+                window.scrollTo({
+                    top: sectionTop,
+                    behavior: 'smooth'
+                });
+            }
+        }
+        window.scrollToSection = scrollToSection;
         
         // ==================== MOBILE MENU ====================
         function openMobileNav() {
@@ -9687,8 +9780,193 @@
             document.getElementById('modalPitchGuia').classList.remove('active');
         }
         
-        function openAfiliadosModal(){
+        async function openAfiliadosModal(){
             document.getElementById('modalAfiliados').classList.add('active');
+            
+            // Verificar si el usuario es un afiliado aprobado
+            const userId = localStorage.getItem('userId');
+            const userEmail = localStorage.getItem('userEmail');
+            
+            if (userId && userEmail) {
+                try {
+                    const { data: afiliado, error } = await supabaseClient
+                        .from('solicitudes_afiliados')
+                        .select('*')
+                        .eq('email', userEmail)
+                        .eq('estado', 'aceptado')
+                        .single();
+                    
+                    if (!error && afiliado) {
+                        // Es un afiliado aprobado, mostrar sección de referidos
+                        document.getElementById('seccionMisReferidos').style.display = 'block';
+                        document.getElementById('miLinkAfiliado').value = `https://algoritmoenmovimiento.com/?ref=${afiliado.codigo_afiliado}`;
+                        
+                        // Cargar referidos
+                        await cargarMisReferidos(afiliado.codigo_afiliado);
+                    } else {
+                        // No es afiliado, ocultar sección
+                        document.getElementById('seccionMisReferidos').style.display = 'none';
+                    }
+                } catch (err) {
+                    console.error('Error verificando afiliado:', err);
+                    document.getElementById('seccionMisReferidos').style.display = 'none';
+                }
+            } else {
+                document.getElementById('seccionMisReferidos').style.display = 'none';
+            }
+        }
+        
+        async function cargarMisReferidos(codigoAfiliado) {
+            try {
+                // Obtener usuarios que usaron este código de afiliado
+                const { data: referidos, error: refError } = await supabaseClient
+                    .from('usuarios')
+                    .select('id, nombre, email, created_at, creditos, tipo')
+                    .eq('codigo_afiliado_usado', codigoAfiliado)
+                    .order('created_at', { ascending: false });
+                
+                if (refError) {
+                    console.error('Error cargando referidos:', refError);
+                    return;
+                }
+                
+                // Actualizar contador de referidos
+                document.getElementById('totalReferidos').textContent = referidos?.length || 0;
+                
+                const container = document.getElementById('listaReferidos');
+                
+                if (!referidos || referidos.length === 0) {
+                    container.innerHTML = `
+                        <div style="padding: 3rem; text-align: center; color: rgba(255,255,255,0.5);">
+                            <div style="font-size: 3rem; margin-bottom: 1rem;">👥</div>
+                            <p>Aún no tienes referidos</p>
+                            <p style="font-size: 0.85rem; margin-top: 0.5rem;">Comparte tu link para empezar a ganar comisiones</p>
+                        </div>
+                    `;
+                    document.getElementById('totalComprasReferidos').textContent = '0';
+                    document.getElementById('totalComisionesReferidos').textContent = '€0';
+                    return;
+                }
+                
+                // Obtener compras de todos los referidos (compras de créditos)
+                const referidosIds = referidos.map(r => r.id);
+                
+                // Buscar en historial de compras/transacciones
+                const { data: compras, error: comprasError } = await supabaseClient
+                    .from('compras_creditos')
+                    .select('*')
+                    .in('usuario_id', referidosIds)
+                    .order('created_at', { ascending: false });
+                
+                let totalCompras = 0;
+                let totalComisiones = 0;
+                let comprasPorUsuario = {};
+                
+                if (!comprasError && compras) {
+                    totalCompras = compras.length;
+                    
+                    compras.forEach(c => {
+                        const monto = parseFloat(c.monto) || 0;
+                        const comision = monto * 0.15; // 15% de comisión
+                        totalComisiones += comision;
+                        
+                        if (!comprasPorUsuario[c.usuario_id]) {
+                            comprasPorUsuario[c.usuario_id] = [];
+                        }
+                        comprasPorUsuario[c.usuario_id].push(c);
+                    });
+                }
+                
+                document.getElementById('totalComprasReferidos').textContent = totalCompras;
+                document.getElementById('totalComisionesReferidos').textContent = `€${totalComisiones.toFixed(2)}`;
+                
+                // Renderizar lista de referidos
+                container.innerHTML = referidos.map(ref => {
+                    const fechaRegistro = new Date(ref.created_at).toLocaleDateString('es-ES', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: 'numeric'
+                    });
+                    
+                    const comprasUsuario = comprasPorUsuario[ref.id] || [];
+                    const totalGastado = comprasUsuario.reduce((sum, c) => sum + (parseFloat(c.monto) || 0), 0);
+                    const comisionUsuario = totalGastado * 0.15;
+                    
+                    // Renderizar compras del usuario
+                    let comprasHTML = '';
+                    if (comprasUsuario.length > 0) {
+                        comprasHTML = comprasUsuario.map(c => {
+                            const fechaCompra = new Date(c.created_at).toLocaleDateString('es-ES', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            });
+                            const monto = parseFloat(c.monto) || 0;
+                            return `
+                                <div style="display: flex; justify-content: space-between; padding: 0.5rem 0; border-top: 1px solid rgba(255,255,255,0.05); font-size: 0.85rem;">
+                                    <span style="color: rgba(255,255,255,0.6);">📅 ${fechaCompra}</span>
+                                    <span style="color: #10b981; font-weight: 600;">+€${monto.toFixed(2)} → €${(monto * 0.15).toFixed(2)} comisión</span>
+                                </div>
+                            `;
+                        }).join('');
+                    }
+                    
+                    return `
+                        <div style="padding: 1.25rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                    <div style="width: 40px; height: 40px; border-radius: 50%; background: linear-gradient(135deg, #7c3aed, #ec4899); display: flex; align-items: center; justify-content: center; font-weight: 700;">
+                                        ${ref.nombre.charAt(0).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 700;">${ref.nombre}</div>
+                                        <div style="font-size: 0.8rem; color: rgba(255,255,255,0.5);">${ref.email}</div>
+                                    </div>
+                                </div>
+                                <div style="text-align: right;">
+                                    <span style="background: ${ref.tipo === 'artista' ? 'rgba(124, 58, 237, 0.2)' : 'rgba(16, 185, 129, 0.2)'}; color: ${ref.tipo === 'artista' ? '#a78bfa' : '#34d399'}; padding: 0.25rem 0.75rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600;">
+                                        ${ref.tipo === 'artista' ? '🎤 Artista' : '🎧 Curador'}
+                                    </span>
+                                </div>
+                            </div>
+                            
+                            <div style="display: flex; gap: 2rem; font-size: 0.85rem; color: rgba(255,255,255,0.7); margin-top: 0.75rem;">
+                                <span>📅 Registro: ${fechaRegistro}</span>
+                                <span>🛒 Compras: ${comprasUsuario.length}</span>
+                                <span style="color: #10b981; font-weight: 600;">💰 Tu comisión: €${comisionUsuario.toFixed(2)}</span>
+                            </div>
+                            
+                            ${comprasUsuario.length > 0 ? `
+                                <details style="margin-top: 0.75rem;">
+                                    <summary style="cursor: pointer; font-size: 0.85rem; color: #7c3aed; font-weight: 600;">
+                                        Ver ${comprasUsuario.length} compra${comprasUsuario.length > 1 ? 's' : ''} →
+                                    </summary>
+                                    <div style="margin-top: 0.5rem; padding-left: 0.5rem;">
+                                        ${comprasHTML}
+                                    </div>
+                                </details>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+            } catch (err) {
+                console.error('Error cargando referidos:', err);
+                document.getElementById('listaReferidos').innerHTML = `
+                    <div style="padding: 2rem; text-align: center; color: rgba(255,255,255,0.5);">
+                        Error al cargar referidos
+                    </div>
+                `;
+            }
+        }
+        
+        function copiarLinkAfiliado() {
+            const input = document.getElementById('miLinkAfiliado');
+            input.select();
+            document.execCommand('copy');
+            alert('✅ Link copiado al portapapeles');
         }
         
         function closeAfiliadosModal(){
@@ -10985,6 +11263,25 @@
             console.log('🚀 Página cargada');
             
             // ========================================
+            // VERIFICAR COMPRA DE CRÉDITOS PENDIENTE
+            // ========================================
+            const pendingCreditPurchase = localStorage.getItem('pendingCreditPurchase');
+            if (pendingCreditPurchase) {
+                const compra = JSON.parse(pendingCreditPurchase);
+                const timeDiff = Date.now() - compra.timestamp;
+                
+                // Si es reciente (menos de 1 hora), preguntar
+                if (timeDiff < 3600000) {
+                    setTimeout(() => {
+                        verificarCompraPendiente();
+                    }, 1500);
+                } else {
+                    // Expirado, limpiar
+                    localStorage.removeItem('pendingCreditPurchase');
+                }
+            }
+            
+            // ========================================
             // DETECTAR PAGO EXITOSO DE DESTACAR PLAYLIST
             // ========================================
             const urlParams = new URLSearchParams(window.location.search);
@@ -11447,6 +11744,166 @@
             smartlink: 'https://buy.stripe.com/bJefZi2nB1XJefD6JH0x20d',
             mastering: 'https://buy.stripe.com/dRm6oId2f45R2wV3xv0x20e'
         };
+        
+        // ==================== COMPRA DE PAQUETES DE CRÉDITOS ====================
+        function comprarPaqueteCreditos(tipoPaquete, monto, creditos, stripeUrl) {
+            const userId = localStorage.getItem('userId');
+            const userEmail = localStorage.getItem('userEmail');
+            
+            if (!userId) {
+                alert('⚠️ Debes iniciar sesión para comprar créditos');
+                return;
+            }
+            
+            // Obtener código de afiliado si el usuario usó uno al registrarse
+            const codigoAfiliadoUsado = localStorage.getItem('codigoAfiliadoDelUsuario') || null;
+            
+            // Guardar datos de la compra pendiente
+            const compraPendiente = {
+                usuario_id: userId,
+                usuario_email: userEmail,
+                tipo_paquete: tipoPaquete,
+                monto: monto,
+                creditos: creditos,
+                codigo_afiliado: codigoAfiliadoUsado,
+                timestamp: Date.now()
+            };
+            
+            localStorage.setItem('pendingCreditPurchase', JSON.stringify(compraPendiente));
+            console.log('💳 Compra pendiente guardada:', compraPendiente);
+            
+            // Abrir Stripe en nueva pestaña
+            window.open(stripeUrl, '_blank');
+            
+            // Mostrar mensaje de confirmación después de 2 segundos
+            setTimeout(() => {
+                verificarCompraPendiente();
+            }, 2000);
+        }
+        
+        async function verificarCompraPendiente() {
+            const pendingPurchase = localStorage.getItem('pendingCreditPurchase');
+            if (!pendingPurchase) return;
+            
+            const compra = JSON.parse(pendingPurchase);
+            
+            // Verificar que sea reciente (menos de 1 hora)
+            const timeDiff = Date.now() - compra.timestamp;
+            if (timeDiff > 3600000) {
+                localStorage.removeItem('pendingCreditPurchase');
+                return;
+            }
+            
+            const confirmado = confirm(
+                '💳 CONFIRMAR COMPRA\n\n' +
+                `¿Completaste el pago de €${compra.monto} en Stripe?\n\n` +
+                `Recibirás: ${compra.creditos} créditos\n\n` +
+                'Pulsa ACEPTAR solo si el pago fue exitoso.'
+            );
+            
+            if (confirmado) {
+                await procesarCompraCreditos(compra);
+            } else {
+                // Preguntar si quiere cancelar o intentar más tarde
+                const cancelar = confirm(
+                    '¿Quieres cancelar esta compra?\n\n' +
+                    'SI → Se eliminará el registro pendiente\n' +
+                    'NO → Podrás confirmar más tarde cuando vuelvas a la página'
+                );
+                
+                if (cancelar) {
+                    localStorage.removeItem('pendingCreditPurchase');
+                    alert('Compra cancelada');
+                }
+            }
+        }
+        
+        async function procesarCompraCreditos(compra) {
+            try {
+                const userId = compra.usuario_id;
+                
+                // 1. Obtener créditos actuales del usuario
+                const { data: usuario, error: userError } = await supabaseClient
+                    .from('usuarios')
+                    .select('creditos, creditos_bienvenida, codigo_afiliado_usado')
+                    .eq('id', userId)
+                    .single();
+                
+                if (userError) throw userError;
+                
+                const creditosActuales = parseFloat(usuario.creditos) || 0;
+                const nuevosCreditos = creditosActuales + compra.creditos;
+                
+                // 2. Actualizar créditos del usuario (se suman a créditos COMPRADOS, no bienvenida)
+                const { error: updateError } = await supabaseClient
+                    .from('usuarios')
+                    .update({ creditos: nuevosCreditos })
+                    .eq('id', userId);
+                
+                if (updateError) throw updateError;
+                
+                // 3. Registrar la compra en la tabla compras_creditos
+                const codigoAfiliado = compra.codigo_afiliado || usuario.codigo_afiliado_usado;
+                const comisionAfiliado = codigoAfiliado ? (compra.monto * 0.15) : 0;
+                
+                const { error: insertError } = await supabaseClient
+                    .from('compras_creditos')
+                    .insert([{
+                        usuario_id: userId,
+                        monto: compra.monto,
+                        creditos_comprados: compra.creditos,
+                        tipo_paquete: compra.tipo_paquete,
+                        metodo_pago: 'stripe',
+                        codigo_afiliado_usado: codigoAfiliado,
+                        comision_afiliado: comisionAfiliado,
+                        estado: 'completado'
+                    }]);
+                
+                if (insertError) {
+                    console.error('Error registrando compra (no crítico):', insertError);
+                    // No lanzamos error porque los créditos ya se agregaron
+                }
+                
+                // 4. Limpiar compra pendiente
+                localStorage.removeItem('pendingCreditPurchase');
+                
+                // 5. Actualizar display de créditos
+                const totalCreditos = nuevosCreditos + (parseFloat(usuario.creditos_bienvenida) || 0);
+                document.getElementById('creditosStandard').textContent = totalCreditos.toFixed(1);
+                localStorage.setItem('userCreditos', totalCreditos);
+                
+                // 6. Mostrar mensaje de éxito
+                alert(
+                    '🎉 ¡COMPRA EXITOSA!\n\n' +
+                    `+${compra.creditos} créditos añadidos a tu cuenta\n\n` +
+                    `💰 Tu nuevo saldo: ${totalCreditos.toFixed(1)} créditos\n\n` +
+                    '¡Ya puedes enviar tu música a las playlists!'
+                );
+                
+                // Cerrar modal de créditos si está abierto
+                const modalCreditos = document.getElementById('modalCreditos');
+                if (modalCreditos) modalCreditos.classList.remove('active');
+                
+                console.log('✅ Compra procesada correctamente:', compra);
+                
+            } catch (err) {
+                console.error('❌ Error procesando compra:', err);
+                alert(
+                    '⚠️ Error al procesar la compra\n\n' +
+                    'Por favor contacta a soporte con este mensaje:\n' +
+                    err.message + '\n\n' +
+                    'No te preocupes, si pagaste en Stripe te añadiremos los créditos manualmente.'
+                );
+            }
+        }
+        
+        // Verificar compra pendiente al cargar la página
+        window.addEventListener('focus', function() {
+            const pendingPurchase = localStorage.getItem('pendingCreditPurchase');
+            if (pendingPurchase) {
+                setTimeout(verificarCompraPendiente, 500);
+            }
+        });
         
         // ==================== SMARTLINK ====================
         document.getElementById('smartLinkForm')?.addEventListener('submit', async function(e) {
