@@ -5634,7 +5634,9 @@
                         password_hash: passwordHash,
                         tipo: userType,
                         creditos: 0,
-                        creditos_bienvenida: userType === 'artista' ? 4.5 : 0,
+                        creditos_bienvenida: 0, // Sin créditos de bienvenida
+                        envios_gratis_restantes: userType === 'artista' ? 3 : 0, // 3 envíos gratis al mes
+                        ultimo_reset_envios: new Date().toISOString(),
                         balance: 0,
                         codigo_referido: codigoReferido,
                         referido_por: referidoPorId,
