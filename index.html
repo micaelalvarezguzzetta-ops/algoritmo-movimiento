@@ -11263,20 +11263,37 @@
             console.log('🚀 Página cargada');
             
             // ========================================
-            // VERIFICAR COMPRA DE CRÉDITOS PENDIENTE
+            // DETECTAR RETORNO DE STRIPE (compra exitosa)
+            // ========================================
+            const urlParams = new URLSearchParams(window.location.search);
+            
+            if (urlParams.get('compra_exitosa') === 'true') {
+                console.log('✅ Usuario volvió de Stripe - compra exitosa');
+                
+                // Limpiar URL
+                window.history.replaceState({}, document.title, window.location.pathname);
+                
+                // Esperar un momento y verificar si los créditos se actualizaron
+                setTimeout(async () => {
+                    await verificarCompraPendiente();
+                }, 2000);
+            }
+            
+            // ========================================
+            // VERIFICAR COMPRA PENDIENTE (backup)
             // ========================================
             const pendingCreditPurchase = localStorage.getItem('pendingCreditPurchase');
-            if (pendingCreditPurchase) {
+            if (pendingCreditPurchase && !urlParams.get('compra_exitosa')) {
                 const compra = JSON.parse(pendingCreditPurchase);
                 const timeDiff = Date.now() - compra.timestamp;
                 
-                // Si es reciente (menos de 1 hora), preguntar
-                if (timeDiff < 3600000) {
-                    setTimeout(() => {
-                        verificarCompraPendiente();
-                    }, 1500);
-                } else {
-                    // Expirado, limpiar
+                // Si pasaron más de 5 minutos, verificar silenciosamente si ya se procesó
+                if (timeDiff > 300000 && timeDiff < 1800000) {
+                    setTimeout(async () => {
+                        await verificarCompraPendiente();
+                    }, 3000);
+                } else if (timeDiff >= 1800000) {
+                    // Expirado (más de 30 min), limpiar
                     localStorage.removeItem('pendingCreditPurchase');
                 }
             }
@@ -11284,7 +11301,6 @@
             // ========================================
             // DETECTAR PAGO EXITOSO DE DESTACAR PLAYLIST
             // ========================================
-            const urlParams = new URLSearchParams(window.location.search);
             
             if (urlParams.get('destacar_success') === 'true') {
                 const playlistId = urlParams.get('playlist_id');
@@ -11755,10 +11771,15 @@
                 return;
             }
             
+            if (!userEmail) {
+                alert('⚠️ Error: No se encontró tu email. Por favor, cierra sesión e inicia de nuevo.');
+                return;
+            }
+            
             // Obtener código de afiliado si el usuario usó uno al registrarse
             const codigoAfiliadoUsado = localStorage.getItem('codigoAfiliadoDelUsuario') || null;
             
-            // Guardar datos de la compra pendiente
+            // Guardar datos de la compra pendiente (backup por si falla el webhook)
             const compraPendiente = {
                 usuario_id: userId,
                 usuario_email: userEmail,
@@ -11770,51 +11791,83 @@
             };
             
             localStorage.setItem('pendingCreditPurchase', JSON.stringify(compraPendiente));
-            console.log('💳 Compra pendiente guardada:', compraPendiente);
+            console.log('💳 Compra iniciada:', compraPendiente);
             
-            // Abrir Stripe en nueva pestaña
-            window.open(stripeUrl, '_blank');
+            // Construir URL con email pre-llenado para que Stripe lo capture
+            // Esto es CRUCIAL para que el webhook identifique al usuario
+            const urlConEmail = stripeUrl + '?prefilled_email=' + encodeURIComponent(userEmail);
             
-            // Mostrar mensaje de confirmación después de 2 segundos
-            setTimeout(() => {
-                verificarCompraPendiente();
-            }, 2000);
+            // Abrir Stripe con el email pre-llenado
+            window.open(urlConEmail, '_blank');
+            
+            // Mostrar mensaje informativo
+            alert(
+                '💳 IMPORTANTE\n\n' +
+                '1. Completa el pago en la pestaña de Stripe\n' +
+                '2. Usa el email: ' + userEmail + '\n' +
+                '3. Los créditos se añadirán AUTOMÁTICAMENTE\n\n' +
+                '⏱️ Puede tardar unos segundos después del pago.'
+            );
         }
         
+        // Backup: verificar compra pendiente si el webhook falla
+        // Esta función solo se activa si los créditos NO se añadieron automáticamente
         async function verificarCompraPendiente() {
             const pendingPurchase = localStorage.getItem('pendingCreditPurchase');
             if (!pendingPurchase) return;
             
             const compra = JSON.parse(pendingPurchase);
             
-            // Verificar que sea reciente (menos de 1 hora)
+            // Verificar que sea reciente (menos de 30 minutos)
             const timeDiff = Date.now() - compra.timestamp;
-            if (timeDiff > 3600000) {
+            if (timeDiff > 1800000) {
                 localStorage.removeItem('pendingCreditPurchase');
                 return;
             }
             
+            // Verificar si los créditos ya se añadieron (por el webhook)
+            try {
+                const { data: usuario } = await supabaseClient
+                    .from('usuarios')
+                    .select('creditos, creditos_bienvenida')
+                    .eq('id', compra.usuario_id)
+                    .single();
+                
+                if (usuario) {
+                    const totalActual = (parseFloat(usuario.creditos) || 0) + (parseFloat(usuario.creditos_bienvenida) || 0);
+                    const totalGuardado = parseFloat(localStorage.getItem('userCreditos')) || 0;
+                    
+                    // Si los créditos aumentaron, el webhook funcionó
+                    if (totalActual > totalGuardado) {
+                        console.log('✅ Webhook procesó la compra correctamente');
+                        localStorage.setItem('userCreditos', totalActual);
+                        document.getElementById('creditosStandard').textContent = totalActual.toFixed(1);
+                        localStorage.removeItem('pendingCreditPurchase');
+                        
+                        alert(
+                            '🎉 ¡COMPRA EXITOSA!\n\n' +
+                            `+${compra.creditos} créditos añadidos a tu cuenta\n\n` +
+                            `💰 Tu nuevo saldo: ${totalActual.toFixed(1)} créditos`
+                        );
+                        return;
+                    }
+                }
+            } catch (err) {
+                console.log('Error verificando créditos:', err);
+            }
+            
+            // Si llegamos aquí, el webhook no procesó la compra
+            // Preguntar al usuario si quiere procesarla manualmente
             const confirmado = confirm(
-                '💳 CONFIRMAR COMPRA\n\n' +
-                `¿Completaste el pago de €${compra.monto} en Stripe?\n\n` +
-                `Recibirás: ${compra.creditos} créditos\n\n` +
-                'Pulsa ACEPTAR solo si el pago fue exitoso.'
+                '⚠️ No detectamos tu pago automáticamente.\n\n' +
+                '¿Completaste el pago de €' + compra.monto + ' en Stripe?\n\n' +
+                'Si es así, pulsa ACEPTAR para añadir los créditos manualmente.'
             );
             
             if (confirmado) {
                 await procesarCompraCreditos(compra);
             } else {
-                // Preguntar si quiere cancelar o intentar más tarde
-                const cancelar = confirm(
-                    '¿Quieres cancelar esta compra?\n\n' +
-                    'SI → Se eliminará el registro pendiente\n' +
-                    'NO → Podrás confirmar más tarde cuando vuelvas a la página'
-                );
-                
-                if (cancelar) {
-                    localStorage.removeItem('pendingCreditPurchase');
-                    alert('Compra cancelada');
-                }
+                localStorage.removeItem('pendingCreditPurchase');
             }
         }
         
