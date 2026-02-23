@@ -11822,19 +11822,6 @@
             );
         }
         
-        // Sistema de pagos: Manual
-        // Cuando alguien compra, Stripe te notifica en la app
-        // Tú añades los créditos manualmente en Supabase
-        }
-        
-        // Verificar compra pendiente al cargar la página
-        window.addEventListener('focus', function() {
-            const pendingPurchase = localStorage.getItem('pendingCreditPurchase');
-            if (pendingPurchase) {
-                setTimeout(verificarCompraPendiente, 500);
-            }
-        });
-        
         // ==================== SMARTLINK ====================
         document.getElementById('smartLinkForm')?.addEventListener('submit', async function(e) {
             e.preventDefault();
