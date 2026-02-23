@@ -2831,8 +2831,13 @@
                     
                     <div id="spotifyPreview" style="display: none; margin-top: 1.5rem;"></div>
                     
-                    <div id="linkError" style="display: none; background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 0.75rem; padding: 1rem; margin-top: 1rem; color: #ef4444; font-weight: 600;">
-                        ⚠️ Link no válido. Asegúrate de copiar el enlace completo de Spotify.
+                    <div id="linkError" style="display: none; background: rgba(239, 68, 68, 0.1); border: 2px solid rgba(239, 68, 68, 0.3); border-radius: 0.75rem; padding: 1rem; margin-top: 1rem; color: #ef4444;">
+                        <div style="font-weight: 700; margin-bottom: 0.5rem;">⚠️ Link no válido</div>
+                        <div style="font-size: 0.9rem; color: rgba(255,255,255,0.8);">
+                            Asegúrate de copiar el enlace completo de Spotify.<br><br>
+                            <strong style="color: #fbbf24;">💡 Consejo:</strong> Si tu enlace contiene <code style="background: rgba(0,0,0,0.3); padding: 0.1rem 0.4rem; border-radius: 0.25rem;">/intl-es/</code> o <code style="background: rgba(0,0,0,0.3); padding: 0.1rem 0.4rem; border-radius: 0.25rem;">/intl-XX/</code>, elimina esa parte del enlace.<br><br>
+                            <span style="color: rgba(255,255,255,0.6);">Ejemplo correcto: https://open.spotify.com/<strong style="color:#ef4444;">track</strong>/2K7zKkLijFnu6dP5st09he</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -6099,7 +6104,7 @@
             const error = document.getElementById('linkError');
             const nextBtn = document.getElementById('next');
             
-            const url = input.value.trim();
+            let url = input.value.trim();
             
             // Resetear estados
             preview.style.display = 'none';
@@ -6107,6 +6112,14 @@
             nextBtn.disabled = true;
             
             if (!url) return;
+            
+            // LIMPIAR AUTOMÁTICAMENTE: Quitar /intl-XX/ del enlace (ej: /intl-es/, /intl-en/, etc.)
+            if (url.includes('/intl-')) {
+                const urlLimpia = url.replace(/\/intl-[a-z]{2}\//gi, '/');
+                console.log('🔗 Limpiando enlace:', url, '→', urlLimpia);
+                url = urlLimpia;
+                input.value = urlLimpia; // Actualizar el input con el enlace limpio
+            }
             
             // Extraer ID de la canción
             // Formatos: https://open.spotify.com/track/6rqhFgbbKwnb9MLmUQDhG6
@@ -11016,8 +11029,29 @@
                         // Mostrar sección de cajero
                         document.getElementById('profileCajeroSection').style.display = 'block';
                         document.getElementById('profileBalance').textContent = (usuario.balance || 0).toFixed(2) + ' €';
-                        document.getElementById('profileTotalEarnings').textContent = '0.00 €'; // TODO: calcular
-                        document.getElementById('profileWithdrawn').textContent = '0.00 €'; // TODO: calcular
+                        document.getElementById('profileWithdrawn').textContent = (usuario.total_retirado || 0).toFixed(2) + ' €';
+                        
+                        // Calcular ganancias totales del curador
+                        try {
+                            const { data: enviosCurador } = await supabaseClient
+                                .from('envios_canciones')
+                                .select('tipo_envio, ganancia_es_puntos, pagado_con_creditos_gratis')
+                                .eq('curador_id', userId)
+                                .eq('estado', 'aceptado');
+                            
+                            let gananciasTotales = 0;
+                            enviosCurador?.forEach(e => {
+                                const esPuntos = e.ganancia_es_puntos === true || e.pagado_con_creditos_gratis === true;
+                                if (!esPuntos) {
+                                    if (e.tipo_envio === 'standard') gananciasTotales += 0.20;
+                                    else if (e.tipo_envio === 'premium') gananciasTotales += 0.45;
+                                }
+                            });
+                            document.getElementById('profileTotalEarnings').textContent = gananciasTotales.toFixed(2) + ' €';
+                        } catch(err) {
+                            console.log('Error calculando ganancias:', err);
+                            document.getElementById('profileTotalEarnings').textContent = '0.00 €';
+                        }
                         
                         // Cambiar botón a "Canjear Puntos"
                         const btnComprar = document.querySelector('button[onclick*="comprarCreditos"]');
