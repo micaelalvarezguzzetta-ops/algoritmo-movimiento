@@ -422,7 +422,7 @@
         
         .hero-title {
             font-family: 'Sora', sans-serif;
-            font-size: 5rem !important;
+            font-size: 10rem !important;
             font-weight: 800;
             line-height: 1;
             margin-bottom: 1.5rem;
@@ -443,6 +443,12 @@
         @keyframes shimmer {
             0% { background-position: 0% center; }
             100% { background-position: 300% center; }
+        }
+        
+        @keyframes gradientMove {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
         
         .hero-subtitle {
@@ -2893,6 +2899,38 @@
             <h2>🎵 Bienvenido, <span id="artistaName">Artista</span></h2>
             <p style="color: var(--text-secondary); margin-top: 0.5rem;">Promociona tu música en las mejores playlists</p>
         </div>
+        
+        <!-- BANNER OFERTA ESPECIAL -->
+        <a href="https://ligamusic.com/#spotify" target="_blank" style="text-decoration: none; display: block;">
+            <div style="
+                background: linear-gradient(135deg, #f72585, #7b61ff, #00f5d4);
+                background-size: 200% 200%;
+                animation: gradientMove 3s ease infinite;
+                border-radius: 20px;
+                padding: 1.5rem 2rem;
+                margin-bottom: 2rem;
+                cursor: pointer;
+                position: relative;
+                overflow: hidden;
+                box-shadow: 0 10px 40px rgba(247, 37, 133, 0.3);
+                transition: all 0.3s ease;
+            " onmouseover="this.style.transform='scale(1.02)'; this.style.boxShadow='0 15px 50px rgba(247, 37, 133, 0.4)';" onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0 10px 40px rgba(247, 37, 133, 0.3)';">
+                <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: url('data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>✨</text></svg>') repeat; opacity: 0.1;"></div>
+                <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; position: relative; z-index: 1;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <span style="font-size: 2.5rem;">🎁</span>
+                        <div>
+                            <div style="font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; opacity: 0.9; margin-bottom: 0.25rem;">🔥 Solo por tiempo limitado</div>
+                            <div style="font-family: 'Sora', sans-serif; font-size: 1.75rem; font-weight: 800; color: #fff;">OFERTA ESPECIAL</div>
+                            <div style="font-size: 1rem; opacity: 0.9; margin-top: 0.25rem;">Promociona tu música en Spotify con descuento exclusivo</div>
+                        </div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.2); padding: 0.75rem 1.5rem; border-radius: 12px; font-weight: 700; font-size: 1rem; backdrop-filter: blur(10px); display: flex; align-items: center; gap: 0.5rem;">
+                        Ver Oferta <span style="font-size: 1.25rem;">→</span>
+                    </div>
+                </div>
+            </div>
+        </a>
         
         <div class="panel-grid">
             <div class="panel-card" onclick="openSpotifyModal()">
