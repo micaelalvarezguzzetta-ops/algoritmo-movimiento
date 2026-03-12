@@ -422,7 +422,7 @@
         
         .hero-title {
             font-family: 'Sora', sans-serif;
-            font-size: 5rem !important;
+            font-size: 10rem !important;
             font-weight: 800;
             line-height: 1;
             margin-bottom: 1.5rem;
@@ -5978,7 +5978,7 @@
             <div style="background: linear-gradient(135deg, #7c3aed, #ec4899); border-radius: 1rem; padding: 2rem; text-align: center; margin-bottom: 2rem;">
                 <div style="font-size: 3rem; margin-bottom: 1rem;">📬</div>
                 <h3 style="font-size: 1.3rem; font-weight: 800; margin-bottom: 1rem;">Email de Soporte</h3>
-                <a href="mailto:soportealgoritmoenmovimiento@gmail.com" style="color: white; font-weight: 700; font-size: 1.1rem; text-decoration: none; word-break: break-all;">soportealgoritmoenmovimiento@gmail.com</a>
+                <a href="/cdn-cgi/l/email-protection#0f7c607f607d7b6a6e6368607d667b62606a616260796662666a617b604f68626e6663216c6062" style="color: white; font-weight: 700; font-size: 1.1rem; text-decoration: none; word-break: break-all;"><span class="__cf_email__" data-cfemail="43302c332c313726222f242c312a372e2c262d2e2c352a2e2a262d372c03242e222a2f6d202c2e">[email&#160;protected]</span></a>
                 <p style="color: rgba(255,255,255,0.9); margin-top: 1rem; font-size: 0.95rem;">Respondemos en menos de 24 horas</p>
             </div>
             
@@ -6077,7 +6077,7 @@
 
     
     
-    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+    <script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
         console.log('🔵🔵🔵 ALGORITMO v6.0 SUPABASE - Script INICIADO 🔵🔵🔵');
         console.log('🔍 Verificando que el script se carga...');
         
@@ -7421,23 +7421,51 @@
             document.getElementById('details').innerHTML = html;
         }
         
+        let enviandoMusica = false; // Bloqueo para evitar envíos múltiples
+        
         async function submitToPlaylists(){
+            // Bloquear envíos múltiples (doble click)
+            if (enviandoMusica) {
+                console.log('⚠️ Envío ya en proceso, ignorando...');
+                return;
+            }
+            enviandoMusica = true;
+            
             try {
                 const userId = localStorage.getItem('userId');
                 let userCreditos = parseFloat(localStorage.getItem('userCreditos')) || 0;
                 
                 if (!userId) {
                     alert('⚠️ Error: No se encontró tu sesión. Por favor inicia sesión de nuevo.');
+                    enviandoMusica = false;
                     return;
                 }
                 
                 if (!selectedSong || !selectedSong.url) {
                     alert('⚠️ Error: No se ha seleccionado una canción válida. Por favor vuelve al paso 1.');
+                    enviandoMusica = false;
                     return;
                 }
                 
                 if (selectedPlaylists.length === 0) {
                     alert('⚠️ Error: No has seleccionado ninguna playlist.');
+                    enviandoMusica = false;
+                    return;
+                }
+                
+                // VALIDACIÓN 1: Verificar envíos duplicados (misma canción a misma playlist)
+                const { data: enviosDuplicados, error: dupError } = await supabaseClient
+                    .from('envios_canciones')
+                    .select('playlist_id, playlist_nombre')
+                    .eq('artista_id', userId)
+                    .eq('cancion_id', selectedSong.id)
+                    .in('playlist_id', selectedPlaylists)
+                    .in('estado', ['pendiente', 'aceptado']);
+                
+                if (enviosDuplicados && enviosDuplicados.length > 0) {
+                    const playlistsDuplicadas = enviosDuplicados.map(e => e.playlist_nombre).join(', ');
+                    alert(`⚠️ Ya enviaste esta canción a: ${playlistsDuplicadas}\n\nNo puedes enviar la misma canción dos veces a la misma playlist mientras esté pendiente o aceptada.`);
+                    enviandoMusica = false;
                     return;
                 }
                 
@@ -7451,6 +7479,7 @@
                 if (userError) {
                     console.error('Error obteniendo usuario:', userError);
                     alert('⚠️ Error al obtener tus datos');
+                    enviandoMusica = false;
                     return;
                 }
                 
@@ -7499,12 +7528,14 @@
                 // Verificar envíos gratis
                 if (playlistsFree.length > enviosGratis) {
                     alert(`⚠️ Envíos gratis insuficientes\n\nHas seleccionado ${playlistsFree.length} playlists FREE pero solo tienes ${enviosGratis} envíos gratis este mes.\n\nPuedes:\n• Deseleccionar algunas playlists FREE\n• Esperar al próximo mes para resetear tus envíos gratis`);
+                    enviandoMusica = false;
                     return;
                 }
                 
                 // Verificar créditos totales para playlists de pago
                 if (creditosNecesarios > userCreditos) {
                     alert(`⚠️ Créditos insuficientes\n\nNecesitas ${creditosNecesarios} créditos para las playlists de pago.\nTienes ${userCreditos} créditos.\n\nCompra más créditos para continuar.`);
+                    enviandoMusica = false;
                     return;
                 }
                 
@@ -7629,6 +7660,7 @@
                 if (updateError) {
                     console.error('Error actualizando datos:', updateError);
                     alert('⚠️ Error al actualizar tus datos. Por favor contacta soporte.');
+                    enviandoMusica = false;
                     return;
                 }
                 
@@ -7661,9 +7693,13 @@
                 
                 closeSpotifyModal();
                 
+                // Liberar bloqueo al completar exitosamente
+                enviandoMusica = false;
+                
             } catch (err) {
                 console.error('Error en submitToPlaylists:', err);
                 alert('⚠️ Error al enviar música. Por favor intenta de nuevo.');
+                enviandoMusica = false;
             }
         }
         
@@ -12609,14 +12645,4 @@
     <script type="text/javascript">
     var Tawk_API=Tawk_API||{}, Tawk_LoadStart=new Date();
     (function(){
-    var s1=document.createElement("script"),s0=document.getElementsByTagName("script")[0];
-    s1.async=true;
-    s1.src='https://embed.tawk.to/699f1f9617d8e71c46df50be/1jiap6pge';
-    s1.charset='UTF-8';
-    s1.setAttribute('crossorigin','*');
-    s0.parentNode.insertBefore(s1,s0);
-    })();
-    </script>
-    <!--End of Tawk.to Script-->
-</body>
-</html>
+    var s1=document.createElement("script"),s0=document.getElementsByTagNam
