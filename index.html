@@ -3342,6 +3342,7 @@
                 <ul>
                     <li><a href="javascript:void(0)" onclick="openTerminosModal()">Términos</a></li>
                     <li><a href="javascript:void(0)" onclick="openPrivacidadModal()">Privacidad</a></li>
+                    <li><a href="javascript:void(0)" onclick="openCookiesModal()">Cookies</a></li>
                 </ul>
             </div>
         </div>
@@ -5938,6 +5939,72 @@
                 
                 <h3 style="font-size: 1.3rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem;">5. Seguridad</h3>
                 <p style="color: rgba(255,255,255,0.8); line-height: 1.8;">Usamos encriptación SSL y medidas de seguridad estándar de la industria para proteger tu información.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL COOKIES -->
+    <div class="modal" id="modalCookies">
+        <div class="modal-content" style="max-width: 800px;">
+            <button class="modal-close" onclick="closeCookiesModal()">×</button>
+            <h2 style="font-size: 2.5rem; font-weight: 900; text-align: center; margin-bottom: 2rem;">🍪 Política de Cookies</h2>
+            
+            <div style="max-height: 60vh; overflow-y: auto; padding-right: 1rem;">
+                <h3 style="font-size: 1.3rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem;">1. ¿Qué son las Cookies?</h3>
+                <p style="color: rgba(255,255,255,0.8); line-height: 1.8;">Las cookies son pequeños archivos de texto que se almacenan en tu dispositivo cuando visitas nuestra web. Nos ayudan a recordar tus preferencias y mejorar tu experiencia.</p>
+                
+                <h3 style="font-size: 1.3rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem;">2. Tipos de Cookies que Usamos</h3>
+                <p style="color: rgba(255,255,255,0.8); line-height: 1.8;">
+                    <strong>🔐 Cookies Esenciales:</strong><br>
+                    • Mantener tu sesión iniciada<br>
+                    • Recordar tu carrito de compras<br>
+                    • Seguridad y autenticación<br><br>
+                    
+                    <strong>📊 Cookies de Análisis:</strong><br>
+                    • Entender cómo usas la plataforma<br>
+                    • Mejorar el rendimiento del sitio<br>
+                    • Detectar errores técnicos<br><br>
+                    
+                    <strong>💬 Cookies de Terceros:</strong><br>
+                    • Tawk.to (chat de soporte)<br>
+                    • Stripe (procesamiento de pagos)<br>
+                    • Spotify (verificación de cuentas)
+                </p>
+                
+                <h3 style="font-size: 1.3rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem;">3. Gestión de Cookies</h3>
+                <p style="color: rgba(255,255,255,0.8); line-height: 1.8;">Puedes gestionar las cookies desde la configuración de tu navegador. Ten en cuenta que desactivar algunas cookies puede afectar la funcionalidad del sitio.</p>
+                
+                <h3 style="font-size: 1.3rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem;">4. Duración de las Cookies</h3>
+                <p style="color: rgba(255,255,255,0.8); line-height: 1.8;">
+                    • <strong>Cookies de sesión:</strong> Se eliminan al cerrar el navegador<br>
+                    • <strong>Cookies persistentes:</strong> Permanecen hasta 1 año o hasta que las elimines
+                </p>
+                
+                <h3 style="font-size: 1.3rem; font-weight: 800; margin-top: 2rem; margin-bottom: 1rem;">5. Más Información</h3>
+                <p style="color: rgba(255,255,255,0.8); line-height: 1.8;">Para más información sobre cómo tratamos tus datos, consulta nuestra <a href="javascript:void(0)" onclick="closeCookiesModal(); openPrivacidadModal();" style="color: #00f5d4;">Política de Privacidad</a>.</p>
+                
+                <p style="color: rgba(255,255,255,0.6); font-size: 0.9rem; margin-top: 2rem;">Última actualización: Marzo 2026</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- BANNER DE COOKIES (GDPR) -->
+    <div id="cookieBanner" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, rgba(15,15,35,0.98), rgba(30,30,60,0.98)); backdrop-filter: blur(20px); padding: 1.5rem 2rem; z-index: 10000; border-top: 1px solid rgba(0,245,212,0.3); box-shadow: 0 -10px 40px rgba(0,0,0,0.5);">
+        <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1rem;">
+            <div style="flex: 1; min-width: 300px;">
+                <p style="color: white; margin: 0; font-size: 0.95rem; line-height: 1.6;">
+                    🍪 Usamos cookies para mejorar tu experiencia. Al continuar navegando, aceptas nuestra 
+                    <a href="javascript:void(0)" onclick="openCookiesModal()" style="color: #00f5d4; text-decoration: underline;">Política de Cookies</a> y 
+                    <a href="javascript:void(0)" onclick="openPrivacidadModal()" style="color: #00f5d4; text-decoration: underline;">Política de Privacidad</a>.
+                </p>
+            </div>
+            <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+                <button onclick="acceptCookies()" style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #00f5d4, #7b61ff); border: none; border-radius: 0.5rem; color: #0a0a1a; font-weight: 700; cursor: pointer; transition: transform 0.2s;">
+                    ✓ Aceptar
+                </button>
+                <button onclick="rejectCookies()" style="padding: 0.75rem 1.5rem; background: transparent; border: 1px solid rgba(255,255,255,0.3); border-radius: 0.5rem; color: white; font-weight: 600; cursor: pointer; transition: all 0.2s;">
+                    Solo esenciales
+                </button>
             </div>
         </div>
     </div>
@@ -10709,6 +10776,35 @@
             document.getElementById('modalPrivacidad').classList.remove('active');
         }
         
+        function openCookiesModal(){
+            document.getElementById('modalCookies').classList.add('active');
+        }
+        
+        function closeCookiesModal(){
+            document.getElementById('modalCookies').classList.remove('active');
+        }
+        
+        // Funciones del banner de cookies (GDPR)
+        function acceptCookies(){
+            localStorage.setItem('cookiesAccepted', 'all');
+            document.getElementById('cookieBanner').style.display = 'none';
+        }
+        
+        function rejectCookies(){
+            localStorage.setItem('cookiesAccepted', 'essential');
+            document.getElementById('cookieBanner').style.display = 'none';
+        }
+        
+        function checkCookieConsent(){
+            const consent = localStorage.getItem('cookiesAccepted');
+            if (!consent) {
+                document.getElementById('cookieBanner').style.display = 'block';
+            }
+        }
+        
+        // Mostrar banner de cookies al cargar
+        window.addEventListener('load', checkCookieConsent);
+        
         function openContratoModal(){
             document.getElementById('modalContrato').classList.add('active');
         }
@@ -10737,6 +10833,10 @@
         window.openAfiliadosModal = openAfiliadosModal;
         window.openTerminosModal = openTerminosModal;
         window.openPrivacidadModal = openPrivacidadModal;
+        window.openCookiesModal = openCookiesModal;
+        window.closeCookiesModal = closeCookiesModal;
+        window.acceptCookies = acceptCookies;
+        window.rejectCookies = rejectCookies;
         window.openContactoModal = openContactoModal;
         window.openEquipoModal = openEquipoModal;
         window.openServiciosCuradorModal = openServiciosCuradorModal;
