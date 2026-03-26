@@ -1,0 +1,21 @@
+# Robots.txt para algoritmoenmovimiento.com
+# Permite a todos los buscadores indexar el sitio
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://algoritmoenmovimiento.com/sitemap.xml
+
+# Bloquear archivos sensibles
+Disallow: /api/
+Disallow: /*.json$
+Disallow: /admin
+
+# Permitir recursos
+Allow: /images/
+Allow: /*.css$
+Allow: /*.js$
+
+# Crawl-delay para ser amigables con el servidor
+Crawl-delay: 1
