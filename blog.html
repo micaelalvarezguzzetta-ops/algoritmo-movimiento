@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- SEO Básico -->
+    <title>Blog - Algoritmo en Movimiento | Guías de Promoción Musical</title>
+    <meta name="description" content="Aprende a promocionar tu música en Spotify. Guías, consejos y estrategias para artistas independientes. Playlist pitching, marketing musical y más.">
+    <meta name="keywords" content="promoción musical, cómo promocionar música Spotify, playlist pitching, marketing musical, artistas independientes, playlists Spotify">
+    <meta name="author" content="Algoritmo en Movimiento">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://algoritmoenmovimiento.com/blog.html">
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <meta name="theme-color" content="#0a0a1a">
+    
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://algoritmoenmovimiento.com/blog.html">
+    <meta property="og:title" content="Blog - Guías de Promoción Musical | Algoritmo en Movimiento">
+    <meta property="og:description" content="Aprende a promocionar tu música en Spotify. Guías y estrategias para artistas independientes.">
+    <meta property="og:image" content="https://algoritmoenmovimiento.com/og-image.png">
+    <meta property="og:locale" content="es_ES">
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Blog - Guías de Promoción Musical">
+    <meta name="twitter:description" content="Aprende a promocionar tu música en Spotify con nuestras guías gratuitas.">
+    
+    <!-- Google AdSense -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6567755987358873"
+     crossorigin="anonymous"></script>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #16161f;
+            --accent-primary: #00f5d4;
+            --accent-secondary: #7b61ff;
+            --accent-pink: #f72585;
+            --text-primary: #ffffff;
+            --text-secondary: rgba(255,255,255,0.7);
+        }
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+        
+        /* Navbar */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            background: rgba(10, 10, 15, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            padding: 1rem 2rem;
+        }
+        
+        .navbar-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            text-decoration: none;
+        }
+        
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+        
+        .nav-links a:hover {
+            color: var(--accent-primary);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: var(--bg-primary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 245, 212, 0.3);
+        }
+        
+        /* Hero Blog */
+        .blog-hero {
+            padding: 8rem 2rem 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .blog-hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 400px;
+            background: radial-gradient(ellipse, rgba(0,245,212,0.15), transparent 70%);
+            pointer-events: none;
+        }
+        
+        .blog-hero h1 {
+            font-size: 3.5rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+        
+        .blog-hero h1 span {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .blog-hero p {
+            font-size: 1.25rem;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        /* Blog Grid */
+        .blog-section {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .blog-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+        
+        .blog-card {
+            background: var(--bg-card);
+            border-radius: 1.5rem;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .blog-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+        }
+        
+        .blog-card-image {
+            height: 200px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+        }
+        
+        .blog-card-content {
+            padding: 1.5rem;
+        }
+        
+        .blog-card-tag {
+            display: inline-block;
+            background: rgba(0,245,212,0.1);
+            color: var(--accent-primary);
+            padding: 0.25rem 0.75rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        
+        .blog-card h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            line-height: 1.3;
+        }
+        
+        .blog-card h2 a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.3s;
+        }
+        
+        .blog-card h2 a:hover {
+            color: var(--accent-primary);
+        }
+        
+        .blog-card p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+        
+        .blog-card-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+        
+        .read-more {
+            color: var(--accent-primary);
+            text-decoration: none;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .read-more:hover {
+            text-decoration: underline;
+        }
+        
+        /* Artículo Individual */
+        .article-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 8rem 2rem 4rem;
+        }
+        
+        .article-header {
+            margin-bottom: 3rem;
+        }
+        
+        .article-tag {
+            display: inline-block;
+            background: rgba(0,245,212,0.1);
+            color: var(--accent-primary);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+        }
+        
+        .article-header h1 {
+            font-size: 2.75rem;
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+        
+        .article-meta {
+            display: flex;
+            gap: 2rem;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+        
+        .article-content {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+        
+        .article-content h2 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin: 2.5rem 0 1rem;
+            color: var(--accent-primary);
+        }
+        
+        .article-content h3 {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin: 2rem 0 0.75rem;
+        }
+        
+        .article-content p {
+            margin-bottom: 1.5rem;
+            color: var(--text-secondary);
+        }
+        
+        .article-content ul, .article-content ol {
+            margin: 1.5rem 0;
+            padding-left: 1.5rem;
+            color: var(--text-secondary);
+        }
+        
+        .article-content li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .article-content strong {
+            color: var(--text-primary);
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, rgba(0,245,212,0.1), rgba(123,97,255,0.1));
+            border-left: 4px solid var(--accent-primary);
+            padding: 1.5rem;
+            border-radius: 0 1rem 1rem 0;
+            margin: 2rem 0;
+        }
+        
+        .highlight-box p {
+            margin: 0;
+            color: var(--text-primary);
+        }
+        
+        /* CTA Box */
+        .cta-box {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border: 1px solid rgba(0,245,212,0.2);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            text-align: center;
+            margin: 3rem 0;
+        }
+        
+        .cta-box h3 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        
+        .cta-box p {
+            color: var(--text-secondary);
+            margin-bottom: 1.5rem;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--bg-secondary);
+            padding: 3rem 2rem;
+            text-align: center;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+        
+        .footer p {
+            color: var(--text-secondary);
+        }
+        
+        .footer a {
+            color: var(--accent-primary);
+            text-decoration: none;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .blog-hero h1 {
+                font-size: 2.5rem;
+            }
+            
+            .blog-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .article-header h1 {
+                font-size: 2rem;
+            }
+            
+            .article-meta {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav class="navbar">
+        <div class="navbar-content">
+            <a href="index.html" class="logo">
+                <span class="logo-text">ALGORITMO EN MOVIMIENTO</span>
+            </a>
+            <ul class="nav-links">
+                <li><a href="index.html">Inicio</a></li>
+                <li><a href="index.html#como-funciona">Cómo Funciona</a></li>
+                <li><a href="index.html#precios">Precios</a></li>
+                <li><a href="blog.html" style="color: var(--accent-primary);">Blog</a></li>
+            </ul>
+            <a href="index.html" class="btn-primary">🚀 Empezar Gratis</a>
+        </div>
+    </nav>
+
+    <!-- Blog Hero -->
+    <section class="blog-hero">
+        <h1>Blog de <span>Promoción Musical</span></h1>
+        <p>Guías, consejos y estrategias para hacer crecer tu música en Spotify y otras plataformas</p>
+    </section>
+
+    <!-- Blog Grid -->
+    <section class="blog-section">
+        <div class="blog-grid">
+            
+            <!-- Artículo 1 -->
+            <article class="blog-card">
+                <div class="blog-card-image">🚀</div>
+                <div class="blog-card-content">
+                    <span class="blog-card-tag">Guía Completa</span>
+                    <h2><a href="blog-como-promocionar-musica-spotify.html">Cómo Promocionar Tu Música en Spotify en 2026: Guía Definitiva</a></h2>
+                    <p>Descubre las mejores estrategias para promocionar tu música en Spotify, desde playlist pitching hasta marketing en redes sociales.</p>
+                    <div class="blog-card-meta">
+                        <span>📅 Marzo 2026</span>
+                        <a href="blog-como-promocionar-musica-spotify.html" class="read-more">Leer más →</a>
+                    </div>
+                </div>
+            </article>
+            
+            <!-- Artículo 2 -->
+            <article class="blog-card">
+                <div class="blog-card-image" style="background: linear-gradient(135deg, #7b61ff, #f72585);">🎯</div>
+                <div class="blog-card-content">
+                    <span class="blog-card-tag">Playlist Pitching</span>
+                    <h2><a href="blog-que-es-playlist-pitching.html">¿Qué es el Playlist Pitching y Cómo Funciona?</a></h2>
+                    <p>Todo lo que necesitas saber sobre cómo enviar tu música a playlists de Spotify y aumentar tus reproducciones.</p>
+                    <div class="blog-card-meta">
+                        <span>📅 Marzo 2026</span>
+                        <a href="blog-que-es-playlist-pitching.html" class="read-more">Leer más →</a>
+                    </div>
+                </div>
+            </article>
+            
+            <!-- Artículo 3 -->
+            <article class="blog-card">
+                <div class="blog-card-image" style="background: linear-gradient(135deg, #f72585, #fee440);">💡</div>
+                <div class="blog-card-content">
+                    <span class="blog-card-tag">Consejos</span>
+                    <h2><a href="blog-10-consejos-artistas-spotify.html">10 Consejos para Artistas Independientes en Spotify</a></h2>
+                    <p>Estrategias probadas para destacar como artista independiente y construir una audiencia fiel en Spotify.</p>
+                    <div class="blog-card-meta">
+                        <span>📅 Marzo 2026</span>
+                        <a href="blog-10-consejos-artistas-spotify.html" class="read-more">Leer más →</a>
+                    </div>
+                </div>
+            </article>
+            
+            <!-- Artículo 4 -->
+            <article class="blog-card">
+                <div class="blog-card-image" style="background: linear-gradient(135deg, #10b981, #06b6d4);">📈</div>
+                <div class="blog-card-content">
+                    <span class="blog-card-tag">Estrategia</span>
+                    <h2><a href="blog-conseguir-playlists-spotify.html">Cómo Conseguir que Tu Canción Entre en Playlists de Spotify</a></h2>
+                    <p>Paso a paso para lograr que curadores incluyan tu música en sus playlists y multiplicar tus streams.</p>
+                    <div class="blog-card-meta">
+                        <span>📅 Marzo 2026</span>
+                        <a href="blog-conseguir-playlists-spotify.html" class="read-more">Leer más →</a>
+                    </div>
+                </div>
+            </article>
+            
+        </div>
+        
+        <!-- CTA -->
+        <div class="cta-box">
+            <h3>🎵 ¿Listo para promocionar tu música?</h3>
+            <p>Únete a más de 5,000 artistas que ya están creciendo con Algoritmo en Movimiento</p>
+            <a href="index.html" class="btn-primary">Empezar Gratis →</a>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>© 2026 <a href="index.html">Algoritmo en Movimiento</a>. Todos los derechos reservados.</p>
+    </footer>
+
+</body>
+</html>
